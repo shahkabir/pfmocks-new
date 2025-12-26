@@ -7,12 +7,13 @@ use App\Models\Auth\Otp;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
     public function sendOtp(Request $request)
     {
-        $otp = rand(100000,999999);
+        $otp = $this->generateOtp();
 
         $user = User::updateOrCreate(
             [
@@ -77,8 +78,67 @@ class RegisterController extends Controller
         ]);
 
         auth()->login($user);
+        //dd($user);
+        //Depend on user role, redirect
+        if($user->role == 'admin'){
 
-        return redirect()->route('dashboard');
+            return redirect()->route('dashboard.admin');
+        }else if($user->role == 'user'){
+
+            return redirect()->route('dashboard.student');
+        }else{
+            //Not defined role, logout
+            Auth::logout();
+            return redirect()->route('login');
+        }
+
+        //return redirect()->route('dashboard');
+    }
+
+    public function loginView()
+    {
+        return view('auth.login');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email'); //,'password'
+
+        $user = User::where('email', $request->email)->first();
+
+        if($user){
+            session(['otp_user_id' => $user->id]);
+
+            $otp = $this->generateOtp();
+
+            //Store OTP
+            Otp::create([
+                'user_id'    => $user->id,
+                'otp'        => $otp,
+                'expires_at' => now()->addMinutes(5),
+            ]);
+
+            return $this->verifyView();
+            // auth()->login($user);
+            // return redirect()->route('dashboard');
+        }else{
+            return back()->withErrors(['email'=>'You are not registered']);
+        }
+        // if(Auth::attempt($credentials)){
+        //     return redirect()->route('dashboard');
+        // }
+        return back()->withErrors(['email'=>'Invalid credentials']);
+    }
+
+    public function generateOtp()
+    {
+        return rand(1000,9999);
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect()->route('login');
     }
 }
 

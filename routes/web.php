@@ -17,12 +17,12 @@ Route::post('/register/send-otp',[RegisterController::class,'sendOtp'])->name('r
 Route::get('/verify-otp',[RegisterController::class,'verifyView'])->name('otp.verify.view');
 Route::post('/verify-otp',[RegisterController::class,'verifyOtp'])->name('otp.verify');
 
-Route::get('/login',[AuthController::class,'loginView'])->name('login');
-Route::post('/login',[AuthController::class,'login']);
+Route::get('/login',[RegisterController::class,'loginView'])->name('login');
+Route::post('/login',[RegisterController::class,'login']);
 
 Route::middleware('auth')->group(function(){
 
-    Route::get('/dashboard',[DashBoardController::class,'index'])->name('dashboard');
+    Route::get('/dashboard',[DashBoardController::class,'index'])->name('dashboard.admin');
 
     Route::post('/logout',[AuthController::class,'logout'])->name('logout');
 
@@ -45,7 +45,7 @@ Route::middleware(['auth', 'admin'])
 Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [ExamController::class, 'dashboard'])
-        ->name('dashboard');
+        ->name('dashboard.student');
 
     Route::get('/exam/{module}/start', [ExamController::class, 'start'])
         ->name('exam.start');

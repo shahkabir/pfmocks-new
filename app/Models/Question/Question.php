@@ -2,6 +2,7 @@
 
 namespace App\Models\Question;
 
+use App\Models\Answer\Answer;
 use App\Models\Module\Module;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
