@@ -5,7 +5,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\Admin\ModuleController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Models\User;
+use Termwind\Components\Raw;
 
 Route::get('/admin-lte', function () {
     return view('layouts.index');
@@ -53,5 +56,15 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/exam/{module}/start', [ExamController::class, 'start'])
         ->name('exam.start');
+
+});
+
+//CRUD: User Page to Admin
+Route::controller(UserController::class)->group(function () {
+    Route::get('user-list', [UserController::class, 'showUserList'])->name('admin.user.list');
+    Route::get('user-list-data', [UserController::class, 'getUserListData'])->name('admin.user.list.data');
+    Route::get('user/edit/{id}', [UserController::class, 'edit'])->name('admin.user.edit');
+    Route::put('user/update', [UserController::class, 'update'])->name('admin.user.update');
+    Route::delete('user/delete/{id}', [UserController::class, 'destroy'])->name('admin.user.delete');
 
 });

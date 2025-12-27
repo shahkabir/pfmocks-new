@@ -4,9 +4,8 @@
         <!--end::To the end-->
         <!--begin::Copyright-->
         <strong>
-          Copyright &copy; 2014-2025&nbsp;
-          <a href="https://www.perfectmocks.com" class="text-decoration-none">Perfectmocks.com</a>.
+          Copyright &copy; 2025&nbsp;
+          <a href="https://www.perfectmocks.com" class="text-decoration-none">Perfectmocks.com</a>
         </strong>
-        All rights reserved.
         <!--end::Copyright-->
       </footer>

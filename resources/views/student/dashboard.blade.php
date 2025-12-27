@@ -31,11 +31,16 @@
                             {{ $userExam->module->duration_minutes }} minutes
                         </p>
 
-                        @if($userExam->type === 'paid')
+                        
                             <p>
-                                <strong>Price:</strong> ৳{{ number_format($userExam->price, 2) }}
+                                <strong>Price:</strong> 
+                                @if($userExam->type === 'paid')
+                                    ৳{{ number_format($userExam->price, 2) }}
+                                @else
+                                    {{ 'Free' }}
+                                @endif
                             </p>
-                        @endif
+                        
                     </div>
 
                     <div class="card-footer text-right">
