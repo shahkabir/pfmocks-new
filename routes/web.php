@@ -7,9 +7,13 @@ use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Auth\RegisterController;
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/admin-lte', function () {
+    return view('layouts.index');
 });
+
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/register', fn()=>view('auth.register'))->name('register');
 Route::post('/register/send-otp',[RegisterController::class,'sendOtp'])->name('register.sendOtp');
