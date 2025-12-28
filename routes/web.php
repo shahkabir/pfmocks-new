@@ -59,6 +59,10 @@ Route::middleware('auth')->group(function () {
 
 });
 
+Route::get('/ielts-writing',function(){
+    return view('exams.ielts.writing');
+});
+
 //CRUD: User Page to Admin
 Route::controller(UserController::class)->group(function () {
     Route::get('user-list', [UserController::class, 'showUserList'])->name('admin.user.list');
