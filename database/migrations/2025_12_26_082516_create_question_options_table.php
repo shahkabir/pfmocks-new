@@ -12,18 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('question_options', function (Blueprint $table) {
-    $table->id();
+            $table->id();
 
-    $table->foreignId('question_id')
-          ->constrained()
-          ->cascadeOnDelete();
+            $table->foreignId('question_id')
+                ->constrained()
+                ->cascadeOnDelete();
+            $table->text('actual_question');
+            $table->string('option_text');
+            $table->boolean('is_correct')->default(false);
+            $table->text('correct_answer_explanation')->nullable();
+            $table->integer('sort_order')->default(0);
 
-    $table->string('option_text');
-    $table->boolean('is_correct')->default(false);
-    $table->integer('sort_order')->default(0);
-
-    $table->timestamps();
-});
+            $table->timestamps();
+        });
     }
 
     /**

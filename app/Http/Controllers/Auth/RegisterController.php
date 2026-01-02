@@ -102,9 +102,12 @@ class RegisterController extends Controller
 
     public function login(Request $request)
     {
+        //dd($request->all());
         $credentials = $request->only('email'); //,'password'
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $credentials)->first();
+
+        //dd($user);
 
         if($user){
             session(['otp_user_id' => $user->id]);

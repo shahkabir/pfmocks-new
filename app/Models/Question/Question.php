@@ -4,7 +4,10 @@ namespace App\Models\Question;
 
 use App\Models\Answer\Answer;
 use App\Models\Module\Module;
+use App\Models\Question\QuestionGroup;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Question\QuestionOptions;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -13,7 +16,7 @@ class Question extends Model
     protected $fillable = [
         'module_id',
         'type',
-        'question_text',
+        'question_header',
         'passage',
         'audio_url',
         'image_url',
@@ -35,6 +38,14 @@ class Question extends Model
     }
 
     /**
+     * A question has many options
+     */
+    public function options(): HasMany
+    {
+        return $this->hasMany(QuestionOptions::class);
+    }
+
+    /**
      * A question can have many answers (one per attempt)
      */
     public function answers(): HasMany
@@ -48,5 +59,13 @@ class Question extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order');
+    }
+
+    /**
+     * A question has one UI group mapping
+     */
+    public function group(): HasOne
+    {
+        return $this->hasOne(QuestionGroup::class);
     }
 }

@@ -7,6 +7,10 @@
 
     <h4 class="mb-3">My Exams</h4>
 
+    {{-- @dd($__data) --}}
+
+    {{-- {{ dd(get_defined_vars())}} --}}
+
     <div class="row">
         @forelse($exams as $userExam)
             <div class="col-md-4">

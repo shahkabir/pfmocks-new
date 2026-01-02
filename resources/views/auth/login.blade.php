@@ -74,14 +74,14 @@
             @csrf
             <div class="input-group mb-1">
               <div class="form-floating">
-                <input id="loginEmail" type="email" class="form-control" value="" placeholder="Email/Mobile Number" />
+                <input id="loginEmail" name="email" type="email" class="form-control" value="" placeholder="Email/Mobile Number" />
                 <label for="loginEmail">Email</label>
               </div>
               <div class="input-group-text"><span class="bi bi-envelope"></span></div>
             </div>
             <div class="input-group mb-1">
               <div class="form-floating">
-                <input id="loginPassword" type="password" class="form-control" placeholder="" />
+                <input id="loginPassword" name="password" type="password" class="form-control" placeholder="" />
                 <label for="loginPassword">Password</label>
               </div>
               <div class="input-group-text"><span class="bi bi-lock-fill"></span></div>

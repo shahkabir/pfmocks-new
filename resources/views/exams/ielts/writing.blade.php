@@ -101,16 +101,17 @@
     {{-- LEFT: QUESTION --}}
     <div class="question-panel">
         <h5>Part 1</h5>
+        {{-- @dd($__data) --}}
 
+        {{-- {{ dd(get_defined_vars())}} --}}
         <p>
-            The table below gives information about the underground railway
-            systems in six cities.
+            {{ $questions[0]['question_header'] }}
+        </p>
+        <p>
+            {{ $questions[0]['passage'] }}
         </p>
 
-        <p>
-            Summarise the information by selecting and reporting the main
-            features, and make comparisons where relevant.
-        </p>
+        
 
         <table class="table table-bordered table-sm mt-3">
             <thead class="thead-light">
