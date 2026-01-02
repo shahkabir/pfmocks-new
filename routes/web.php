@@ -63,6 +63,18 @@ Route::get('/ielts-writing',function(){
     return view('exams.ielts.writing');
 });
 
+Route::get('/ielts-reading',function(){
+    return view('exams.ielts.reading');
+});
+
+Route::get('/ielts-listening',function(){
+    return view('exams.ielts.listening');
+});
+
+Route::get('/ielts-speaking',function(){
+    return view('exams.ielts.speaking');
+});
+
 //CRUD: User Page to Admin
 Route::controller(UserController::class)->group(function () {
     Route::get('user-list', [UserController::class, 'showUserList'])->name('admin.user.list');
