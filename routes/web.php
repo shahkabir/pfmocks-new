@@ -63,6 +63,9 @@ Route::get('/ielts-writing',function(){
     return view('exams.ielts.writing');
 });
 
+Route::post('/ielts-writing/submit', [ExamController::class, 'submitIELTSWriting'])
+    ->name('exam.ielts.writing.submit');
+
 Route::get('/ielts-reading',function(){
     return view('exams.ielts.reading');
 });
