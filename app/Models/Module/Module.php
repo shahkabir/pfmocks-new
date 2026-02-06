@@ -13,6 +13,7 @@ class Module extends Model
     protected $fillable = [
         'exam_id',
         'name',
+        'module_type',
         'duration_minutes',
     ];
 

@@ -18,7 +18,7 @@ class QuestionOptions extends Model
      */
     protected $fillable = [
         'question_id',
-        'actual_question',
+        'actual_question', //questions for all type - Reading, Listening, Writing, Speaking
         'option_text',
         'is_correct',
         'correct_answer_explanation',

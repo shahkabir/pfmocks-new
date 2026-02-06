@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Answer\Answer;
-use App\Models\Exam\ExamAttempt;
+use App\Constants\ModuleConstants;
 use Illuminate\Http\Request;
+use App\Models\Answer\Answer;
 use App\Models\Exam\UserExam;
+use App\Models\Module\Module;
+use App\Models\Exam\ExamAttempt;
 use App\Models\Question\Question;
 
 class ExamController extends Controller
@@ -31,29 +33,70 @@ class ExamController extends Controller
     public function start($moduleId)
     {
         $user = auth()->user();
+        //dd($user);
+        //dd($moduleId);
 
-        $hasAccess = UserExam::where('user_id', $user->id)
+        $userExam = UserExam::where('user_id', $user->id)
             ->where('module_id', $moduleId)
-            ->exists();
+            ->get();
+            //->exists();
 
-        //dd($hasAccess);
+        //dd($userExam);
 
-        if (!$hasAccess) {
-            abort(403, 'You do not have access to this exam.');
-        }
+        // if (!$userExam) {
+        //     abort(403, 'You do not have access to this exam.');
+        // }
+
+        //Get the Module Details
+        $module = Module::findOrFail($moduleId);
+                  // ->get();
+                 //->toArray();
+         
+        //dd($module);
+
+        $duration = $module->duration_minutes;
+        $moduleType = $module->module_type;
+        //dd($module->module_type);
 
         //Get the questons for the module
+        // $questions = Question::with('options')
+        //     ->join('modules', 'questions.module_id', '=', 'modules.id')
+        //     ->where('modules.module_type', $moduleType)
+        //     //->where('module_id', $moduleId)
+        //     ->orderBy('sort_order', 'asc')
+        //     ->get()
+        //     ->toArray();
+
         $questions = Question::with('options')
-            ->where('module_id', $moduleId)
-            ->orderBy('sort_order', 'asc')
-            ->get()
-            ->toArray();
+        ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
+        ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
+        ->where('modules.module_type', $moduleType)
+        ->orderBy('questions.sort_order')
+        ->select([
+            'questions.*',
+            'question_groups.question_options_group_ids',
+            'question_groups.part_number',
+            ])
+        ->get()
+        ->toArray();
+
 
         //dd($questions);
 
         $showFeedback = false;
 
-        return view('exams.ielts.writing', compact('questions', 'user', 'showFeedback'));
+        //if(ModuleConstants::MODULES['writing'])
+        if(($moduleType === 'writing')){
+            return view('exams.ielts.writing', compact('questions', 'user', 'showFeedback', 'module'));
+        }else if(($moduleType === 'listening')){
+            return view('exams.ielts.listening', compact('questions', 'user', 'showFeedback', 'module'));
+        }else if(($moduleType === 'reading')){
+            return view('exams.ielts.reading', compact('questions', 'user', 'showFeedback', 'module'));
+        }else if(($moduleType === 'speaking')){
+            return view('exams.ielts.speaking', compact('questions', 'user', 'showFeedback', 'module'));
+        }else{
+            abort(404, 'Module type not found.');
+        }
 
         // Later: create exam_attempt here
         //return view('student.exam-start', compact('moduleId'));

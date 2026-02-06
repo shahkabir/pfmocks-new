@@ -150,71 +150,94 @@
 </div>
 
 {{-- ================= BODY ================= --}}
+
+{{-- {{ dd(get_defined_vars()) }} --}}
+
+@php
+    $parts = [];
+
+    foreach ($questions as $question) {
+
+        $part = $question['part_number']; //['group']
+        // var_dump($part);
+
+        if (!isset($parts[$part])) {
+
+            $parts[$part] = [
+                'header' => $question['question_header'],
+                'passage' => $question['passage'],
+                'questions' => []
+            ];
+        }
+
+        $grouped = collect($question['options'])->groupBy('actual_question');
+
+        foreach ($grouped as $actualQuestion => $options) {
+            $parts[$part]['questions'][$actualQuestion] = $options;
+        }
+    }
+
+    // dd($parts);
+
+@endphp
+
+
 <div class="exam-body">
+    @foreach($parts as $partNumber => $partData)
+            <div class="exam-body reading-part"
+                id="part-{{ $partNumber }}"
+                style="{{ $partNumber === array_key_first($parts) ? '' : 'display:none' }}">
 
-    {{-- LEFT: READING PASSAGE --}}
-    <div class="reading-panel">
-        <h5>Part 1</h5>
-        <p><strong>Read the text and answer questions 1–13.</strong></p>
+                {{-- LEFT: PASSAGE --}}
+                <div class="reading-panel">
+                    <h5>Part {{ $partNumber }}</h5>
+                    <p><strong>{{ $partData['header'] }}</strong></p>
+                    <div>
+                        {!! nl2br(e($partData['passage'])) !!}
+                    </div>
+                </div>
 
-        <h6 class="mt-3">The life and work of Marie Curie</h6>
+                {{-- RIGHT: QUESTIONS --}}
+                <div class="question-panel">
+                    @php $qNo = 1; @endphp
 
-        <p>
-            Marie Curie is probably the most famous woman scientist who has ever lived.
-            Born Maria Sklodowska in Poland in 1867, she is famous for her work on radioactivity,
-            and was twice a winner of the Nobel Prize.
-        </p>
+                    @foreach($partData['questions'] as $actualQuestion => $options)
+                        <div class="mb-4">
 
-        <p>
-            With her husband Pierre Curie, and Henri Becquerel, she was awarded the 1903 Nobel Prize
-            for Physics, and was then sole winner of the 1911 Nobel Prize for Chemistry.
-        </p>
+                            <h6 class="mb-2">
+                                {{ $qNo++ }}. {{ $actualQuestion }}
+                            </h6>
 
-        <p>
-            From childhood, Marie was remarkable for her prodigious memory, and at the age of 16
-            won a gold medal on completion of her secondary education.
-        </p>
+                            @foreach($options as $option)
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input"
+                                        type="radio"
+                                        name="answers[{{ md5($actualQuestion) }}]"
+                                        value="{{ $option['id'] }}"
+                                        id="option-{{ $option['id'] }}">
 
-        <p>
-            In 1891 Marie went to Paris and began to study at the Sorbonne. She often worked far into
-            the night and lived on little more than bread and tea.
-        </p>
+                                    <label class="form-check-label"
+                                        for="option-{{ $option['id'] }}">
+                                        {{ $option['option_text'] }}
+                                    </label>
+                                </div>
+                            @endforeach
 
-        <p>
-            Their marriage in 1895 marked the start of a partnership that was soon to achieve
-            results of world significance.
-        </p>
-    </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+    @endforeach
+</div>
 
-    {{-- RIGHT: QUESTIONS --}}
-    <div class="question-panel">
-        <h6>Questions 1–6</h6>
-        <p class="mb-3">
-            Choose <strong>TRUE</strong>, <strong>FALSE</strong> or <strong>NOT GIVEN</strong>.
-        </p>
-
-        <div class="question">
-            <h6>1. Marie Curie’s husband was a joint winner of both Marie’s Nobel Prizes.</h6>
-            <label><input type="radio" name="q1"> TRUE</label>
-            <label><input type="radio" name="q1"> FALSE</label>
-            <label><input type="radio" name="q1"> NOT GIVEN</label>
-        </div>
-
-        <div class="question">
-            <h6>2. Marie became interested in science when she was a child.</h6>
-            <label><input type="radio" name="q2"> TRUE</label>
-            <label><input type="radio" name="q2"> FALSE</label>
-            <label><input type="radio" name="q2"> NOT GIVEN</label>
-        </div>
-
-        <div class="question">
-            <h6>3. Marie was able to attend the Sorbonne because of her sister’s financial help.</h6>
-            <label><input type="radio" name="q3"> TRUE</label>
-            <label><input type="radio" name="q3"> FALSE</label>
-            <label><input type="radio" name="q3"> NOT GIVEN</label>
-        </div>
-    </div>
-
+{{-- ================= Parts ================= --}}
+<div class="mb-3">
+    @foreach($parts as $partNumber => $partData)
+        <button class="btn btn-sm btn-primary"
+                onclick="showPart({{ $partNumber }})">
+            Part {{ $partNumber }}
+        </button>
+    @endforeach
 </div>
 
 {{-- ================= QUESTION PALETTE ================= --}}
@@ -225,6 +248,8 @@
         </button>
     @endfor
 </div>
+
+
 
 {{-- ================= FOOTER ================= --}}
 <div class="exam-footer">
@@ -238,3 +263,17 @@
 </div>
 
 {{-- @endsection --}}
+<script>
+    function showPart(partNumber) {
+        document.querySelectorAll('.reading-part').forEach(part => {
+            part.style.display = 'none';
+        });
+        document.getElementById('part-' + partNumber).style.display = 'flex';
+
+        // Update active button
+        document.querySelectorAll('.palette-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+</script>

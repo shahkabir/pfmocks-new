@@ -17,7 +17,7 @@ class Question extends Model
         'module_id',
         'type',
         'question_header',
-        'passage',
+        'passage', //contains reading/listening passage
         'audio_url',
         'image_url',
         'marks',
