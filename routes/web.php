@@ -70,6 +70,9 @@ Route::get('/ielts-reading',function(){
     return view('exams.ielts.reading');
 });
 
+Route::post('/ielts-reading/submit', [ExamController::class, 'submitIELTSReading'])
+    ->name('exam.ielts.reading.submit');
+
 Route::get('/ielts-listening',function(){
     return view('exams.ielts.listening');
 });

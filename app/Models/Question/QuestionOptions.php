@@ -19,6 +19,7 @@ class QuestionOptions extends Model
     protected $fillable = [
         'question_id',
         'actual_question', //questions for all type - Reading, Listening, Writing, Speaking
+        'question_type', //'generic_question','mcq_single','mcq_multiple','fill_in_blanks''writing','essay','audio','speaking''highlighting','reordering'
         'option_text',
         'is_correct',
         'correct_answer_explanation',

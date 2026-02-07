@@ -4,6 +4,7 @@ namespace App\Models\Question;
 
 use App\Models\Question\Question;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class QuestionGroup extends Model
@@ -27,5 +28,11 @@ class QuestionGroup extends Model
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class);
+    }
+
+    public function blocks(): HasMany
+    {
+        return $this->hasMany(QuestionGroupBlock::class)
+                    ->orderBy('sort_order');
     }
 }

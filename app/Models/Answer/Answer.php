@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Exam\ExamAttempt;
 use App\Models\Question\Question;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Question\QuestionOptions;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Answer extends Model
@@ -52,6 +53,6 @@ class Answer extends Model
      */
     public function option(): BelongsTo
     {
-        return $this->belongsTo(QuestionOption::class, 'question_option_id');
+        return $this->belongsTo(QuestionOptions::class, 'question_option_id');
     }
 }

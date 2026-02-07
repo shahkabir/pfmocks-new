@@ -67,7 +67,7 @@ class ExamController extends Controller
         //     ->get()
         //     ->toArray();
 
-        $questions = Question::with('options')
+        $questions = Question::with(['options','group.blocks'])
         ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
         ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
         ->where('modules.module_type', $moduleType)
@@ -141,6 +141,48 @@ class ExamController extends Controller
 
         return response()->json([
             'message' => 'Writing answers submitted successfully!',
+            //'answers' => $answers,
+        ]);
+    }
+
+    public function submitIELTSReading(Request $request)
+    {
+        dd($request->all());
+
+        $user = auth()->user();
+        $answers = $request->input('answers', []);
+
+        //Update Exam Attempt
+        $examAttempt = ExamAttempt::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'module_id' => 2, // IELTS Reading module ID
+                'started_at' => now(),
+                'status' => 'completed',
+            ],
+            [
+                'ended_at' => now(),
+            ]
+        );
+
+        foreach ($answers as $questionId => $data) {
+            
+                Answer::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'exam_attempt_id' => $examAttempt->id,
+                            'question_id' => $questionId,
+                            'question_option_id' => $data['question_option_id'] ?? null,
+                        ],
+                        [
+                            'answer' => $data['answer'],
+                            'is_correct' => $data['is_correct'] ?? false,
+                        ]
+                    );
+        }
+
+        return response()->json([
+            'message' => 'Reading answers submitted successfully!',
             //'answers' => $answers,
         ]);
     }
