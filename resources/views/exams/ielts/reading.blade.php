@@ -200,7 +200,7 @@
             }
         }
     }
-    // dd($parts);
+    //dd($parts);
 @endphp
 
 <form class="reading-form">
@@ -236,7 +236,7 @@
                                 <div class="mb-4">
 
                                     <h6 class="mb-2">
-                                        {{ $qNo++ }}. {{ $actualQuestion }}
+                                        {{ $qNo }}. {{ $actualQuestion }}
                                     </h6>
 
                                     {{-- @php dd($actualQuestion, $options); @endphp --}}
@@ -266,7 +266,8 @@
                                                 <div class="form-check mb-1">
                                                     <input class="form-check-input"
                                                         type="radio"
-                                                        name="answers[{{ $option['question_id'] }}]['question_id']"
+                                                        name="answers[{{ $option['question_id'] }}][question_option_id][{{$qNo}}]"
+                                                        {{-- name="answers[{{ $option['id'] }}]" --}}
                                                         {{-- name="answers[{{ md5($actualQuestion) }}]" --}}
                                                         value="{{ $option['id'] }}"
                                                         id="option-{{ $option['id'] }}">
@@ -281,7 +282,8 @@
                                                 <div class="form-check mb-1">
                                                     <input class="form-check-input"
                                                         type="checkbox"
-                                                        name="answers[{{ md5($actualQuestion) }}][]"
+                                                        name="answers[{{ $option['question_id'] }}][question_option_id][{{$qNo}}][]"
+                                                        {{-- name="answers[{{ md5($actualQuestion) }}][]" --}}
                                                         value="{{ $option['id'] }}"
                                                         id="option-{{ $option['id'] }}">
 
@@ -294,12 +296,14 @@
 
                                         @endforeach
                                 </div>
+                             @php $qNo++ @endphp
                             {{-- {{ QUESTION BLOCK ENDS HERE }} --}}
                             @endforeach
                         {{-- BLOCKS loop ends here --}}
                         @endforeach
                     </div>
                 </div>
+       
         {{-- PARTS loop ends here--}}
         @endforeach 
     </div>
