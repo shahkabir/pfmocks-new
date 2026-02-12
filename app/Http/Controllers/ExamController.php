@@ -312,8 +312,22 @@ class ExamController extends Controller
                             ]
                         );
                     }
+                    else if($questionType === 'mcq_select'){ // For select dropdown case
+
+                        Answer::updateOrCreate(
+                            [
+                                'user_id' => $user->id,
+                                'exam_attempt_id' => $examAttempt->id,
+                                'question_id' => $questionId,
+                                'question_option_id' => is_numeric($optionId) ? $optionId : null,
+                            ],
+                            [
+                                'is_correct' => $isCorrect,
+                            ]
+                        );
+                    }
                     else{
-                        // Handle other question types if needed
+                        // Handle unknown question types if necessary
                     }
                 }
         }

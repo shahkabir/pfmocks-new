@@ -62,6 +62,7 @@
         padding: 20px;
         overflow-y: auto;
         border-right: 1px solid #ddd;
+        background: #e5e5e5; /* very soft blue background for reading panel */
     }
 
     .question-panel {
@@ -132,6 +133,28 @@
     }
 </style>
 
+<style>
+/* Style for mcq, multi select */
+/* Default option block */
+.exam-option {
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    border: 1px solid transparent;
+}
+
+/* Hover */
+.exam-option:hover {
+    background-color: #f8f9fa;
+}
+
+/* Selected */
+.exam-option.selected {
+    background-color: #e9f2ff;   /* very soft blue */
+    border-color: #c7ddff;
+}
+</style>
+
 {{-- ================= TOP BAR ================= --}}
 <div class="exam-topbar">
     <div class="exam-topbar-left">
@@ -200,7 +223,9 @@
             }
         }
     }
+    
     // dd($parts);
+
 @endphp
 
 <form class="reading-form">
@@ -229,28 +254,33 @@
 
                             {{-- INSTRUCTION (shown ONCE per block) --}}
                                 <div class="alert alert-light mb-3 border-secondary">
-                                    <b>{!! nl2br(e($block['instruction'])) !!}</b>
+                                    <b>{!! $block['instruction'] !!}</b>
+                                    {{-- nl2br(e()) --}}
                                 </div>
                             {{-- QUESTIONS UNDER THIS INSTRUCTION --}}
                             @foreach($block['questions'] as $actualQuestion => $options)
                                 <div class="mb-4">
 
                                     <h6 class="mb-2">
-                                        {{ $qNo }}. {{ $actualQuestion }}
+                                             @if(!str_contains($actualQuestion, '[[blank]]'))
+                                                <b>{{ $qNo }}&nbsp;</b>{{ $actualQuestion }}
+                                             @endif  
                                     </h6>
 
                                     {{-- @php dd($actualQuestion, $options); @endphp --}}
                                     {{-- {{ $actualQuestion}} --}}
                                         @foreach($options as $option)
 
-                                        <h6 class="mb-2">
+                                        {{-- <h6 class="mb-2">
                                             {{ 'question_option_id:'. $option['id']}}
                                             {{ 'question_id: '. $option['question_id'] }}
-                                        </h6>
+                                            {{ 'correct: '. ($option['is_correct'] ? 'true' : 'false') }}
+                                        </h6> --}}
 
                                             @if($option['question_type'] == 'fill_in_blanks')
                                                 
                                             <div class="mb-3">
+                                                <b>{{ $qNo }}&nbsp;</b>
                                                 {!! str_replace(
                                                     '[[blank]]',
                                                     '<input type="text" 
@@ -265,7 +295,8 @@
 
                                             @elseif($option['question_type'] == 'mcq_single')
 
-                                                <div class="form-check mb-1">
+                                                <div class="exam-option">
+                                                    {{-- mb-1 --}}
                                                     <input class="form-check-input"
                                                         type="radio"
                                                         name="answers[{{ $option['question_id'] }}][question_option_id][{{$qNo}}]"
@@ -283,7 +314,7 @@
 
                                             @elseif($option['question_type'] === 'mcq_multiple')
 
-                                                <div class="form-check mb-1">
+                                                <div class="mb-1 exam-option">
                                                     <input class="form-check-input"
                                                         type="checkbox"
                                                         name="answers[{{ $option['question_id'] }}][question_option_id][{{$qNo}}][]"
@@ -298,6 +329,24 @@
                                                         {{ $option['option_text'] }}
                                                     </label>
                                                 </div>
+
+                                            @elseif($option['question_type'] === 'mcq_select')
+                                                <div class="mb-3">
+                                                    <select class="form-select"
+                                                        name="answers[{{ $option['question_id'] }}][question_option_id][{{$qNo}}]"
+                                                        {{-- name="answers[{{ md5($actualQuestion) }}]" --}}>
+
+                                                        <option value="">-- Select Answer --</option>
+
+                                                        @foreach($options as $option)
+                                                            <option value="{{ $option['id'] }}">
+                                                                {{ $option['option_text'] }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+
+                                                </div>
+                                                @php break; @endphp
                                             @endif
 
                                         @endforeach
@@ -386,4 +435,33 @@
         });
         event.target.classList.add('active');
     }
+
+
+    $(document).on('change', '.exam-option input', function () {
+
+        const $input = $(this);
+        const $container = $input.closest('.exam-option');
+
+        // If radio → remove selection from siblings
+        if ($input.attr('type') === 'radio') {
+            const name = $input.attr('name');
+
+            $('input[name="' + name + '"]').each(function () {
+                $(this).closest('.exam-option').removeClass('selected');
+            });
+
+            $container.addClass('selected');
+        }
+
+        // If checkbox → toggle individually
+        if ($input.attr('type') === 'checkbox') {
+            if ($input.is(':checked')) {
+                $container.addClass('selected');
+            } else {
+                $container.removeClass('selected');
+            }
+        }
+
+    });
+
 </script>
