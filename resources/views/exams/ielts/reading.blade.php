@@ -200,7 +200,7 @@
             }
         }
     }
-    //dd($parts);
+    // dd($parts);
 @endphp
 
 <form class="reading-form">
@@ -251,14 +251,16 @@
                                             @if($option['question_type'] == 'fill_in_blanks')
                                                 
                                             <div class="mb-3">
-                                                {!! str_replace('[[blank]]',
-                                                    '<input type="text"
-                                                            class="form-control d-inline-block mx-1"
-                                                            style="width:160px"
-                                                            name="answers['.$option['id'].']"
-                                                            data-question-id="'.$option['question_id'].'">',
+                                                {!! str_replace(
+                                                    '[[blank]]',
+                                                    '<input type="text" 
+                                                            class="form-control d-inline-block mx-1" 
+                                                            style="width:160px" 
+                                                            name="answers[' . $option['question_id'] . '][question_option_id][' . $option['id'] . ']"  
+                                                            data-question-id="' . $option['question_id'] . '">', ////$qNo
                                                     e($option['actual_question'])
                                                 ) !!}
+                                                {{-- <input type="hidden" name="answers[{{ $option['question_id'] }}][question_type]" value="{{ $option['question_type'] }}"> --}}
                                             </div>
 
                                             @elseif($option['question_type'] == 'mcq_single')
@@ -271,6 +273,8 @@
                                                         {{-- name="answers[{{ md5($actualQuestion) }}]" --}}
                                                         value="{{ $option['id'] }}"
                                                         id="option-{{ $option['id'] }}">
+
+                                                        {{-- <input type="hidden" name="answers[{{ $option['question_id'] }}][question_type]" value="{{ $option['question_type'] }}"> --}}
 
                                                     <label class="form-check-label" for="option-{{ $option['id'] }}">
                                                         {{ $option['option_text'] }}
@@ -286,6 +290,8 @@
                                                         {{-- name="answers[{{ md5($actualQuestion) }}][]" --}}
                                                         value="{{ $option['id'] }}"
                                                         id="option-{{ $option['id'] }}">
+
+                                                        {{-- <input type="hidden" name="answers[{{ $option['question_id'] }}][question_type]" value="{{ $option['question_type'] }}"> --}}
 
                                                     <label class="form-check-label"
                                                         for="option-{{ $option['id'] }}">

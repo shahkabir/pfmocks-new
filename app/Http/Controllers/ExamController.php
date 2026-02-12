@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Constants\ModuleConstants;
 use Illuminate\Http\Request;
 use App\Models\Answer\Answer;
 use App\Models\Exam\UserExam;
 use App\Models\Module\Module;
 use App\Models\Exam\ExamAttempt;
 use App\Models\Question\Question;
+use App\Constants\ModuleConstants;
+use App\Models\Question\QuestionOptions;
 
 class ExamController extends Controller
 {
@@ -71,6 +72,7 @@ class ExamController extends Controller
         ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
         ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
         ->where('modules.module_type', $moduleType)
+        ->active()
         ->orderBy('questions.sort_order')
         ->select([
             'questions.*',
@@ -145,18 +147,79 @@ class ExamController extends Controller
         ]);
     }
 
+    // This function will convert the nested answer structure into a linear array of option IDs 
+    // and also capture fill in the blanks answers
+    // Returns an array with 'option_ids' and 'fill_in_blank_answers'
+    public function makeArrayLinear($array)
+    {
+        $allOptionIds = [];
+        $fill_in_blank_answers = [];
+
+        foreach ($array as $key => $value) {
+
+            if(is_numeric($value)){ //single mcq
+                $allOptionIds[] = (int) $value;
+            }
+            else if (is_array($value)) //mcq multiselect
+            {
+                foreach ($value as $v) {
+                    if (is_numeric($v)) {
+                        $allOptionIds[] = (int) $v;
+                    }
+                }
+                // $allOptionIds = array_merge($allOptionIds, $value);
+            }
+            // else if(is_string($value) && trim($value) !== ''){ // For fill in the blanks case
+            //     $allOptionIds = array_merge($allOptionIds, [$key]);
+            // } 
+            else { //fill_in_blanks
+                $allOptionIds = array_merge($allOptionIds, [$key]);
+                $fill_in_blank_answers[$key] = $value; // Store the user's input for fill in the blanks
+            }
+        }
+
+        return [
+            'option_ids' => $allOptionIds,
+            'fill_in_blank_answers' => $fill_in_blank_answers
+        ];
+    }
+
+
     public function submitIELTSReading(Request $request)
     {
-        dd($request->all());
+        //dd($request->all());
 
         $user = auth()->user();
         $answers = $request->input('answers', []);
+        //dd($answers);
+
+        //First get the question_type for each question from the request
+        // We need this to handle different question types (mcq_single, mcq_multiple, fill_in_blanks) 
+        // differently while saving answers
+        $allOptionIds = [];
+        foreach ($answers as $questionId => $data) {
+
+            if (isset($data['question_option_id'])) {
+                
+                $optionIds = $this->makeArrayLinear($data['question_option_id'])['option_ids'];
+                $allOptionIds = array_merge($allOptionIds, $optionIds);
+            }
+        }
+        
+
+        $questionTypes = QuestionOptions::whereIn('id', $allOptionIds)
+                    ->get(['id', 'question_type'])
+                    ->keyBy('id')
+                    ->pluck('question_type', 'id')
+                    ->toArray();
+
+        //dd($allOptionIds, $questionTypes);
 
         //Update Exam Attempt
         $examAttempt = ExamAttempt::updateOrCreate(
             [
                 'user_id' => $user->id,
-                'module_id' => 2, // IELTS Reading module ID
+                'module_id' => 1, // IELTS Reading module ID
                 'started_at' => now(),
                 'status' => 'completed',
             ],
@@ -165,20 +228,94 @@ class ExamController extends Controller
             ]
         );
 
+        // answers contains the question_id as key and an array of question_option_id(s) 
         foreach ($answers as $questionId => $data) {
-            
-                Answer::updateOrCreate(
-                        [
-                            'user_id' => $user->id,
-                            'exam_attempt_id' => $examAttempt->id,
-                            'question_id' => $questionId,
-                            'question_option_id' => $data['question_option_id'] ?? null,
-                        ],
-                        [
-                            'answer' => $data['answer'],
-                            'is_correct' => $data['is_correct'] ?? false,
-                        ]
-                    );
+                
+                //dd($data['question_option_id']);
+
+                // Normalize to array (important)
+                // $optionIds = 
+                //     is_array($data['question_option_id'])
+                //     ? array_merge($optionIds ?? [], $data['question_option_id'])
+                //     : [$data[$questionId]]; // $data['question_option_id']
+
+                $optionIds = $this->makeArrayLinear($data['question_option_id'])['option_ids'];
+                $fillInBlankAnswers = $this->makeArrayLinear($data['question_option_id'])['fill_in_blank_answers'];
+                
+                //dd($optionIds, $fillInBlankAnswers);
+  
+                //dd($questionId, $data['question_option_id'], $optionIds);
+
+                // optionIds contains the IDs of the options selected by the user for this question 
+                // (can be multiple for multiselect, single for single select, 
+                // and can also contain question IDs for fill in the blanks)
+                foreach ($optionIds as $optionId) {
+                    
+                    //var_dump($optionId);
+                    
+                    //dd($optionIds);
+
+                    //Check question type using optionId
+                    if(array_key_exists($optionId, $questionTypes)){
+                        $questionType = $questionTypes[$optionId];
+                    } else {
+                        // Handle the case where the option ID is not found in the question types
+                        // You might want to log this or set a default value
+                        $questionType = null; // or 'unknown'
+                    }
+
+                    //echo "Processing Question ID: $questionId, Option ID: $optionId\n" . "Question Type: $questionType\n";
+
+                    //Check if the answer is correct
+                    $isCorrect = QuestionOptions::where('id', $optionId)->value('is_correct');
+                    // $isCorrect = true;
+
+                    if ($questionType === 'mcq_multiple') { //For multiselect case
+                        
+                            Answer::updateOrCreate([
+                                'user_id' => $user->id,
+                                'exam_attempt_id' => $examAttempt->id,
+                                'question_id' => $questionId,
+                            ],
+                            [
+                                'question_option_id' => $optionId, //$nestedId,
+                                'is_correct' => $isCorrect,
+                            ]
+                            );
+                        
+                    } 
+                    else if($questionType === 'mcq_single'){ // normal case
+                        Answer::updateOrCreate(
+                            [
+                                'user_id' => $user->id,
+                                'exam_attempt_id' => $examAttempt->id,
+                                'question_id' => $questionId,
+                                'question_option_id' => is_numeric($optionId) ? $optionId : null,
+                            ],
+                            [
+                                'is_correct' => $isCorrect,
+                            ]
+                        );
+                    }
+                    else if($questionType === 'fill_in_blanks'){ // For fill in the blanks case // && trim($optionId) !== ''
+                        
+                        Answer::updateOrCreate(
+                            [
+                                'user_id' => $user->id,
+                                'exam_attempt_id' => $examAttempt->id,
+                                'question_id' => $questionId,
+                                'question_option_id' => $optionId, // No option ID for fill in the blanks
+                            ],
+                            [
+                                'answer' => $fillInBlankAnswers[$optionId], // Store the user's input as the answer
+                                'is_correct' => $isCorrect,
+                            ]
+                        );
+                    }
+                    else{
+                        // Handle other question types if needed
+                    }
+                }
         }
 
         return response()->json([

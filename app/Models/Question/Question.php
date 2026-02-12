@@ -68,4 +68,11 @@ class Question extends Model
     {
         return $this->hasOne(QuestionGroup::class);
     }
+
+    public function scopeActive($query)
+    {
+        return $query->whereHas('options', function ($q) {
+            $q->where('is_active', 1);
+        });
+    }
 }

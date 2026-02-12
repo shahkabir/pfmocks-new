@@ -24,6 +24,7 @@ class QuestionOptions extends Model
         'is_correct',
         'correct_answer_explanation',
         'sort_order',
+        'is_active'
     ];
 
     /**
@@ -31,6 +32,7 @@ class QuestionOptions extends Model
      */
     protected $casts = [
         'is_correct' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     /**
@@ -47,5 +49,10 @@ class QuestionOptions extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('questions_options.is_active', 1);
     }
 }
