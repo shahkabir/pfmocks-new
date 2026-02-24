@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Constants\ModuleConstants;
 use App\Models\Answer\Answer;
+use App\Models\Answer\Results;
+use App\Models\Exam\ExamAttempt;
 use App\Models\Exam\UserExam;
 use App\Models\Module\Module;
-use App\Models\Exam\ExamAttempt;
 use App\Models\Question\Question;
-use App\Constants\ModuleConstants;
 use App\Models\Question\QuestionOptions;
+use Illuminate\Http\Request;
 
 class ExamController extends Controller
 {
@@ -332,9 +333,72 @@ class ExamController extends Controller
                 }
         }
 
+
+
+        //Save the results for the exam attempt here (calculate score, save to results table, etc.)
+        $status = 'completed'; // or 'pending' if you want to evaluate later
+        $achievedScore = Answer::where('exam_attempt_id', $examAttempt->id)
+                        ->where('is_correct', true)
+                        ->count();
+
+        $totalScore = Question::where('module_id', 1)->count(); // Total questions in the module
+        $scorePercentage = $totalScore > 0 ? ($achievedScore / $totalScore) * 100 : 0;
+        $bandScore = $this->calculateIELTSBand($scorePercentage);
+        $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
+
+        // Save the result to the results table
+        $result = Results::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'exam_attempt_id' => $examAttempt->id,
+            ],
+            [
+                'status' => $status,
+                'exam_name' => 'IELTS Reading',
+                'module_name' => 'Reading',
+                'achieved_score' => $achievedScore,
+                'total_score' => $totalScore,
+                'score_percentage' => $scorePercentage,
+                'band_score' => $bandScore,
+                'time_taken_seconds' => $timeTakenSeconds,
+            ]
+        );
+
+
+
         return response()->json([
             'message' => 'Reading answers submitted successfully!',
-            //'answers' => $answers,
+            'achieved_score' => $achievedScore,
+            'total_score' => $totalScore,
+            'score_percentage' => $scorePercentage,
+            'band_score' => $bandScore,
         ]);
+    }
+
+    public function calculateIELTSBand($scorePercentage)
+    {
+        // This is a simplified example. You can adjust the thresholds based on actual IELTS band score criteria.
+        if ($scorePercentage >= 90) {
+            return 9.0;
+        } elseif ($scorePercentage >= 80) {
+            return 8.0;
+        } elseif ($scorePercentage >= 70) {
+            return 7.0;
+        } elseif ($scorePercentage >= 60) {
+            return 6.0;
+        } elseif ($scorePercentage >= 50) {
+            return 5.0;
+        } elseif ($scorePercentage >= 40) {
+            return 4.0;
+        } elseif ($scorePercentage >= 30) {
+            return 3.0;
+        } elseif ($scorePercentage >= 20) {
+            return 2.0;
+        } elseif ($scorePercentage >= 10) {
+            return 1.0;
+        } else {
+            return 0.0;
+        }
+
     }
 }

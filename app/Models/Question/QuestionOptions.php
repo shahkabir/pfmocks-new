@@ -50,9 +50,4 @@ class QuestionOptions extends Model
     {
         return $query->orderBy('sort_order');
     }
-
-    public function scopeActive($query)
-    {
-        return $query->where('questions_options.is_active', 1);
-    }
 }

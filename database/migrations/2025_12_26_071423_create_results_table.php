@@ -41,9 +41,6 @@ return new class extends Migration
             //   "part2": 7,
             //   "part3": 9
             // }
-
-
-
             $table->timestamps();
             $table->index(['user_id', 'created_at']);
         });
