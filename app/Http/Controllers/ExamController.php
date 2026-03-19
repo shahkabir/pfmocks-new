@@ -79,6 +79,8 @@ class ExamController extends Controller
             'questions.*',
             'question_groups.question_options_group_ids',
             'question_groups.part_number',
+            'question_groups.part_audio_url',
+            'question_groups.part_image_url'
             ])
         ->get()
         ->toArray();

@@ -308,7 +308,8 @@
             $parts[$part] = [
                 'header' => $question['question_header'],
                 'passage' => $question['passage'],
-                'audio_url' => $question['audio_url'],
+                'part_audio_url' => $question['part_audio_url'],
+                'part_image_url' => $question['part_image_url'],
                 'blocks' => []
             ];
         }
@@ -390,6 +391,17 @@
                                                 {{ $actualQuestion }}
                                              @endif  
                                     </h6>
+                                    
+                                    {{-- {{ dd($options); }} --}}
+
+                                    {{-- show question image if exists --}}
+                                    @if(!empty($options[0]['question_image_path']))
+                                        <div class="mb-3">
+                                            <img src="{{ asset($options[0]['question_image_path']) }}" 
+                                            alt="Question Image" class="img-fluid"
+                                            style="max-width: 400px; max-height: 400px;">
+                                        </div>
+                                    @endif
 
                                     {{-- @php dd($actualQuestion, $options, $options[0]['ielts_listening_question_line']); @endphp --}}
                                     {{-- {{ $actualQuestion}} --}}
@@ -411,7 +423,8 @@
                                                             class="form-control d-inline-block mx-1" 
                                                             style="width:160px" 
                                                             name="answers[' . $option['question_id'] . '][question_option_id][' . $option['id'] . ']"  
-                                                            data-question-id="' . $option['question_id'] . '">', ////$qNo
+                                                            data-question-id="' . $option['question_id'] . '"
+                                                            placeholder="'. $qNo .'">', ////$qNo
                                                     e($option['actual_question'])
                                                 ) !!}
                                                 {{-- <input type="hidden" name="answers[{{ $option['question_id'] }}][question_type]" value="{{ $option['question_type'] }}"> --}}
@@ -525,7 +538,7 @@
     <div class="exam-footer">
 
         <audio controls class="audio-player" controlsList="nodownload">
-            <source src="{{ asset('').$parts[1]['audio_url'] }}" type="audio/mpeg">
+            <source src="{{ asset('').$parts[1]['part_audio_url'] }}" type="audio/mpeg">
             Your browser does not support the audio element.
         </audio>
 
@@ -598,6 +611,13 @@
             btn.classList.remove('active');
         });
         event.target.classList.add('active');
+
+        // Update audio source
+        const audioPlayer = document.querySelector('.audio-player');
+        const partAudioUrl = "{{ asset('') }}" + @json($parts)[partNumber]['part_audio_url'];
+        audioPlayer.src = partAudioUrl;
+        audioPlayer.load();
+
     }
 
 

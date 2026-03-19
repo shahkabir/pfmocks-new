@@ -15,6 +15,8 @@ class QuestionGroup extends Model
         'question_id',
         'question_options_group_ids',
         'part_number',
+        'part_audio_url',
+        'part_image_url'
     ];
 
     protected $casts = [
