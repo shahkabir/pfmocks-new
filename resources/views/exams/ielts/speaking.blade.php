@@ -1,6 +1,6 @@
 
 {{-- @extends('layouts.app') --}}
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @section('title', 'IELTS Speaking Test')
 
 {{-- @section('content') --}}
@@ -112,82 +112,167 @@
     </div>
 </div>
 
+{{-- {{ dd(get_defined_vars()) }} --}}
+
+@php
+    $parts = [];
+
+    foreach ($questions as $question) {
+
+        $part = $question['part_number']; //['group']
+        // var_dump($part);
+
+        if (!isset($parts[$part])) {
+
+            $parts[$part] = [
+                'header' => $question['question_header'],
+                'passage' => $question['passage'],
+                'part_audio_url' => $question['part_audio_url'],
+                'part_image_url' => $question['part_image_url'],
+                'blocks' => []
+            ];
+        }
+
+        // Each instruction block
+        foreach ($question['group']['blocks'] as $block) {
+
+            $blockKey = $block['id'];
+
+            if (!isset($parts[$part]['blocks'][$blockKey])) {
+
+                $parts[$part]['blocks'][$blockKey] = [
+                    'instruction' => $block['instruction_text'],
+                    'questions' => []
+                ];
+            }
+
+            // echo 'question_option_ids: '. print_r($block['question_option_ids']);
+
+            // print_r(collect($question['options'])->pluck('id'));
+
+            // Filter only options belonging to this block
+            $optionsInBlock = collect($question['options'])
+                ->whereIn('id', $block['question_option_ids'])
+                ->groupBy('actual_question');
+
+            //dd($optionsInBlock);
+
+            foreach ($optionsInBlock as $actualQuestion => $options) {
+                $parts[$part]['blocks'][$blockKey]['questions'][$actualQuestion] = $options;
+            }
+        }
+    }
+    
+    // dd($parts);
+
+@endphp
+
 {{-- ================= MAIN CONTENT ================= --}}
+<form class="speaking-form">
+@csrf
 <div class="exam-content">
 
-    {{-- ===== PART 1 ===== --}}
-    <div class="speaking-part">
-        <h5>Part 1 – Introduction & Interview</h5>
+    <div class="exam-body">
+        @php $qNo = 1; @endphp
+        @foreach($parts as $partNumber => $partData)
 
-        <div class="question-item">
-            <div>1. Can you tell me about your hometown?</div>
-            <button class="btn btn-outline-danger btn-sm record-btn">
-                🎤 Record
-            </button>
-        </div>
+                <div class="exam-body listening-part"
+                    id="part-{{ $partNumber }}"
+                    style="{{ $partNumber === array_key_first($parts) ? '' : 'display:none' }}">
 
-        <div class="question-item">
-            <div>2. Do you work or are you a student?</div>
-            <button class="btn btn-outline-danger btn-sm record-btn">
-                🎤 Record
-            </button>
-        </div>
+                    {{-- RIGHT: QUESTIONS --}}
+                    <div class="question-panel">
+                    
+                        @foreach($partData['blocks'] as $block)
 
-        <div class="question-item">
-            <div>3. What do you like to do in your free time?</div>
-            <button class="btn btn-outline-danger btn-sm record-btn">
-                🎤 Record
-            </button>
-        </div>
-    </div>
+                            {{-- INSTRUCTION (shown ONCE per block) --}}
+                                <div class="alert alert-light mb-3 border-secondary">
+                                    <b>{!! $block['instruction'] !!}</b>
+                                    {{-- nl2br(e()) --}}
+                                </div>
 
-    {{-- ===== PART 2 ===== --}}
-    <div class="speaking-part">
-        <h5>Part 2 – Long Turn</h5>
+                            {{-- QUESTIONS UNDER THIS INSTRUCTION --}}
+                            @foreach($block['questions'] as $actualQuestion => $options)
+                                <div class="mb-4">
+                                    {{-- @php var_dump($options); @endphp --}}
+                                    <h6 class="mb-2">
+                                             @if(!str_contains($actualQuestion, '[[blank]]') 
+                                                && $options[0]['question_type'] != 'fill_in_blanks'
+                                                && $options[0]['question_type'] != 'no_question')
+                                                <strong>{{ $qNo }}&nbsp;{{ $actualQuestion }} </strong>
+                                             @elseif($options[0]['question_type'] == 'no_question')
+                                              @php $qNo--; @endphp
+                                                {{ $actualQuestion }}
+                                             @endif  
+                                    </h6>
+                                    
+                                    {{-- {{ dd($options); }} --}}
 
-        <div class="mb-3">
-            <strong>Describe a memorable journey you have taken.</strong>
-            <ul>
-                <li>where you went</li>
-                <li>who you went with</li>
-                <li>what you did</li>
-                <li>and explain why it was memorable</li>
-            </ul>
-            <p><em>You will have 1 minute to prepare and up to 2 minutes to speak.</em></p>
-        </div>
+                                    {{-- show question image if exists --}}
+                                    @if(!empty($options[0]['question_image_path']))
+                                        <div class="mb-3">
+                                            <img src="{{ asset($options[0]['question_image_path']) }}" 
+                                            alt="Question Image" class="img-fluid"
+                                            style="max-width: 400px; max-height: 400px;">
+                                        </div>
+                                    @endif
 
-        <button class="btn btn-outline-danger btn-sm record-btn">
-            🎤 Record Answer
-        </button>
-    </div>
+                                    {{-- @php dd($actualQuestion, $options, $options[0]['ielts_listening_question_line']); @endphp --}}
+                                    {{-- {{ $actualQuestion}} --}}
+                                        @foreach($options as $option)
 
-    {{-- ===== PART 3 ===== --}}
-    <div class="speaking-part">
-        <h5>Part 3 – Discussion</h5>
+                                        {{-- <h6 class="mb-2">
+                                            {{ 'question_option_id:'. $option['id']}}
+                                            {{ 'question_id: '. $option['question_id'] }}
+                                            {{ 'correct: '. ($option['is_correct'] ? 'true' : 'false') }}
+                                        </h6> --}}
 
-        <div class="question-item">
-            <div>1. Why do people like to travel to different countries?</div>
-            <button class="btn btn-outline-danger btn-sm record-btn">
-                🎤 Record
-            </button>
-        </div>
+                                            @if($option['question_type'] == 'ielts_speaking')
 
-        <div class="question-item">
-            <div>2. How has travel changed in the last few decades?</div>
-            <button class="btn btn-outline-danger btn-sm record-btn">
-                🎤 Record
-            </button>
-        </div>
+                                                <div class="speaking-question mb-3" data-question-id="{{ $option['question_id'] }}">
+                                                    
+                                                    {{-- <audio controls>
+                                                        <source src="{{ asset($option['option_text']) }}" type="audio/mpeg">
+                                                        Your browser does not support the audio element.
+                                                    </audio> --}}
 
-        <div class="question-item">
-            <div>3. Do you think international travel will increase in the future?</div>
-            <button class="btn btn-outline-danger btn-sm record-btn">
-                🎤 Record
-            </button>
-        </div>
+                                                    <button type="button" class="btn btn-sm btn-primary start-btn">Start</button>
+                                                    <button type="button" class="btn btn-sm btn-danger stop-btn">Stop</button>
+
+                                                    <audio class="preview mt-2" controls></audio>
+
+                                                    {{-- store uploaded file path --}}
+                                                    {{-- <input type="hidden"
+                                                        name="answers[{{ $question['id'] }}][audio_path]"
+                                                        class="audio-path"> --}}
+                                                </div>
+
+                                             
+
+                                                {{-- @elseif($option['question_type'] === 'no_question')
+                                                    <div class="mb-3">
+                                                        <b>{{ $option['actual_question'] }}</b>
+                                                    </div> --}}
+
+                                                @php break; @endphp
+                                            @endif
+
+                                        @endforeach
+                                </div>
+                             @php $qNo++ @endphp
+                            {{-- {{ QUESTION BLOCK ENDS HERE }} --}}
+                            @endforeach
+                        {{-- BLOCKS loop ends here --}}
+                        @endforeach
+                    </div>
+                </div>
+       
+        {{-- PARTS loop ends here--}}
+        @endforeach 
     </div>
 
 </div>
+</form>
 
 {{-- ================= FOOTER ================= --}}
 <div class="exam-footer">
@@ -201,5 +286,58 @@
         </button>
     </div>
 </div>
+
+<script>
+let recorders = {};
+
+document.querySelectorAll('.speaking-question').forEach(container => {
+
+    const startBtn = container.querySelector('.start-btn');
+    const stopBtn = container.querySelector('.stop-btn');
+    const audioPreview = container.querySelector('.preview');
+    const hiddenInput = container.querySelector('.audio-path');
+
+    let mediaRecorder;
+    let chunks = [];
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'audio/webm' });
+            chunks = [];
+
+            audioPreview.src = URL.createObjectURL(blob);
+
+            uploadAudio(blob, container.dataset.questionId, hiddenInput);
+        };
+
+        startBtn.onclick = () => mediaRecorder.start();
+        stopBtn.onclick = () => mediaRecorder.stop();
+    });
+});
+
+function uploadAudio(blob, questionId, hiddenInput) {
+
+    let formData = new FormData();
+    formData.append('audio', blob, 'speaking.webm');
+    formData.append('question_id', questionId);
+
+    fetch('/speaking-upload-audio', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(res => res.json());
+    // .then(data => {
+    //     hiddenInput.value = data.path;
+    // });
+}
+</script>
 
 {{-- @endsection --}}

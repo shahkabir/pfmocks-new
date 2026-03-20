@@ -81,6 +81,9 @@ Route::get('/ielts-speaking',function(){
     return view('exams.ielts.speaking');
 });
 
+Route::post('/speaking-upload-audio', [ExamController::class, 'submitIeltsSpeakingAudio'])
+    ->name('exam.ielts.speaking.upload_audio');
+
 //CRUD: User Page to Admin
 Route::controller(UserController::class)->group(function () {
     Route::get('user-list', [UserController::class, 'showUserList'])->name('admin.user.list');

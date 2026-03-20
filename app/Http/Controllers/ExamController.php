@@ -377,6 +377,45 @@ class ExamController extends Controller
         ]);
     }
 
+    public function submitIeltsSpeakingAudio(Request $request)
+    {
+        //dd($request->all());
+
+        $user = auth()->user();
+        $questionId = $request->input('question_id');
+        $audioFile = $request->file('audio');
+
+        $filename = uniqid().'_'.$audioFile->getClientOriginalName();
+
+        if ($audioFile) {
+            $path = $audioFile->storeAs('speaking-audios', $filename, 'public');
+            $audioUrl = str_replace('public/', 'storage/', $path);
+
+            // Save the audio URL to the database (you can create a new model or use an existing one)
+            Answer::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'question_id' => $questionId,
+                    'exam_attempt_id' => ExamAttempt::where('user_id', $user->id)
+                                        ->where('module_id', 1) // IELTS Speaking module ID
+                                        ->value('id'),
+                ],
+                [
+                    'answer' => $audioUrl, // Store the audio URL as the answer
+                    'is_correct' => null, // Speaking answers are not auto-graded
+                ]
+            );
+
+            return response()->json([
+                'message' => 'Audio uploaded successfully!',
+                'audio_url' => asset($audioUrl),
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'No audio file uploaded.',
+            ], 400);
+        }
+    }
     public function calculateIELTSBand($scorePercentage)
     {
         // This is a simplified example. You can adjust the thresholds based on actual IELTS band score criteria.
