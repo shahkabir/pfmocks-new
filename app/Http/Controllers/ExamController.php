@@ -391,14 +391,25 @@ class ExamController extends Controller
             $path = $audioFile->storeAs('speaking-audios', $filename, 'public');
             $audioUrl = str_replace('public/', 'storage/', $path);
 
+        //Update Exam Attempt
+        $examAttempt = ExamAttempt::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'module_id' => 1, // IELTS Reading module ID
+                'started_at' => now(),
+                'status' => 'completed',
+            ],
+            [
+                'ended_at' => now(),
+            ]
+        );
+
             // Save the audio URL to the database (you can create a new model or use an existing one)
             Answer::updateOrCreate(
                 [
                     'user_id' => $user->id,
                     'question_id' => $questionId,
-                    'exam_attempt_id' => ExamAttempt::where('user_id', $user->id)
-                                        ->where('module_id', 1) // IELTS Speaking module ID
-                                        ->value('id'),
+                    'exam_attempt_id' => $examAttempt->id,
                 ],
                 [
                     'answer' => $audioUrl, // Store the audio URL as the answer

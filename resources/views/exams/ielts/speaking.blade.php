@@ -44,35 +44,52 @@
     /* ===== CONTENT ===== */
     .exam-content {
         background: #fff;
-        height: calc(100vh - 220px);
+        height: calc(100vh - 260px);
         overflow-y: auto;
         padding: 20px;
     }
 
-    .speaking-part {
-        border-bottom: 1px solid #eee;
+    .question-block {
         margin-bottom: 25px;
-        padding-bottom: 20px;
     }
 
-    .speaking-part h5 {
-        margin-bottom: 15px;
-        font-weight: 600;
+    .question-block input {
+        width: 120px;
+        display: inline-block;
+        margin: 0 5px;
+        text-align: center;
     }
 
-    .question-item {
-        margin-bottom: 15px;
-        padding: 10px 15px;
+    /* ===== QUESTION PALETTE ===== */
+    .question-palette {
         background: #f9fafb;
-        border-radius: 4px;
+        border-top: 1px solid #ddd;
+        padding: 10px 15px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
+        flex-wrap: wrap;
     }
 
-    .record-btn {
-        white-space: nowrap;
+    .palette-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        background: #fff;
+        font-size: 13px;
+    }
+
+    .palette-btn.active {
+        background: #007bff;
+        color: #fff;
+        border-color: #007bff;
+    }
+
+    .palette-nav {
+        margin-left: auto;
+        display: flex;
+        gap: 5px;
     }
 
     /* ===== FOOTER ===== */
@@ -82,12 +99,12 @@
         padding: 10px 15px;
         display: flex;
         align-items: center;
+        gap: 15px;
     }
 
-    .time-left {
-        font-weight: bold;
-        font-size: 14px;
-    }
+    /* .exam-footer audio {
+        width: 320px;
+    } */
 
     .footer-right {
         margin-left: auto;
@@ -274,6 +291,33 @@
 </div>
 </form>
 
+{{-- ================= Parts ================= --}}
+    <div class="mb-3">
+        @foreach($parts as $partNumber => $partData)
+            <button type="button" class="btn btn-sm btn-primary" onclick="showPart({{ $partNumber }})">
+                Part {{ $partNumber }}
+            </button>
+        @endforeach
+    </div>
+
+    {{-- ================= QUESTION PALETTE ================= --}}
+    <div class="question-palette">
+        @for($i = 1; $i <= 10; $i++)
+            <button class="palette-btn {{ $i === 1 ? 'active' : '' }}">
+                {{ $i }}
+            </button>
+        @endfor
+
+        <div class="palette-nav">
+            <button class="btn btn-outline-secondary btn-sm">
+                ←
+            </button>
+            <button class="btn btn-primary btn-sm">
+                →
+            </button>
+        </div>
+    </div>
+
 {{-- ================= FOOTER ================= --}}
 <div class="exam-footer">
     <div class="time-left">
@@ -338,6 +382,21 @@ function uploadAudio(blob, questionId, hiddenInput) {
     //     hiddenInput.value = data.path;
     // });
 }
+
+
+function showPart(partNumber) {
+        document.querySelectorAll('.listening-part').forEach(part => {
+            part.style.display = 'none';
+        });
+        document.getElementById('part-' + partNumber).style.display = 'flex';
+
+        // Update active button
+        document.querySelectorAll('.palette-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+    }
 </script>
 
 {{-- @endsection --}}

@@ -276,24 +276,30 @@
 {{-- ================= TOP BAR ================= --}}
 <div class="exam-topbar">
     <div class="exam-topbar-left">
-        <div class="exam-logo">IELTS</div>
-        <div class="candidate-info">
-            <strong>48887345</strong><br>
-            <span class="timer">59 minutes remaining</span>
+        <div class="exam-logo">IELTS | {{ $module->name }}</div>
+        {{-- <strong>Candidate:</strong> {{ $user->name }} – {{ $user->id }} --}}
+    </div>
+
+    <div class="exam-topbar-center">
+        <div class="time" id="time">
+            <svg xmlns="http://w3.org" width="16" height="16" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
+                <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
+                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/>
+            </svg>
+            <span id="timer">{{ $module->duration_minutes }}:00</span>
         </div>
     </div>
 
-    <div class="top-icons">
-        <i class="fas fa-wifi"></i>
-        <i class="far fa-bell"></i>
-        <i class="fas fa-bars"></i>
-        <i class="far fa-edit"></i>
+    <div class="exam-topbar-right">
+        <div class="candidate-info">
+            <strong> {{ $user->name }}</strong><br>
+        </div>
     </div>
 </div>
 
 {{-- ================= BODY ================= --}}
 
-{{-- {{ dd(get_defined_vars()) }} --}}
+{{-- {{ dd(get_defined_vars(), $module->duration_minutes) }} --}}
 
 @php
     $parts = [];
@@ -647,6 +653,18 @@
         }
 
     });
+
+    // Countdown timer (dummy)
+    let seconds = {{ $module->duration_minutes * 60 }}; // 59 minutes
+
+    setInterval(() => {
+        if (seconds <= 0) return;
+        seconds--;
+        let m = Math.floor(seconds / 60);
+        let s = seconds % 60;
+        document.getElementById('timer').innerText =
+            `${m}:${s.toString().padStart(2, '0')}`;
+    }, 1000);
 
 </script>
 {{-- @endsection --}}
