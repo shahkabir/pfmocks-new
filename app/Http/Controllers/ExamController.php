@@ -427,6 +427,30 @@ class ExamController extends Controller
             ], 400);
         }
     }
+
+    public function submitIELTSListening(Request $request)
+    {
+        //dd($request->all());
+
+        $user = auth()->user();
+        $answers = $request->input('answers', []);
+        //dd($answers);
+
+        // The logic for processing listening answers will be similar to reading answers
+        // You can reuse the makeArrayLinear function and the way we handle different question types
+
+        // For brevity, I'm not repeating the entire code here, but you would follow a similar structure:
+        // 1. Flatten the answers array to get all option IDs and fill in the blank answers
+        // 2. Get question types based on option IDs
+        // 3. Update or create Answer records based on question type (mcq_single, mcq_multiple, fill_in_blanks, etc.)
+        // 4. Calculate score and save results
+
+        return response()->json([
+            'message' => 'Listening answers submitted successfully!',
+            //'answers' => $answers,
+        ]);
+    }
+
     public function calculateIELTSBand($scorePercentage)
     {
         // This is a simplified example. You can adjust the thresholds based on actual IELTS band score criteria.

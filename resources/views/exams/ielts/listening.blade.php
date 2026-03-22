@@ -4,21 +4,21 @@
 
 {{-- @section('content') --}}
 <style>
-    body {
+    /* body {
         background: #f4f6f9;
-    }
+    } */
 
     /* ===== TOP BAR ===== */
-    .exam-topbar {
+    /* .exam-topbar {
         background: #ffffff;
         border-bottom: 1px solid #ddd;
         padding: 10px 15px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-    }
+    } */
 
-    .exam-topbar-left {
+    /* .exam-topbar-left {
         display: flex;
         align-items: center;
         gap: 15px;
@@ -38,7 +38,7 @@
         margin-left: 15px;
         color: #555;
         cursor: pointer;
-    }
+    } */
 
     /* ===== CONTENT ===== */
     .exam-content {
@@ -145,13 +145,14 @@
     }
 
     .candidate-info {
-        font-size: 13px;
-        color: #333;
+        font-size: 15px;
+        /* color: #333; */
+        color: rgb(120, 121, 122);
     }
 
     .timer {
         font-weight: bold;
-        font-size: 14px;
+        font-size: 15px;
     }
 
     .top-icons i {
@@ -166,7 +167,7 @@
         /* display: flex; */
         height: calc(100vh - 200px);
         background: #fff;
-        border-bottom: 1px solid #ddd;
+        /* border-bottom: 1px solid #ddd; */
     }
 
     .listening-panel {
@@ -179,9 +180,13 @@
 
     .question-panel {
         width: 100%;
-        padding: 20px;
+        padding: 10px 20px;
         overflow-y: auto;
         background: #e5e5e5;
+    }
+
+    .border-secondary{
+        margin-bottom: 5px !important;
     }
 
     .question {
@@ -202,11 +207,23 @@
     /* ===== QUESTION PALETTE ===== */
     .question-palette {
         background: #f9fafb;
-        border-top: 1px solid #ddd;
-        padding: 10px 15px;
+        /* border-top: 1px solid #ddd; */
+        padding: 5px 20px;
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+    }
+
+    .parts-area{
+        margin: 0px !important;
+        padding-left: 20px;
+        display: flex;
+        gap: 15px;
+        background: #f9fafb;
+    }
+
+    .btn-parts {
+       border-radius: 5px;
     }
 
     .palette-btn {
@@ -214,14 +231,14 @@
         height: 34px;
         border-radius: 4px;
         border: 1px solid #ccc;
-        background: #fff;
+        background: #676767;
         font-size: 13px;
     }
 
     .palette-btn.active {
-        background: #007bff;
-        color: #fff;
-        border-color: #007bff;
+        background: #ffffff;
+        color: #000000;
+        border-color: #676767;
     }
 
     /* ===== FOOTER ===== */
@@ -245,9 +262,16 @@
         font-size: 14px;
     }
 
+    /* ====== Audio Player ====== */
+    .audio-div{
+        display: flex;
+        padding: 2px 15px 10px 15px;
+        justify-content: center;
+    }
+
     .audio-player {
         width: 100%;
-        max-width: 1000px;
+        max-width: 1200px;
     }
 </style>
 
@@ -276,8 +300,7 @@
 {{-- ================= TOP BAR ================= --}}
 <div class="exam-topbar">
     <div class="exam-topbar-left">
-        <div class="exam-logo">IELTS | {{ $module->name }}</div>
-        {{-- <strong>Candidate:</strong> {{ $user->name }} – {{ $user->id }} --}}
+        <div class="exam-logo">IELTS</div>  {{ $module->name }}
     </div>
 
     <div class="exam-topbar-center">
@@ -286,7 +309,7 @@
                 <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
                 <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/>
             </svg>
-            <span id="timer">{{ $module->duration_minutes }}:00</span>
+            <strong><span id="timer">{{ $module->duration_minutes }}:00</span></strong>
         </div>
     </div>
 
@@ -299,11 +322,9 @@
 
 {{-- ================= BODY ================= --}}
 
-{{-- {{ dd(get_defined_vars(), $module->duration_minutes) }} --}}
-
 @php
     $parts = [];
-
+    $totalNumberOfQuestionsInAllParts = 0;
     foreach ($questions as $question) {
 
         $part = $question['part_number']; //['group']
@@ -346,15 +367,16 @@
 
             foreach ($optionsInBlock as $actualQuestion => $options) {
                 $parts[$part]['blocks'][$blockKey]['questions'][$actualQuestion] = $options;
+                $totalNumberOfQuestionsInAllParts++;
             }
         }
     }
     
-    // dd($parts);
-
 @endphp
 
-<form class="reading-form">
+{{-- {{ dd(get_defined_vars(), $parts, $totalNumberOfQuestionsInAllParts) }} --}}
+
+<form class="listening-form">
 @csrf
     <div class="exam-body">
         @php $qNo = 1; @endphp
@@ -364,18 +386,10 @@
                     id="part-{{ $partNumber }}"
                     style="{{ $partNumber === array_key_first($parts) ? '' : 'display:none' }}">
 
-                    {{-- LEFT: PASSAGE --}}
-                    {{-- <div class="reading-panel">
-                        <h5>Part {{ $partNumber }}</h5>
-                        <p><strong>{{ $partData['header'] }}</strong></p>
-                        <div>
-                            {!! nl2br(e($partData['passage'])) !!}
-                        </div>
-                    </div> --}}
-
+                    
                     {{-- RIGHT: QUESTIONS --}}
                     <div class="question-panel">
-                    
+
                         @foreach($partData['blocks'] as $block)
 
                             {{-- INSTRUCTION (shown ONCE per block) --}}
@@ -383,9 +397,20 @@
                                     <b>{!! $block['instruction'] !!}</b>
                                     {{-- nl2br(e()) --}}
                                 </div>
+
+                                <div class="audio-div">
+                                    <audio controls class="audio-player" controlsList="nodownload">
+                                        <source src="{{ asset('').$parts[1]['part_audio_url'] }}" type="audio/mpeg">
+                                                Your browser does not support the audio element.
+                                    </audio>    
+                                </div>
+
                             {{-- QUESTIONS UNDER THIS INSTRUCTION --}}
                             @foreach($block['questions'] as $actualQuestion => $options)
-                                <div class="mb-4">
+                            {{-- Actual Question div --}}
+                                <div class="mb-4 question-item" id="question-{{ $qNo }}" 
+                                            data-part="{{ $partNumber }}"
+                                            data-qno="{{ $qNo }}">
                                     {{-- @php var_dump($options); @endphp --}}
                                     <h6 class="mb-2">
                                              @if(!str_contains($actualQuestion, '[[blank]]') 
@@ -514,40 +539,25 @@
 
 
     {{-- ================= Parts ================= --}}
-    <div class="mb-3">
+    <div class="mb-3 parts-area">
         @foreach($parts as $partNumber => $partData)
-            <button type="button" class="btn btn-sm btn-primary" onclick="showPart({{ $partNumber }})">
+            <button type="button" class="btn btn-sm btn-secondary btn-parts" onclick="showPart({{ $partNumber }})">
                 Part {{ $partNumber }}
             </button>
         @endforeach
     </div>
-
+    {{-- {{dd($qNo)}} --}}
     {{-- ================= QUESTION PALETTE ================= --}}
     <div class="question-palette">
-        @for($i = 1; $i <= 10; $i++)
-            <button class="palette-btn {{ $i === 1 ? 'active' : '' }}">
+        @for($i = 1; $i <= $qNo; $i++)
+            <button type="button" class="palette-btn {{ $i === 1 ? 'active' : '' }}" data-target="question-{{ $i }}">
                 {{ $i }}
             </button>
         @endfor
-
-        <div class="palette-nav">
-            <button class="btn btn-outline-secondary btn-sm">
-                ←
-            </button>
-            <button class="btn btn-primary btn-sm">
-                →
-            </button>
-        </div>
     </div>
 
     {{-- ================= FOOTER ================= --}}
     <div class="exam-footer">
-
-        <audio controls class="audio-player" controlsList="nodownload">
-            <source src="{{ asset('').$parts[1]['part_audio_url'] }}" type="audio/mpeg">
-            Your browser does not support the audio element.
-        </audio>
-
         <div class="footer-right">
             <button type="submit" class="btn btn-success btn-sm">Submit Answers</button>
             <button class="btn btn-outline-secondary btn-sm">
@@ -555,35 +565,12 @@
             </button>
         </div>
     </div>
-
-    {{-- ================= QUESTION PALETTE ================= --}}
-    {{-- <div class="question-palette">
-        @for($i = 1; $i <= 13; $i++)
-            <button class="palette-btn {{ $i === 1 ? 'active' : '' }}">
-                {{ $i }}
-            </button>
-        @endfor
-    </div> --}}
-
-
-
-    {{-- ================= FOOTER ================= --}}
-    {{-- <div class="exam-footer">
-        <div class="current-time">
-            ⏰ 15:49
-        </div>
-
-        <div class="footer-right">
-            <button type="submit" class="btn btn-success btn-sm">Submit Answers</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm">Exit</button>
-        </div>
-    </div> --}}
 </form>
 
 {{-- @endsection --}}
 <script>
 
-    $('.reading-form').on('submit', function(e) {
+    $('.listening-form').on('submit', function(e) {
         e.preventDefault();
 
         const formData = $(this).serialize();
@@ -591,7 +578,7 @@
         console.log(formData);
 
         $.ajax({
-            url: "{{ route('exam.ielts.reading.submit') }}",
+            url: "{{ route('exam.ielts.listening.submit') }}",
             method: "POST",
             data: formData,
             success: function(response) {
@@ -607,9 +594,10 @@
 
 
     function showPart(partNumber) {
-        document.querySelectorAll('.listening-part').forEach(part => {
+        document.querySelectorAll('.listening-part' ,'.audio-div').forEach(part => {
             part.style.display = 'none';
         });
+
         document.getElementById('part-' + partNumber).style.display = 'flex';
 
         // Update active button
@@ -654,6 +642,8 @@
 
     });
 
+
+
     // Countdown timer (dummy)
     let seconds = {{ $module->duration_minutes * 60 }}; // 59 minutes
 
@@ -665,6 +655,30 @@
         document.getElementById('timer').innerText =
             `${m}:${s.toString().padStart(2, '0')}`;
     }, 1000);
+
+    // Question palette navigation
+    $(document).on('click', '.palette-btn', function () {
+
+            let targetId = $(this).data('target');
+            let $target = $('#' + targetId);
+
+            if (!$target.length) return;
+
+            let part = $target.data('part');
+
+            // 🔹 Step 1: Show correct part
+            $('.listening-part').hide();
+            $('#part-' + part).show();
+
+            // 🔹 Step 2: Scroll to question
+            $('html, body').animate({
+                scrollTop: $target.offset().top - 100
+            }, 300);
+
+            // 🔹 Step 3: Highlight active palette
+            $('.palette-btn').removeClass('active');
+            $(this).addClass('active');
+    });
 
 </script>
 {{-- @endsection --}}

@@ -77,6 +77,9 @@ Route::get('/ielts-listening',function(){
     return view('exams.ielts.listening');
 });
 
+Route::post('/ielts-listening/submit', [ExamController::class, 'submitIELTSListening'])
+    ->name('exam.ielts.listening.submit');
+
 Route::get('/ielts-speaking',function(){
     return view('exams.ielts.speaking');
 });
