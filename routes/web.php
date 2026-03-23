@@ -70,14 +70,14 @@ Route::get('/ielts-reading',function(){
     return view('exams.ielts.reading');
 });
 
-Route::post('/ielts-reading/submit', [ExamController::class, 'submitIELTSReading'])
+Route::post('/ielts-reading/submit', [ExamController::class, 'submitIELTSReadingAndListening'])
     ->name('exam.ielts.reading.submit');
 
 Route::get('/ielts-listening',function(){
     return view('exams.ielts.listening');
 });
 
-Route::post('/ielts-listening/submit', [ExamController::class, 'submitIELTSListening'])
+Route::post('/ielts-listening/submit', [ExamController::class, 'submitIELTSReadingAndListening'])
     ->name('exam.ielts.listening.submit');
 
 Route::get('/ielts-speaking',function(){

@@ -25,6 +25,7 @@ class ExamController extends Controller
             ->where('user_id', $user->id)
             ->orderByDesc('purchased_at')
             ->get();
+        //dd($exams);
 
         return view('student.dashboard', compact('exams'));
     }
@@ -187,13 +188,21 @@ class ExamController extends Controller
         ];
     }
 
+    /*
+    * Saves noth IELTS Reading and Listening answers since they have similar 
+    * structure and handling (mcq single, mcq multiple, fill in the blanks, etc.
+    *
+    */
 
-    public function submitIELTSReading(Request $request)
+    public function submitIELTSReadingAndListening(Request $request)
     {
         //dd($request->all());
 
         $user = auth()->user();
         $answers = $request->input('answers', []);
+        $moduleId = $request->input('module_id');
+        $moduleType = $request->input('module_type');
+        $examName = $request->input('exam_name');
         //dd($answers);
 
         //First get the question_type for each question from the request
@@ -222,7 +231,7 @@ class ExamController extends Controller
         $examAttempt = ExamAttempt::updateOrCreate(
             [
                 'user_id' => $user->id,
-                'module_id' => 1, // IELTS Reading module ID
+                'module_id' => $moduleId,
                 'started_at' => now(),
                 'status' => 'completed',
             ],
@@ -336,7 +345,6 @@ class ExamController extends Controller
         }
 
 
-
         //Save the results for the exam attempt here (calculate score, save to results table, etc.)
         $status = 'completed'; // or 'pending' if you want to evaluate later
         $achievedScore = Answer::where('exam_attempt_id', $examAttempt->id)
@@ -356,8 +364,8 @@ class ExamController extends Controller
             ],
             [
                 'status' => $status,
-                'exam_name' => 'IELTS Reading',
-                'module_name' => 'Reading',
+                'exam_name' => $examName, 
+                'module_name' => ModuleConstants::MODULES[$moduleType] ?? null,
                 'achieved_score' => $achievedScore,
                 'total_score' => $totalScore,
                 'score_percentage' => $scorePercentage,
@@ -366,10 +374,12 @@ class ExamController extends Controller
             ]
         );
 
+        // Update user exam status to completed
+        $this->updateUserExamStatus($user->id, $moduleId, 'completed');
 
 
         return response()->json([
-            'message' => 'Reading answers submitted successfully!',
+            'message' => 'Your answers have been submitted successfully!',
             'achieved_score' => $achievedScore,
             'total_score' => $totalScore,
             'score_percentage' => $scorePercentage,
@@ -428,28 +438,28 @@ class ExamController extends Controller
         }
     }
 
-    public function submitIELTSListening(Request $request)
-    {
-        //dd($request->all());
+    // public function submitIELTSListening(Request $request)
+    // {
+    //     //dd($request->all());
 
-        $user = auth()->user();
-        $answers = $request->input('answers', []);
-        //dd($answers);
+    //     $user = auth()->user();
+    //     $answers = $request->input('answers', []);
+    //     //dd($answers);
 
-        // The logic for processing listening answers will be similar to reading answers
-        // You can reuse the makeArrayLinear function and the way we handle different question types
+    //     // The logic for processing listening answers will be similar to reading answers
+    //     // You can reuse the makeArrayLinear function and the way we handle different question types
 
-        // For brevity, I'm not repeating the entire code here, but you would follow a similar structure:
-        // 1. Flatten the answers array to get all option IDs and fill in the blank answers
-        // 2. Get question types based on option IDs
-        // 3. Update or create Answer records based on question type (mcq_single, mcq_multiple, fill_in_blanks, etc.)
-        // 4. Calculate score and save results
+    //     // For brevity, I'm not repeating the entire code here, but you would follow a similar structure:
+    //     // 1. Flatten the answers array to get all option IDs and fill in the blank answers
+    //     // 2. Get question types based on option IDs
+    //     // 3. Update or create Answer records based on question type (mcq_single, mcq_multiple, fill_in_blanks, etc.)
+    //     // 4. Calculate score and save results
 
-        return response()->json([
-            'message' => 'Listening answers submitted successfully!',
-            //'answers' => $answers,
-        ]);
-    }
+    //     return response()->json([
+    //         'message' => 'Listening answers submitted successfully!',
+    //         //'answers' => $answers,
+    //     ]);
+    // }
 
     public function calculateIELTSBand($scorePercentage)
     {
@@ -476,5 +486,12 @@ class ExamController extends Controller
             return 0.0;
         }
 
+    }
+
+    public function updateUserExamStatus($userId, $moduleId, $status)
+    {
+        return UserExam::where('user_id', $userId)
+                ->where('module_id', $moduleId)
+                ->update(['status' => $status]);
     }
 }

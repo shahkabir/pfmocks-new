@@ -17,6 +17,8 @@ class UserExam extends Model
         'module_id',
         'type',
         'price',
+        'status', // free->free exams,purchased->initial purchase, payment_pending->payment verification pending, 
+                //cancelled->exam cancelled, completed->student completed the exam
         'purchased_at',
     ];
 

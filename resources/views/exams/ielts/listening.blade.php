@@ -560,9 +560,10 @@
     <div class="exam-footer">
         <div class="footer-right">
             <button type="submit" class="btn btn-success btn-sm">Submit Answers</button>
-            <button class="btn btn-outline-secondary btn-sm">
-                Exit
-            </button>
+            <button class="btn btn-outline-secondary btn-sm">Exit</button>
+            <input type="hidden" name="module_id" value="{{ $module->id }}">
+            <input type="hidden" name="exam_name" value="{{ $module->name }}">
+            <input type="hidden" name="module_type" value="{{ $module->module_type }}">
         </div>
     </div>
 </form>
@@ -582,9 +583,11 @@
             method: "POST",
             data: formData,
             success: function(response) {
-                alert('Your answers have been submitted successfully!');
+                //alert('Your answers have been submitted successfully!');
                 // Optionally, redirect or perform other actions
                 console.log(response);
+                alert(response.message+" Going back to dashboard.");
+                window.location.href = "{{ route('dashboard.student') }}";
             },
             error: function(xhr, status, error) {
                 alert('An error occurred while submitting your answers. Please try again.');
