@@ -54,6 +54,13 @@
     <!--begin::Required Plugin(AdminLTE)-->
     <link rel="stylesheet" href="{{ asset('admin/dist/css/adminlte.css') }}" />
     <!--end::Required Plugin(AdminLTE)-->
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
   </head>
   <!--end::Head-->
   <!--begin::Body-->
@@ -70,7 +77,7 @@
         </div>
         <div class="card-body login-card-body">
           {{-- <p class="login-box-msg">Sign in to start your session</p> --}}
-          <form action="{{ route('login') }}" method="post">
+          <form action="" method="POST" id="loginForm">
             @csrf
             <div class="input-group mb-1">
               <div class="form-floating">
@@ -89,15 +96,12 @@
             <!--begin::Row-->
             <div class="row">
               <div class="col-8 d-inline-flex align-items-center">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-                  <label class="form-check-label" for="flexCheckDefault"> Remember Me </label>
-                </div>
+               <span id="responseMessage"></span>
               </div>
               <!-- /.col -->
               <div class="col-4">
                 <div class="d-grid gap-2">
-                  <button type="submit" class="btn btn-primary">Sign In</button>
+                  <button type="submit" id="loginButton" class="btn btn-primary">Sign In</button>
                 </div>
               </div>
               <!-- /.col -->
@@ -110,19 +114,45 @@
               <i class="bi bi-facebook me-2"></i> Sign in using Facebook
             </a>
             <a href="#" class="btn btn-danger">
-              <i class="bi bi-google me-2"></i> Sign in using Google+
+              <i class="bi bi-google me-2"></i> Sign in using Google
             </a>
           </div>
           <!-- /.social-auth-links -->
-          <p class="mb-1"><a href="forgot-password.html">I forgot my password</a></p>
-          <p class="mb-0">
-            <a href="register.html" class="text-center"> Register a new membership </a>
+          <p class="mb-1"><a href="forgot-password.html">Forgot password?</a></p>
+          <p class="mb-1">
+            <a href="register.html" class="text-center"> Register</a>
           </p>
         </div>
         <!-- /.login-card-body -->
       </div>
     </div>
     <!-- /.login-box -->
+
+    <!-- OTP Modal -->
+    <div class="modal fade" id="otpModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="otpModalLabel">Enter OTP</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+
+            <form id="otpForm" method="POST">
+              @csrf
+              <div class="mb-3">
+                {{-- <label for="otpInput" class="form-label">One-Time Password</label> --}}
+                <input type="text" name="otp" class="form-control" id="otpInput" placeholder="Enter OTP" style="margin-bottom: 10px;">
+                <span id="loginResponseMessage" class="text-info"></span>
+                <span id="otpResponseMessage" class="text-dark"></span>
+              </div>
+              <button type="submit" class="btn btn-primary">Verify OTP</button>
+              
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <!--end::Required Plugin(Bootstrap 5)-->
     
@@ -133,6 +163,82 @@
    
     <!--end::OverlayScrollbars Configure-->
     <!--end::Script-->
+
+    <script>
+    $(document).ready(function() {
+
+      $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+
+      //Handle form submit then show OTP modal
+      $('#loginForm').submit(function(e) {
+        e.preventDefault();
+
+        $.ajax({
+          url: '{{ route("login.submit") }}', 
+          type: 'POST',        
+          data: $(this).serialize(),
+          // {
+          //   email: this.email.value,
+          //   password: this.password.value
+          // },
+
+          success: function(response) {
+            // On successful login, show OTP modal
+            console.log('Login successful:', response);
+            // document.getElementById('otpModal').show();
+            document.getElementById('loginResponseMessage').innerHTML = '';
+            document.getElementById('loginResponseMessage').innerHTML = response.message || 'Please enter the OTP sent to your email.';
+            // $('#loginResponseMessage').innerHTML = 
+            $('#otpModal').modal('show');
+          },
+          error: function(response) {
+            // Display error message
+            console.error('Login failed:', response);
+            document.getElementById('responseMessage').innerHTML = '';
+            document.getElementById('responseMessage').innerHTML = 
+            response.responseJSON.message || 'Login failed. Please try again.';
+          }
+        });
+      });
+
+      // Handle OTP form submission
+      $('#otpForm').submit(function(e) {
+        e.preventDefault();
+
+        $.ajax({
+          url: '{{ route("otp.verify") }}', 
+          type: 'POST',        
+          data: $(this).serialize(),
+          // {
+          //   otp: this.otp.value,
+          //   '_token': $('meta[name="csrf-token"]').attr('content')
+          // },
+          success: function(response) {
+            console.log('OTP verification successful:', response);
+            document.getElementById('otpResponseMessage').innerHTML = '';
+            document.getElementById('otpResponseMessage').innerHTML = response.message || 'OTP verified successfully. Redirecting...';
+            // Redirect to dashboard or home page after successful OTP verification
+            // setTimeout(function() {
+            //   window.location.href = '{{ route("dashboard") }}'; 
+            // }, 2000); 
+          },
+          error: function(response) {
+            console.error('OTP verification failed:', response);
+            // $('#otpModal').modal('hide');
+            document.getElementById('otpResponseMessage').innerHTML='';
+            document.getElementById('otpResponseMessage').innerHTML = 
+            response.message || 'OTP verification failed. Please try again.';
+          }
+        });
+      });
+    });
+
+    </script>
   </body>
   <!--end::Body-->
 </html>

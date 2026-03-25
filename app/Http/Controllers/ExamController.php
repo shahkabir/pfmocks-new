@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Constants\ModuleConstants;
 use App\Models\Answer\Answer;
 use App\Models\Answer\Results;
+use App\Models\Exam\Exam;
 use App\Models\Exam\ExamAttempt;
 use App\Models\Exam\UserExam;
 use App\Models\Module\Module;
@@ -493,5 +494,31 @@ class ExamController extends Controller
         return UserExam::where('user_id', $userId)
                 ->where('module_id', $moduleId)
                 ->update(['status' => $status]);
+    }
+
+    public function showExams($examName)
+    {
+        // This function can be used to show the exam instructions page before starting the exam
+        // You can customize this based on your requirements
+
+        //$user = auth()->user();
+
+        // $exams = UserExam::with(['module.exam'])
+        //     ->where('user_id', $user->id)
+        //     ->orderByDesc('purchased_at')
+        //     ->get();
+        // //dd($exams);
+
+        // select ex.*, m.* from exams as ex left join modules as m on ex.id=m.exam_id
+        // where ex.tag='gre'
+        $exams = Exam::with('modules')
+            ->where('tag', $examName)
+            ->where('is_active', true)
+            ->orderByDesc('created_at')
+            ->get();
+
+        // dd($exams);
+
+        return view('student.dashboard-all-exams', compact('exams'));
     }
 }

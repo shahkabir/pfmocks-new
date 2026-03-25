@@ -1,17 +1,75 @@
 <?php
 namespace App\Http\Controllers\Auth;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Auth\Otp;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Auth\Otp;
+use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
-    public function sendOtp(Request $request)
+
+    public function loginView()
+    {
+        return view('auth.login');
+    }
+
+    public function validateLogin(Request $request)
+    {
+        //dd($request->all());
+        $credentials = $request->only('email', 'password');
+
+        //$user = User::where('email', $credentials['email'])->first();
+
+        // $user = User::where('email', $request->email)->first();
+
+        // if ($user && md5($request->password) === $user->password) {
+
+        //     // ✅ Update to bcrypt
+        //     $user->password = Hash::make($request->password);
+        //     $user->save();
+        // }
+
+        //dd($user);
+        // dd(Auth::attempt($credentials));
+
+        if(Auth::attempt($credentials)){
+
+            $user = Auth::user();
+            session(['otp_user_id' => $user->id]);
+
+            // dd(session()->all());
+
+            $otp = $this->generateOtp();
+
+            //Store OTP
+            Otp::create([
+                'user_id'    => $user->id,
+                'otp'        => $otp,
+                'expires_at' => now()->addMinutes(5),
+            ]);
+
+            return response()->json(['message' => 'OTP sent to your registered email/phone. Please provide OTP within 5 minutes.'], 200);
+
+            // return $this->verifyView();
+            // auth()->login($user);
+            // return redirect()->route('dashboard');
+        }else{
+            $message = 'You are not registered. <a target="_blank" href="' . route('register') . '">Register Here</a>.';
+            return response()->json(['message'=>$message], 422);
+        }
+        // if(Auth::attempt($credentials)){
+        //     return redirect()->route('dashboard');
+        // }
+        return response()->json(['message'=>'Invalid credentials'], 422);
+    }
+
+
+    public function sendOTP(Request $request)
     {
         $otp = $this->generateOtp();
 
@@ -50,11 +108,19 @@ class RegisterController extends Controller
         return view('auth.verify-otp');
     }
 
-    public function verifyOtp(Request $request)
+    public function verifyOTP(Request $request)
     {
+        dd(
+        session()->token(),          // session token
+        $request->header('X-CSRF-TOKEN'),
+        $request->_token
+    );
+
         $user = User::find(session('otp_user_id'));
         $otp_details = Otp::where('user_id', $user->id)->latest()->first();
+        $providedOTP = $request->otp;
 
+        dd($user, $otp_details, $providedOTP, now()->lt($otp_details->expires_at));
         //$otp_created = session('otp_created');
 
         //dd($user, $otp_details, $request->otp, now()->lt($otp_details->expires_at));
@@ -62,9 +128,10 @@ class RegisterController extends Controller
         //dd($user->otp, $request->otp);
         //dd(!$user, $otp_details->otp !== $request->otp, now()->gt($otp_details->expires_at));
         //Check if user exists and OTP matches and not expired
-        if (!$user || $otp_details->otp !== $request->otp || now()->gt($otp_details->expires_at)) {
-            dd('match failed');
+        if (!$user || $otp_details->otp !== $providedOTP || now()->gt($otp_details->expires_at)) {
+            //dd('match failed');
             //return back()->withErrors(['otp'=>'Invalid or expired OTP']);
+            return response()->json(['message'=>'Invalid or expired OTP.'], 422);
         }
         // else {
         //     dd('match success');
@@ -79,59 +146,38 @@ class RegisterController extends Controller
 
         auth()->login($user);
         //dd($user);
+
+        //OTP matches, log the user in
+        return response()->json(['message'=>'OTP verified successfully. Redirecting to dashboard...'], 200);
+        
+    }
+
+    public function dashboard()
+    {
+        $user = auth()->user();
+        $userSession = User::find(session('otp_user_id'));
+
         //Depend on user role, redirect
-        if($user->role == 'admin'){
+        if($userSession){
+            if($user->role == 'admin'){
 
-            return redirect()->route('dashboard.admin');
-        }else if($user->role == 'user'){
+                return redirect()->route('dashboard.admin');
+            }else if($user->role == 'user'){
 
-            return redirect()->route('dashboard.student');
+                return redirect()->route('dashboard.student');
+            }else{
+                //Not defined role, logout
+                Auth::logout();
+                return redirect()->route('login');
+            }
         }else{
-            //Not defined role, logout
+            //No session, logout
             Auth::logout();
             return redirect()->route('login');
         }
-
-        //return redirect()->route('dashboard');
     }
 
-    public function loginView()
-    {
-        return view('auth.login');
-    }
-
-    public function login(Request $request)
-    {
-        //dd($request->all());
-        $credentials = $request->only('email'); //,'password'
-
-        $user = User::where('email', $credentials)->first();
-
-        //dd($user);
-
-        if($user){
-            session(['otp_user_id' => $user->id]);
-
-            $otp = $this->generateOtp();
-
-            //Store OTP
-            Otp::create([
-                'user_id'    => $user->id,
-                'otp'        => $otp,
-                'expires_at' => now()->addMinutes(5),
-            ]);
-
-            return $this->verifyView();
-            // auth()->login($user);
-            // return redirect()->route('dashboard');
-        }else{
-            return back()->withErrors(['email'=>'You are not registered']);
-        }
-        // if(Auth::attempt($credentials)){
-        //     return redirect()->route('dashboard');
-        // }
-        return back()->withErrors(['email'=>'Invalid credentials']);
-    }
+    
 
     public function generateOtp()
     {
@@ -141,6 +187,7 @@ class RegisterController extends Controller
     public function logout()
     {
         Auth::logout();
+        session()->invalidate();
         return redirect()->route('login');
     }
 }

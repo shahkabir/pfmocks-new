@@ -19,17 +19,25 @@ Route::get('/admin-lte', function () {
 // });
 
 Route::get('/register', fn()=>view('auth.register'))->name('register');
-Route::post('/register/send-otp',[RegisterController::class,'sendOtp'])->name('register.sendOtp');
+Route::post('/register/send-otp',[RegisterController::class,'sendOTP'])->name('register.sendOtp');
 
 Route::get('/verify-otp',[RegisterController::class,'verifyView'])->name('otp.verify.view');
-Route::post('/verify-otp',[RegisterController::class,'verifyOtp'])->name('otp.verify');
+Route::post('/verify-otp',[RegisterController::class,'verifyOTP'])->name('otp.verify');
 
 Route::get('/login',[RegisterController::class,'loginView'])->name('login');
-Route::post('/login',[RegisterController::class,'login']);
+Route::post('/login',[RegisterController::class,'validateLogin'])->name('login.submit');
+Route::get('/logout',[RegisterController::class,'logout'])->name('logout');
+
+Route::get('/dashboard', [RegisterController::class, 'dashboard'])->name('dashboard');
 
 Route::middleware('auth')->group(function(){
+    //Route::get('/dashboard',[DashBoardController::class,'index'])->name('dashboard.admin');
 
-    Route::get('/dashboard',[DashBoardController::class,'index'])->name('dashboard.admin');
+     Route::get('/dashboard-student', [ExamController::class, 'dashboard'])->name('dashboard.student');
+
+    Route::get('/exam/{module}/start', [ExamController::class, 'start'])->name('exam.start');
+
+    Route::get('/exams/{examName}', [ExamController::class, 'showExams'])->name('exams.show');
 
     Route::post('/logout',[AuthController::class,'logout'])->name('logout');
 
@@ -46,17 +54,6 @@ Route::middleware(['auth', 'admin'])
 
         Route::resource('modules', ModuleController::class)
             ->except(['show']);
-});
-
-
-Route::middleware('auth')->group(function () {
-
-    Route::get('/dashboard', [ExamController::class, 'dashboard'])
-        ->name('dashboard.student');
-
-    Route::get('/exam/{module}/start', [ExamController::class, 'start'])
-        ->name('exam.start');
-
 });
 
 Route::get('/ielts-writing',function(){

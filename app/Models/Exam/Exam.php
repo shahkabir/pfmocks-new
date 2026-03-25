@@ -10,6 +10,7 @@ class Exam extends Model
 {
     protected $fillable = [
         'name',
+        'tag',
         'is_active',
     ];
 

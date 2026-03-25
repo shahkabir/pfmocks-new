@@ -51,7 +51,7 @@
               data-accordion="false"
               id="navigation"
             >
-              {{-- <li class="nav-item menu-open">
+              <li class="nav-item menu-open">
                 <a href="#" class="nav-link active">
                   <i class="nav-icon bi bi-speedometer"></i>
                   <p>
@@ -79,14 +79,14 @@
                     </a>
                   </li>
                 </ul>
-              </li> --}}
+              </li>
               <li class="nav-item">
-                <a href="{{ route('dashboard') }}" class="nav-link">
-                  <i class="nav-icon bi bi-openai"></i>
+                <a href="./generate/theme.html" class="nav-link">
+                  <i class="nav-icon bi bi-palette"></i>
                   <p>My Exams</p>
                 </a>
               </li>
-              {{-- <li class="nav-item">
+              <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-box-seam-fill"></i>
                   <p>
@@ -249,7 +249,7 @@
                     </a>
                   </li>
                 </ul>
-              </li> --}}
+              </li>
               {{-- <li class="nav-header">EXAMPLES</li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
@@ -314,47 +314,47 @@
                   </li>
                 </ul>
               </li> --}}
-              {{-- <li class="nav-item">
-                  <a class="nav-link" href="#">Premium Features
-                    <span class="badge bg-warning text-dark rounded-pill">Soon</span>
-                    <span class="badge rounded-pill bg-info text-uppercase" style="font-size: 0.7rem;">
-                    Coming Soon
-                  </span>
-                  </a>
-
-                  <a class="nav-link" href="#">
-                  Analytics
-                  <sup class="badge rounded-pill text-bg-primary pulse-chip ms-1" style="font-size: 0.7rem;">Coming Soon</sup>
-                  </a>
-
-
-              </li> --}}
-
-              {{-- <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-flask"></i>
-                  <p>
-                    Labs
-                    <span class="badge badge-outline-info right" style="font-size: 0.6rem; border: 1px solid;">COMING SOON</span>
-                  </p>
-                </a>
-              </li>
-
               <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-chart-pie"></i>
-                  <p>
-                    Analytics <sup class="text-danger text-xs"><b>COMING SOON</b></sup>
-                  </p>
-                </a>
-              </li> --}}
+  <a class="nav-link" href="#">Premium Features
+    <span class="badge bg-warning text-dark rounded-pill">Soon</span>
+    <span class="badge rounded-pill bg-info text-uppercase" style="font-size: 0.7rem;">
+  Coming Soon
+</span>
+  </a>
+
+  <a class="nav-link" href="#">
+  Analytics
+  <sup class="badge rounded-pill text-bg-primary pulse-chip ms-1" style="font-size: 0.7rem;">Coming Soon</sup>
+</a>
+
+
+</li>
+
+<li class="nav-item">
+  <a href="#" class="nav-link">
+    <i class="nav-icon fas fa-flask"></i>
+    <p>
+      Labs
+      <span class="badge badge-outline-info right" style="font-size: 0.6rem; border: 1px solid;">COMING SOON</span>
+    </p>
+  </a>
+</li>
+
+<li class="nav-item">
+  <a href="#" class="nav-link">
+    <i class="nav-icon fas fa-chart-pie"></i>
+    <p>
+      Analytics <sup class="text-danger text-xs"><b>COMING SOON</b></sup>
+    </p>
+  </a>
+</li>
 
 
 
               <li class="nav-header">EXAMS</li>
               <li class="nav-item">
-                <a href="{{ route('exams.show', ['examName' => 'ielts']) }}" class="nav-link">
-                  <i class="nav-icon bi bi-journal-check"></i>
+                <a href="./docs/introduction.html" class="nav-link">
+                  <i class="nav-icon bi bi-download"></i>
                   <p>IELTS 
                     {{-- <sup class="text-success text-xs"><b>READY</b></sup> --}}
                   <sup class="badge rounded-pill text-bg-success pulse-chip ms-1" style="font-size: 0.7rem;">Ready</sup>
@@ -362,31 +362,31 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('exams.show', ['examName' => 'pte']) }}" class="nav-link">
+                <a href="./docs/layout.html" class="nav-link">
                   <i class="nav-icon bi bi-grip-horizontal"></i>
-                  <p>PTE <sup class="text-warning text-xs"><b>TBA</b></sup></p>
+                  <p>PTE <sup class="text-danger text-s"><b>COMING SOON</b></sup></p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('exams.show', ['examName' => 'gre']) }}" class="nav-link">
-                  <i class="nav-icon bi bi-grip-horizontal"></i>
-                  <p>GRE <sup class="text-warning text-xs"><b>TBA</b></sup></p>
+                <a href="./docs/color-mode.html" class="nav-link">
+                  <i class="nav-icon bi bi-star-half"></i>
+                  <p>GRE</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('exams.show', ['examName' => 'duolingo']) }}" class="nav-link">
-                  <i class="nav-icon bi bi-grip-horizontal"></i>
-                  <p>Duolingo <sup class="text-warning text-xs"><b>TBA</b></sup></p>
+                <a href="./docs/color-mode.html" class="nav-link">
+                  <i class="nav-icon bi bi-star-half"></i>
+                  <p>Duolingo</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ route('exams.show', ['examName' => 'gmat']) }}" class="nav-link">
-                  <i class="nav-icon bi bi-grip-horizontal"></i>
-                  <p>GMAT <sup class="text-warning text-xs"><b>TBA</b></sup></p>
+                <a href="./docs/color-mode.html" class="nav-link">
+                  <i class="nav-icon bi bi-star-half"></i>
+                  <p>OIETS</p>
                 </a>
               </li>
 
-              {{-- <li class="nav-item">
+              <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-ui-checks-grid"></i>
                   <p>
@@ -449,38 +449,34 @@
                   <i class="nav-icon bi bi-patch-check-fill"></i>
                   <p>License</p>
                 </a>
-              </li> --}}
-
-             
-
-
-              <li class="nav-header">PROFILE</li>
+              </li>
+              <li class="nav-header">MULTI LEVEL EXAMPLE</li>
               <li class="nav-item">
-                <a href="{{ route('profile') }}" class="nav-link">
-                  <i class="nav-icon bi bi-person-badge"></i>
-                  <p>My Profile</p>
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-circle-fill"></i>
+                  <p>Level 1</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="nav-icon bi bi-person-plus-fill"></i>
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-circle-fill"></i>
                   <p>
-                    Referal Program
-                    {{-- <i class="nav-icon bi bi-chevron-right"></i> --}}
+                    Level 1
+                    <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
-                {{-- <ul class="nav nav-treeview">
+                <ul class="nav nav-treeview">
                   <li class="nav-item">
                     <a href="#" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p></p>
+                      <p>Level 2</p>
                     </a>
                   </li>
                   <li class="nav-item">
                     <a href="#" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
                       <p>
-                        Logout
+                        Level 2
                         <i class="nav-arrow bi bi-chevron-right"></i>
                       </p>
                     </a>
@@ -511,15 +507,15 @@
                       <p>Level 2</p>
                     </a>
                   </li>
-                </ul> --}}
+                </ul>
               </li>
               <li class="nav-item">
-                <a href="{{ route('logout') }}" class="nav-link">
-                  <i class="nav-icon bi bi-box-arrow-left"></i>
-                  <p>Logout</p>
+                <a href="#" class="nav-link">
+                  <i class="nav-icon bi bi-circle-fill"></i>
+                  <p>Level 1</p>
                 </a>
               </li>
-              {{-- <li class="nav-header">LABELS</li>
+              <li class="nav-header">LABELS</li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-circle text-danger"></i>
@@ -537,7 +533,7 @@
                   <i class="nav-icon bi bi-circle text-info"></i>
                   <p>Informational</p>
                 </a>
-              </li> --}}
+              </li>
             </ul>
             <!--end::Sidebar Menu-->
           </nav>
