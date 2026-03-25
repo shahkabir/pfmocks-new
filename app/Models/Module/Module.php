@@ -14,6 +14,9 @@ class Module extends Model
         'exam_id',
         'name',
         'module_type',
+        'type', //free, paid
+        'price_in_bdt',
+        'price_in_usd',
         'duration_minutes',
     ];
 
@@ -25,5 +28,10 @@ class Module extends Model
     public function questions(): HasMany
     {
         return $this->hasMany(Question::class);
+    }
+
+    public function timestamps()
+    {
+        return $this->hasTimestamps();
     }
 }

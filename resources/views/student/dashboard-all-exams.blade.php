@@ -4,30 +4,24 @@
 
 @section('content')
 <style>
+   
     .row {
         row-gap: 15px;
     }
-
-    .status-dot {
+    /* Custom CSS for pulse animation on badges */
+    /* .status-dot {
         height: 10px;
         width: 10px;
         border-radius: 50%;
         display: inline-block;
         margin-right: 5px;
     }
-    /* .dot-top {
-        position: relative;
-        top: -1px;
-    }
-    .pending {
-        background-color: #ffc107; /* Bootstrap warning color */
-    /*} 
-    */
+    
 
     .status-dot.pending {
-    background-color: rgb(255, 193, 7);/*#dc3545;*/
-    animation: pulse 1.5s infinite;
-}
+    background-color: rgb(255, 193, 7);#dc3545; */
+   /* animation: pulse 1.5s infinite; */
+/* } */
 
 @keyframes pulse {
     0% {
@@ -49,69 +43,94 @@
 
     {{-- @dd($__data) --}}
 
-    {{ dd(get_defined_vars())}}
-
-    <div class="row">
+    {{-- {{ dd(get_defined_vars())}} --}}
+    <div class="row" style="gap-rows: 0.5rem">
         @forelse($exams as $exam)
-            <div class="col-md-4">
-                <div class="card card-outline {{ $exam->type === 'free' ? 'card-success' : 'card-primary' }}">
-                    <div class="card-header">
-                        <h5 class="card-title">
-                            {{ $exam->modules->name }}
-                        </h5>
-                        <div class="card-tools">
-                            <span class="badge {{ $exam->type === 'free' ? 'badge-success' : 'badge-info' }}">
-                                {{ strtoupper($exam->type) }}
-                            </span>
-                        </div>
-                    </div>
+        <div class="col-md-4">
+            <div class="card card-outline card-primary h-100">
 
-                    <div class="card-body">
-                        <p>
-                            <strong>Module:</strong> {{ $exam->modules->name }}
-                        </p>
-                        <p>
-                            <strong>Duration:</strong>
-                            {{ $exam->modules->duration_minutes }} minutes
-                        </p>
+                {{-- HEADER --}}
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        {{ $exam->name }}
+                    </h5>
 
-                        
-                            <p>
-                                <strong>Price:</strong> 
-                                @if($exam->type === 'paid')
-                                    ৳{{ number_format($userExam->price, 2) }}
+                    {{-- Example tag badge --}}
+                    <span class="badge badge-danger text-uppercase">
+                        {{ $exam->tag }}
+                    </span>
+                </div>
+
+                {{-- BODY --}}
+                <div class="card-body">
+
+                    {{-- <p class="mb-2 text-muted">Modules</p> --}}
+
+                    @forelse($exam->modules as $module)
+
+                        <div class="mb-2 p-2 border rounded-sm">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                {{-- Module Name --}}
+                                <strong>{{ $module->name }}</strong>
+
+                                {{-- Duration --}}
+                                <span class="badge bg-info text-dark">
+                                    {{ $module->duration_minutes }} min
+                                </span>
+                            </div>
+
+                            {{-- Price --}}
+                            <div class="mt-1">
+                                @if(isset($module->price_in_bdt))
+                                    <span class="badge bg-success text-white">
+                                        {{ number_format($module->price_in_bdt, 2) }} BDT
+                                    </span>
                                 @else
-                                    {{ 'Free' }}
+                                    <span class="badge bg-secondary">N/A</span>
                                 @endif
-                            </p>
-                        
-                    </div>
+                            </div>
 
-                    <div class="card-footer text-right">
-                        @if($userExam->status === 'free')
+                        </div>
+
+                    @empty
+                        <div class="text-muted">No modules available.</div>
+                    @endforelse
+
+                </div>
+
+                {{-- FOOTER (optional actions) --}}
+                <div class="card-footer text-right">
+                    <a href="#" class="btn btn-sm btn-secondary">
+                        View Details <i class="bi bi-chevron-double-up"></i>
+                    </a>
+
+                    {{-- @if($userExam->status === 'free')
+                                <a href="{{ route('exam.start', $userExam->module_id) }}"
+                                class="btn btn-sm btn-success">
+                                    Start Exam
+                                </a>
+                            @elseif($userExam->status === 'payment_pending')
+                                <span class="status-dot pending dot-top"></span>
+                                <span class="text-warning mr-2">Payment Pending</span>
+                            @elseif($userExam->status === 'cancelled')
+                                <span class="text-danger mr-2">Cancelled</span>
+                            @elseif($userExam->status === 'purchased')
                             <a href="{{ route('exam.start', $userExam->module_id) }}"
-                               class="btn btn-sm btn-success">
+                            class="btn btn-sm btn-success">
                                 Start Exam
                             </a>
-                        @elseif($userExam->status === 'payment_pending')
-                            <span class="status-dot pending dot-top"></span>
-                            <span class="text-warning mr-2">Payment Pending</span>
-                        @elseif($userExam->status === 'cancelled')
-                            <span class="text-danger mr-2">Cancelled</span>
-                        @elseif($userExam->status === 'purchased')
-                        <a href="{{ route('exam.start', $userExam->module_id) }}"
-                           class="btn btn-sm btn-success">
-                            Start Exam
-                        </a>
-                        @elseif($userExam->status === 'completed')
-                            <a href="{{ route('exam.start', $userExam->id) }}"
-                            class="btn btn-sm btn-info">
-                                View Result
-                            </a>
-                        @endif
-                    </div>
+                            @elseif($userExam->status === 'completed')
+                                <a href="{{ route('exam.start', $userExam->id) }}"
+                                class="btn btn-sm btn-info">
+                                    View Result
+                                </a>
+                            @endif --}}
                 </div>
+
             </div>
+        </div>
         @empty
             <div class="col-12">
                 <div class="alert alert-info">
@@ -119,7 +138,7 @@
                 </div>
             </div>
         @endforelse
-    </div>
 
+    </div>
 </div>
 @endsection

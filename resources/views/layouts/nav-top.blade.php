@@ -4,29 +4,29 @@
                 <i class="bi bi-list"></i>
               </a>
             </li>
-            <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Home</a></li>
-            <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Contact</a></li>
+            {{-- <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Home</a></li>
+            <li class="nav-item d-none d-md-block"><a href="#" class="nav-link">Contact</a></li> --}}
           </ul>
           <!--end::Start Navbar Links-->
           <!--begin::End Navbar Links-->
           <ul class="navbar-nav ms-auto">
             <!--begin::Navbar Search-->
-            <li class="nav-item">
+            {{-- <li class="nav-item">
               <a class="nav-link" data-widget="navbar-search" href="#" role="button">
                 <i class="bi bi-search"></i>
               </a>
-            </li>
+            </li> --}}
             <!--end::Navbar Search-->
             <!--begin::Messages Dropdown Menu-->
             
             <!--end::Messages Dropdown Menu-->
             <!--begin::Notifications Dropdown Menu-->
-            <li class="nav-item dropdown">
+            {{-- <li class="nav-item dropdown">
               <a class="nav-link" data-bs-toggle="dropdown" href="#">
                 <i class="bi bi-bell-fill"></i>
                 <span class="navbar-badge badge text-bg-warning">15</span>
               </a>
-              <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+              {{-- <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                 <span class="dropdown-item dropdown-header">15 Notifications</span>
                 <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item">
@@ -45,8 +45,8 @@
                 </a>
                 <div class="dropdown-divider"></div>
                 <a href="#" class="dropdown-item dropdown-footer"> See All Notifications </a>
-              </div>
-            </li>
+              </div> --}}
+            {{-- </li> --}}
             <!--end::Notifications Dropdown Menu-->
             <!--begin::Fullscreen Toggle-->
             <li class="nav-item">
@@ -81,7 +81,7 @@
                 </li>
                 <!--end::User Image-->
                 <!--begin::Menu Body-->
-                <li class="user-body">
+                {{-- <li class="user-body">
                   <!--begin::Row-->
                   <div class="row">
                     <div class="col-4 text-center"><a href="#">Followers</a></div>
@@ -89,12 +89,12 @@
                     <div class="col-4 text-center"><a href="#">Friends</a></div>
                   </div>
                   <!--end::Row-->
-                </li>
+                </li> --}}
                 <!--end::Menu Body-->
                 <!--begin::Menu Footer-->
                 <li class="user-footer">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
-                  <a href="#" class="btn btn-default btn-flat float-end">Sign out</a>
+                  <a href="{{ route('profile') }}" class="btn btn-default btn-flat">Profile</a>
+                  <a href="{{ route('logout') }}" class="btn btn-default btn-flat float-end">Sign out</a>
                 </li>
                 <!--end::Menu Footer-->
               </ul>

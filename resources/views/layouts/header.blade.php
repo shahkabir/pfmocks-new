@@ -1,6 +1,6 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>AdminLTE v4 | Dashboard</title>
+    <title>PerfectMocks</title>
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
@@ -8,15 +8,15 @@
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
     <!--end::Accessibility Meta Tags-->
     <!--begin::Primary Meta Tags-->
-    <meta name="title" content="AdminLTE v4 | Dashboard" />
-    <meta name="author" content="ColorlibHQ" />
+    <meta name="title" content="PerfectMocks" />
+    <meta name="author" content="shari1909@gmail.com" />
     <meta
       name="description"
-      content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS. Fully accessible with WCAG 2.1 AA compliance."
+      content="PerfectMocks is a comprehensive online platform designed to provide students with high-quality mock exams and practice tests. Our mission is to help students prepare effectively for their exams by offering a wide range of resources, including realistic mock exams, detailed solutions, and performance analytics. With PerfectMocks, students can build confidence, identify areas for improvement, and achieve their academic goals with ease."
     />
     <meta
       name="keywords"
-      content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard, accessible admin panel, WCAG compliant"
+      content="mock exams, practice tests, online learning, exam preparation, performance analytics, educational resources, student success"
     />
     <!--end::Primary Meta Tags-->
     <!--begin::Accessibility Features-->

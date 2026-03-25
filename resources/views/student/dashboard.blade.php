@@ -53,6 +53,7 @@
 
     <div class="row">
         @forelse($exams as $userExam)
+        {{-- {{dd($userExam->type)}} --}}
             <div class="col-md-4">
                 <div class="card card-outline {{ $userExam->type === 'free' ? 'card-success' : 'card-primary' }}">
                     <div class="card-header">
@@ -60,7 +61,7 @@
                             {{ $userExam->module->exam->name }}
                         </h5>
                         <div class="card-tools">
-                            <span class="badge {{ $userExam->type === 'free' ? 'badge-success' : 'badge-info' }}">
+                            <span class="badge {{ $userExam->type === 'free' ? 'badge-success' : 'badge-secondary' }}">
                                 {{ strtoupper($userExam->type) }}
                             </span>
                         </div>

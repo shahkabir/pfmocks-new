@@ -516,6 +516,7 @@ class ExamController extends Controller
             ->where('is_active', true)
             ->orderByDesc('created_at')
             ->get();
+            // ->toArray();
 
         // dd($exams);
 

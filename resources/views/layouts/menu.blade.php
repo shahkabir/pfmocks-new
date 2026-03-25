@@ -1,4 +1,5 @@
 <style>
+  /* Custom CSS for pulse animation on badges */
   @keyframes chip-pulse {
   0% {
     transform: scale(0.95);
