@@ -69,7 +69,7 @@
                             ],
                             pageLength: 5,
                             lengthMenu: [10, 25, 50, 100],
-                            order: [[0, 'desc']],
+                            order: [[0, 'asc']],
                             columnDefs: [
                                 { orderable: false, targets: 7 } // disable sorting on Actions
                             ]

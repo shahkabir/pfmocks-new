@@ -3,7 +3,7 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>AdminLTE 4 | Login Page v2</title>
+    <title>PerfectMocks</title>
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
@@ -11,15 +11,15 @@
     <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)" />
     <!--end::Accessibility Meta Tags-->
     <!--begin::Primary Meta Tags-->
-    <meta name="title" content="AdminLTE 4 | Login Page v2" />
+    <meta name="title" content="PerfectMocks" />
     <meta name="author" content="ColorlibHQ" />
     <meta
       name="description"
-      content="AdminLTE is a Free Bootstrap 5 Admin Dashboard, 30 example pages using Vanilla JS. Fully accessible with WCAG 2.1 AA compliance."
+      content="PerfectMocks is a comprehensive online platform designed to provide students with high-quality mock exams and practice tests. Our mission is to help students prepare effectively for their exams by offering a wide range of resources, including realistic mock exams, detailed solutions, and performance analytics. With PerfectMocks, students can build confidence, identify areas for improvement, and achieve their academic goals with ease."
     />
     <meta
       name="keywords"
-      content="bootstrap 5, bootstrap, bootstrap 5 admin dashboard, bootstrap 5 dashboard, bootstrap 5 charts, bootstrap 5 calendar, bootstrap 5 datepicker, bootstrap 5 tables, bootstrap 5 datatable, vanilla js datatable, colorlibhq, colorlibhq dashboard, colorlibhq admin dashboard, accessible admin panel, WCAG compliant"
+      content="perfectmocks, mock exams, practice tests, online platform, students, academic goals, exam preparation"
     />
     <!--end::Primary Meta Tags-->
     <!--begin::Accessibility Features-->
@@ -59,7 +59,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
 
   </head>
   <!--end::Head-->
@@ -128,31 +128,7 @@
     </div>
     <!-- /.login-box -->
 
-    <!-- OTP Modal -->
-    <div class="modal fade" id="otpModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="otpModalLabel">Enter OTP</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-
-            <form id="otpForm" method="POST">
-              @csrf
-              <div class="mb-3">
-                {{-- <label for="otpInput" class="form-label">One-Time Password</label> --}}
-                <input type="text" name="otp" class="form-control" id="otpInput" placeholder="Enter OTP" style="margin-bottom: 10px;">
-                <span id="loginResponseMessage" class="text-info"></span>
-                <span id="otpResponseMessage" class="text-dark"></span>
-              </div>
-              <button type="submit" class="btn btn-primary">Verify OTP</button>
-              
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+   
     
     <!--end::Required Plugin(Bootstrap 5)-->
     
@@ -165,17 +141,17 @@
     <!--end::Script-->
 
     <script>
-    $(document).ready(function() {
+    // $(document).ready(function() {
 
-      $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
+    //   $.ajaxSetup({
+    //     headers: {
+    //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //     }
+    // });
 
 
       //Handle form submit then show OTP modal
-      $('#loginForm').submit(function(e) {
+      $('#loginForm').on('submit', function(e) {
         e.preventDefault();
 
         $.ajax({
@@ -187,14 +163,18 @@
           //   password: this.password.value
           // },
 
-          success: function(response) {
+          success: function(data, textStatus, xhr) {
             // On successful login, show OTP modal
-            console.log('Login successful:', response);
+            console.log('Login successful:', data);
             // document.getElementById('otpModal').show();
-            document.getElementById('loginResponseMessage').innerHTML = '';
-            document.getElementById('loginResponseMessage').innerHTML = response.message || 'Please enter the OTP sent to your email.';
+            // document.getElementById('loginResponseMessage').innerHTML = '';
+            // document.getElementById('loginResponseMessage').innerHTML = response.message || 'Please enter the OTP sent to your email.';
             // $('#loginResponseMessage').innerHTML = 
-            $('#otpModal').modal('show');
+            // $('#otpModal').modal('show');
+
+            if (xhr.status === 200) {
+                window.location.href = '{{ route("otp.verify.view") }}';
+            }
           },
           error: function(response) {
             // Display error message
@@ -206,37 +186,7 @@
         });
       });
 
-      // Handle OTP form submission
-      $('#otpForm').submit(function(e) {
-        e.preventDefault();
-
-        $.ajax({
-          url: '{{ route("otp.verify") }}', 
-          type: 'POST',        
-          data: $(this).serialize(),
-          // {
-          //   otp: this.otp.value,
-          //   '_token': $('meta[name="csrf-token"]').attr('content')
-          // },
-          success: function(response) {
-            console.log('OTP verification successful:', response);
-            document.getElementById('otpResponseMessage').innerHTML = '';
-            document.getElementById('otpResponseMessage').innerHTML = response.message || 'OTP verified successfully. Redirecting...';
-            // Redirect to dashboard or home page after successful OTP verification
-            // setTimeout(function() {
-            //   window.location.href = '{{ route("dashboard") }}'; 
-            // }, 2000); 
-          },
-          error: function(response) {
-            console.error('OTP verification failed:', response);
-            // $('#otpModal').modal('hide');
-            document.getElementById('otpResponseMessage').innerHTML='';
-            document.getElementById('otpResponseMessage').innerHTML = 
-            response.message || 'OTP verification failed. Please try again.';
-          }
-        });
-      });
-    });
+      
 
     </script>
   </body>

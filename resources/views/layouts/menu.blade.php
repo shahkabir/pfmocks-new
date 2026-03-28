@@ -81,6 +81,7 @@
                   </li>
                 </ul>
               </li> --}}
+              @if (Auth::user()->role === 'admin' || Auth::user()->role === 'user')
               <li class="nav-item">
                 <a href="{{ route('dashboard') }}" class="nav-link">
                   <i class="nav-icon bi bi-openai"></i>
@@ -350,8 +351,6 @@
                 </a>
               </li> --}}
 
-
-
               <li class="nav-header">EXAMS</li>
               <li class="nav-item">
                 <a href="{{ route('exams.show', ['examName' => 'ielts']) }}" class="nav-link">
@@ -386,6 +385,45 @@
                   <p>GMAT <sup class="text-warning text-xs"><b>TBA</b></sup></p>
                 </a>
               </li>
+
+              @if(Auth::user()->role === 'admin')
+                <li class="nav-header">Administration</li>
+                <li class="nav-item">
+                  <a href="{{ route('admin.user.list') }}" class="nav-link">
+                    <i class="nav-icon bi bi-journal-check"></i>
+                    <p>USERS</p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <i class="nav-icon bi bi-journal-check"></i>
+                    <p>EXAMS</p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <i class="nav-icon bi bi-journal-check"></i>
+                    <p>MODULES</p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
+                    <i class="nav-icon bi bi-journal-check"></i>
+                    <p>QUESTIONS</p>
+                  </a>
+                </li>
+
+                {{-- <li class="nav-item">
+                  <a href="{{ route('admin.user.list') }}" class="nav-link">
+                    <i class="nav-icon bi bi-journal-check"></i>
+                    <p>USERS</p>
+                  </a>
+                </li> --}}
+
+              @endif
 
               {{-- <li class="nav-item">
                 <a href="#" class="nav-link">
@@ -539,6 +577,7 @@
                   <p>Informational</p>
                 </a>
               </li> --}}
+              @endif
             </ul>
             <!--end::Sidebar Menu-->
           </nav>

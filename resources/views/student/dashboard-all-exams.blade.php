@@ -39,7 +39,7 @@
 
 <div class="container-fluid">
 
-    <h4 class="mb-3">Available Exams</h4>
+    <h4 class="mb-3">Available Exams - {{ strtoupper(request()->segment(2)) }}</h4>
 
     {{-- @dd($__data) --}}
 

@@ -8,7 +8,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Log;
 
 class RegisterController extends Controller
 {
@@ -53,7 +55,34 @@ class RegisterController extends Controller
                 'expires_at' => now()->addMinutes(5),
             ]);
 
+            // SEND MAIL/SMS
+            // Mail::to($user->email)->send(new OtpMail($otp));
+            // SMS::send($user->mobile, $otp);  
+
+            $mailData = [
+                'otp' => $otp,
+                'name' => $user->name
+            ];
+
+            $mailBody = "Hello {$mailData['name']},\n\nYour OTP for login is: {$mailData['otp']}\n\n
+            This OTP is valid for 5 minutes.\n\n
+            If you did not request this, please ignore this email.\n\nBest regards,\nPerfectMocks Team";
+
+            try {
+                Mail::raw($mailBody, function ($message) use ($user) {
+                    $message->to($user->email)
+                            ->subject('PerfectMocks - Your OTP for Login');
+                });
+            } catch (\Exception $e) {
+                // Handle email sending error
+                //Log::error('Failed to send OTP email: ' . $e->getMessage());
+                dd($e->getMessage());
+            }
+
+
+
             return response()->json(['message' => 'OTP sent to your registered email/phone. Please provide OTP within 5 minutes.'], 200);
+            //return redirect()->route('otp.verify.view')->with('message', 'OTP sent to your registered email/phone. Please provide OTP within 5 minutes.');
 
             // return $this->verifyView();
             // auth()->login($user);
@@ -69,39 +98,39 @@ class RegisterController extends Controller
     }
 
 
-    public function sendOTP(Request $request)
-    {
-        $otp = $this->generateOtp();
+    // public function sendOTP(Request $request)
+    // {
+    //     $otp = $this->generateOtp();
 
-        $user = User::updateOrCreate(
-            [
-             'name' => $request->name,
-             'email' => filter_var($request->identity, FILTER_VALIDATE_EMAIL) ? $request->identity : null,
-             'mobile' => is_numeric($request->identity) ? $request->identity : null
-            ],
-            // [
-            //     'name' => $request->name,
-            //     'otp' => $otp,
-            //     'otp_expires_at' => Carbon::now()->addMinutes(5),
-            // ]
-        );
+    //     $user = User::updateOrCreate(
+    //         [
+    //          'name' => $request->name,
+    //          'email' => filter_var($request->identity, FILTER_VALIDATE_EMAIL) ? $request->identity : null,
+    //          'mobile' => is_numeric($request->identity) ? $request->identity : null
+    //         ],
+    //         // [
+    //         //     'name' => $request->name,
+    //         //     'otp' => $otp,
+    //         //     'otp_expires_at' => Carbon::now()->addMinutes(5),
+    //         // ]
+    //     );
 
-        // SEND OTP (pseudo)
-        // Mail::to($user->email)->send(new OtpMail($otp));
-        // SMS::send($user->mobile, $otp);
+    //     // SEND OTP (pseudo)
+    //     // Mail::to($user->email)->send(new OtpMail($otp));
+    //     // SMS::send($user->mobile, $otp);
 
-        //Store in OTP table
-        Otp::create([
-            'user_id'    => $user->id,
-            'otp'        => $otp,
-            'expires_at' => now()->addMinutes(5),
-        ]);
+    //     //Store in OTP table
+    //     Otp::create([
+    //         'user_id'    => $user->id,
+    //         'otp'        => $otp,
+    //         'expires_at' => now()->addMinutes(5),
+    //     ]);
 
-        session(['otp_user_id' => $user->id]);
-        //session(['otp_created' => $otp]);
+    //     session(['otp_user_id' => $user->id]);
+    //     //session(['otp_created' => $otp]);
 
-        return redirect()->route('otp.verify.view');
-    }
+    //     return redirect()->route('otp.verify.view');
+    // }
 
     public function verifyView()
     {
@@ -110,17 +139,17 @@ class RegisterController extends Controller
 
     public function verifyOTP(Request $request)
     {
-        dd(
-        session()->token(),          // session token
-        $request->header('X-CSRF-TOKEN'),
-        $request->_token
-    );
+    //     dd(
+    //     session()->token(),          // session token
+    //     $request->header('X-CSRF-TOKEN'),
+    //     $request->_token
+    // );
 
         $user = User::find(session('otp_user_id'));
         $otp_details = Otp::where('user_id', $user->id)->latest()->first();
         $providedOTP = $request->otp;
 
-        dd($user, $otp_details, $providedOTP, now()->lt($otp_details->expires_at));
+        // dd($user, $otp_details, $providedOTP, now()->lt($otp_details->expires_at));
         //$otp_created = session('otp_created');
 
         //dd($user, $otp_details, $request->otp, now()->lt($otp_details->expires_at));
@@ -161,7 +190,9 @@ class RegisterController extends Controller
         if($userSession){
             if($user->role == 'admin'){
 
-                return redirect()->route('dashboard.admin');
+                // return redirect()->route('dashboard.admin');
+                return redirect()->route('dashboard.student');
+
             }else if($user->role == 'user'){
 
                 return redirect()->route('dashboard.student');

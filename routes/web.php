@@ -18,10 +18,16 @@ Route::get('/admin-lte', function () {
 //     return view('welcome');
 // });
 
-Route::get('/register', fn()=>view('auth.register'))->name('register');
-Route::post('/register/send-otp',[RegisterController::class,'sendOTP'])->name('register.sendOtp');
+Route::get('/csrf-token', function () {
+    return response()->json([
+        'token' => csrf_token()
+    ]);
+});
 
-Route::get('/verify-otp',[RegisterController::class,'verifyView'])->name('otp.verify.view');
+// Route::get('/register', fn()=>view('auth.register'))->name('register');
+// Route::post('/register/send-otp',[RegisterController::class,'sendOTP'])->name('register.sendOtp');
+
+Route::get('/show-otp',[RegisterController::class,'verifyView'])->name('otp.verify.view');
 Route::post('/verify-otp',[RegisterController::class,'verifyOTP'])->name('otp.verify');
 
 Route::get('/login',[RegisterController::class,'loginView'])->name('login');
