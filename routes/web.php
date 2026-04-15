@@ -10,9 +10,9 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Models\User;
 use Termwind\Components\Raw;
 
-Route::get('/admin-lte', function () {
-    return view('layouts.index');
-});
+// Route::get('/admin-lte', function () {
+//     return view('layouts.index');
+// });
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -43,19 +43,20 @@ Route::middleware('auth')->group(function(){
 
     Route::get('/exam/{module}/start', [ExamController::class, 'start'])->name('exam.start');
 
-    Route::get('/exams/{examName}', [ExamController::class, 'showExams'])->name('exams.show');
+    Route::get('/exam~/{examName}', [ExamController::class, 'showExams'])->name('exams.show');
 
     Route::post('/logout',[AuthController::class,'logout'])->name('logout');
 
     Route::get('/profile', function(){
-        return view('profile');
+        //return view('profile');
+        dd(auth()->user());
     })->name('profile');
 
 });
 
-// Admin CRUD routes
+// Admin CRUD routes (routes/admin.php)
 Route::middleware(['auth', 'admin'])
-    ->prefix('admin')
+    ->prefix('admin2')
     ->name('admin.')
     ->group(base_path('routes/admin.php'));
 

@@ -407,7 +407,7 @@
 
                 <li class="nav-item">
                   <a href="{{ route('admin.exams.index') }}"
-                     class="nav-link {{ request()->routeIs('admin.exams.*') ? 'active' : '' }}">
+                     class="nav-link {{ request()->routeIs('admin2.exams.*') ? 'active' : '' }}">
                     <i class="nav-icon bi bi-mortarboard-fill"></i>
                     <p>Exams</p>
                   </a>

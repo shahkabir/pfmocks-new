@@ -174,7 +174,7 @@ class RegisterController extends Controller
         ]);
 
         auth()->login($user);
-        //dd($user);
+        // dd($user);
 
         //OTP matches, log the user in
         return response()->json(['message'=>'OTP verified successfully. Redirecting to dashboard...'], 200);

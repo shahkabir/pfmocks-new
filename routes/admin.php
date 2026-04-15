@@ -16,8 +16,7 @@ use App\Http\Controllers\Admin\QuestionGroupBlockController;
 */
 
 // Exams
-Route::resource('exams', ExamController::class)
-->except(['show']);
+Route::resource('exams', ExamController::class)->except(['show']);
 
 // Modules
 Route::resource('modules', ModuleController::class)->except(['show']);
