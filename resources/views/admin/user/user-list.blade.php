@@ -67,7 +67,7 @@
                                 { data: 'created_at', name: 'created_at' },
                                 { data: 'action', name: 'action', orderable: false, searchable: false }
                             ],
-                            pageLength: 5,
+                            pageLength: 50,
                             lengthMenu: [10, 25, 50, 100],
                             order: [[0, 'asc']],
                             columnDefs: [

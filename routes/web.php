@@ -53,14 +53,11 @@ Route::middleware('auth')->group(function(){
 
 });
 
+// Admin CRUD routes
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
-    ->group(function () {
-
-        Route::resource('modules', ModuleController::class)
-            ->except(['show']);
-});
+    ->group(base_path('routes/admin.php'));
 
 Route::get('/ielts-writing',function(){
     return view('exams.ielts.writing');
@@ -89,6 +86,9 @@ Route::get('/ielts-speaking',function(){
 
 Route::post('/speaking-upload-audio', [ExamController::class, 'submitIeltsSpeakingAudio'])
     ->name('exam.ielts.speaking.upload_audio');
+
+Route::post('/general-mcq/submit', [ExamController::class, 'submitGeneralMCQ'])
+    ->name('exam.general.mcq.submit');
 
 //CRUD: User Page to Admin
 Route::controller(UserController::class)->group(function () {

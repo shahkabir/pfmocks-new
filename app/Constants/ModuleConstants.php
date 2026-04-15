@@ -6,10 +6,11 @@ class ModuleConstants
 {   
     //These values are maintained for different LOB types
     const MODULES =     [
-                            'listening'=> 'Listening',
-                            'reading' => 'Reading',
-                            'writing' => 'Writing',
-                            'speaking' => 'Speaking'
+                            'listening'   => 'Listening',
+                            'reading'     => 'Reading',
+                            'writing'     => 'Writing',
+                            'speaking'    => 'Speaking',
+                            'general_mcq' => 'General MCQ',
                         ];
     
     // const SESSION_TYPE = [

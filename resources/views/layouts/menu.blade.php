@@ -385,43 +385,73 @@
                   <p>GMAT <sup class="text-warning text-xs"><b>TBA</b></sup></p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{ route('exams.show', ['examName' => 'bangladesh_bank_ad']) }}" class="nav-link">
+                  <i class="nav-icon bi bi-bank"></i>
+                  <p>Bangladesh Bank AD
+                    <sup class="badge rounded-pill text-bg-success pulse-chip ms-1" style="font-size: 0.7rem;">Ready</sup>
+                  </p>
+                </a>
+              </li>
 
               @if(Auth::user()->role === 'admin')
                 <li class="nav-header">Administration</li>
+
                 <li class="nav-item">
-                  <a href="{{ route('admin.user.list') }}" class="nav-link">
-                    <i class="nav-icon bi bi-journal-check"></i>
-                    <p>USERS</p>
+                  <a href="{{ route('admin.user.list') }}"
+                     class="nav-link {{ request()->routeIs('admin.user.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-people-fill"></i>
+                    <p>Users</p>
                   </a>
                 </li>
 
                 <li class="nav-item">
-                  <a href="#" class="nav-link">
-                    <i class="nav-icon bi bi-journal-check"></i>
-                    <p>EXAMS</p>
+                  <a href="{{ route('admin.exams.index') }}"
+                     class="nav-link {{ request()->routeIs('admin.exams.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-mortarboard-fill"></i>
+                    <p>Exams</p>
                   </a>
                 </li>
 
                 <li class="nav-item">
-                  <a href="#" class="nav-link">
-                    <i class="nav-icon bi bi-journal-check"></i>
-                    <p>MODULES</p>
+                  <a href="{{ route('admin.modules.index') }}"
+                     class="nav-link {{ request()->routeIs('admin.modules.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-collection-fill"></i>
+                    <p>Modules</p>
                   </a>
                 </li>
 
                 <li class="nav-item">
-                  <a href="#" class="nav-link">
-                    <i class="nav-icon bi bi-journal-check"></i>
-                    <p>QUESTIONS</p>
+                  <a href="{{ route('admin.questions.index') }}"
+                     class="nav-link {{ request()->routeIs('admin.questions.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-patch-question-fill"></i>
+                    <p>Questions</p>
                   </a>
                 </li>
 
-                {{-- <li class="nav-item">
-                  <a href="{{ route('admin.user.list') }}" class="nav-link">
-                    <i class="nav-icon bi bi-journal-check"></i>
-                    <p>USERS</p>
+                <li class="nav-item">
+                  <a href="{{ route('admin.question-options.index') }}"
+                     class="nav-link {{ request()->routeIs('admin.question-options.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-ui-radios"></i>
+                    <p>Question Options</p>
                   </a>
-                </li> --}}
+                </li>
+
+                <li class="nav-item">
+                  <a href="{{ route('admin.question-groups.index') }}"
+                     class="nav-link {{ request()->routeIs('admin.question-groups.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-diagram-3-fill"></i>
+                    <p>Question Groups</p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a href="{{ route('admin.question-group-blocks.index') }}"
+                     class="nav-link {{ request()->routeIs('admin.question-group-blocks.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-layout-text-sidebar-reverse"></i>
+                    <p>Group Blocks</p>
+                  </a>
+                </li>
 
               @endif
 

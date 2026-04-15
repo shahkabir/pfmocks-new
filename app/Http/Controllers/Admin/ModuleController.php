@@ -2,70 +2,76 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Exam\Exam;
-use Illuminate\Http\Request;
-use App\Models\Module\Module;
 use App\Http\Controllers\Controller;
+use App\Services\ExamService;
+use App\Services\ModuleService;
+use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
-    public function index()
-    {
-        $modules = Module::with('exam')
-            ->orderBy('id', 'desc')
-            ->paginate(10);
+    public function __construct(
+        private readonly ModuleService $service,
+        private readonly ExamService   $examService,
+    ) {}
 
-        return view('admin.modules.index', compact('modules'));
+    public function index(Request $request)
+    {
+        if ($request->ajax()) {
+            return datatables()->eloquent($this->service->getQuery())
+                ->addColumn('exam_name',    fn($m) => $m->exam?->name ?? '—')
+                ->addColumn('type_badge',   fn($m) => $m->type === 'free'
+                    ? '<span class="badge bg-success">Free</span>'
+                    : '<span class="badge bg-primary">Paid</span>')
+                ->addColumn('action', fn($m) =>
+                    '<a href="' . route('admin.modules.edit', $m->id) . '" class="btn btn-sm btn-warning me-1">Edit</a>
+                     <button data-id="' . $m->id . '" class="btn btn-sm btn-danger delete-btn">Delete</button>')
+                ->rawColumns(['type_badge', 'action'])
+                ->make(true);
+        }
+
+        return view('admin.modules.index');
     }
 
     public function create()
     {
-        $exams = Exam::orderBy('name')->get();
+        $exams = $this->examService->all()->sortBy('name');
         return view('admin.modules.create', compact('exams'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'exam_id' => 'required|exists:exams,id',
-            'name' => 'required|string|max:255',
-            'duration_minutes' => 'required|integer|min:1',
-        ]);
-
-        Module::create($request->all());
-
-        return redirect()
-            ->route('admin.modules.index')
-            ->with('success', 'Module created successfully');
+        try {
+            $this->service->create($request->all());
+            return redirect()->route('admin.modules.index')->with('success', 'Module created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
     }
 
-    public function edit(Module $module)
+    public function edit(int $id)
     {
-        $exams = Exam::orderBy('name')->get();
+        $module = $this->service->findOrFail($id);
+        $exams  = $this->examService->all()->sortBy('name');
         return view('admin.modules.edit', compact('module', 'exams'));
     }
 
-    public function update(Request $request, Module $module)
+    public function update(Request $request, int $id)
     {
-        $request->validate([
-            'exam_id' => 'required|exists:exams,id',
-            'name' => 'required|string|max:255',
-            'duration_minutes' => 'required|integer|min:1',
-        ]);
-
-        $module->update($request->all());
-
-        return redirect()
-            ->route('admin.modules.index')
-            ->with('success', 'Module updated successfully');
+        try {
+            $this->service->update($id, $request->all());
+            return redirect()->route('admin.modules.index')->with('success', 'Module updated successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return back()->withErrors($e->errors())->withInput();
+        }
     }
 
-    public function destroy(Module $module)
+    public function destroy(int $id)
     {
-        $module->delete();
-
-        return redirect()
-            ->route('admin.modules.index')
-            ->with('success', 'Module deleted successfully');
+        try {
+            $this->service->delete($id);
+            return response()->json(['status' => 'success', 'message' => 'Module deleted.']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
     }
 }

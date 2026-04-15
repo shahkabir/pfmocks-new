@@ -101,6 +101,8 @@ class ExamController extends Controller
             return view('exams.ielts.reading', compact('questions', 'user', 'showFeedback', 'module'));
         }else if(($moduleType === 'speaking')){
             return view('exams.ielts.speaking', compact('questions', 'user', 'showFeedback', 'module'));
+        }else if(($moduleType === 'general_mcq')){
+            return view('exams.general.mcq', compact('questions', 'user', 'showFeedback', 'module'));
         }else{
             abort(404, 'Module type not found.');
         }
@@ -461,6 +463,111 @@ class ExamController extends Controller
     //         //'answers' => $answers,
     //     ]);
     // }
+
+    /*
+    * Saves General MCQ exam answers (mcq_single, mcq_multiple).
+    * Auto-grades answers and saves results without a band score.
+    */
+    public function submitGeneralMCQ(Request $request)
+    {
+        $user = auth()->user();
+        $answers = $request->input('answers', []);
+        $moduleId = $request->input('module_id');
+        $moduleType = $request->input('module_type');
+        $examName = $request->input('exam_name');
+
+        $allOptionIds = [];
+        foreach ($answers as $questionId => $data) {
+            if (isset($data['question_option_id'])) {
+                $optionIds = $this->makeArrayLinear($data['question_option_id'])['option_ids'];
+                $allOptionIds = array_merge($allOptionIds, $optionIds);
+            }
+        }
+
+        $questionTypes = QuestionOptions::whereIn('id', $allOptionIds)
+            ->get(['id', 'question_type'])
+            ->keyBy('id')
+            ->pluck('question_type', 'id')
+            ->toArray();
+
+        $examAttempt = ExamAttempt::updateOrCreate(
+            [
+                'user_id'    => $user->id,
+                'module_id'  => $moduleId,
+                'started_at' => now(),
+                'status'     => 'completed',
+            ],
+            [
+                'ended_at' => now(),
+            ]
+        );
+
+        foreach ($answers as $questionId => $data) {
+            $optionIds          = $this->makeArrayLinear($data['question_option_id'])['option_ids'];
+
+            foreach ($optionIds as $optionId) {
+                $questionType = $questionTypes[$optionId] ?? null;
+                $isCorrect    = QuestionOptions::where('id', $optionId)->value('is_correct');
+
+                if ($questionType === 'mcq_multiple') {
+                    Answer::updateOrCreate(
+                        [
+                            'user_id'         => $user->id,
+                            'exam_attempt_id' => $examAttempt->id,
+                            'question_id'     => $questionId,
+                        ],
+                        [
+                            'question_option_id' => $optionId,
+                            'is_correct'         => $isCorrect,
+                        ]
+                    );
+                } else if ($questionType === 'mcq_single') {
+                    Answer::updateOrCreate(
+                        [
+                            'user_id'            => $user->id,
+                            'exam_attempt_id'    => $examAttempt->id,
+                            'question_id'        => $questionId,
+                            'question_option_id' => is_numeric($optionId) ? $optionId : null,
+                        ],
+                        [
+                            'is_correct' => $isCorrect,
+                        ]
+                    );
+                }
+            }
+        }
+
+        $achievedScore   = Answer::where('exam_attempt_id', $examAttempt->id)->where('is_correct', true)->count();
+        $totalScore      = Question::where('module_id', $moduleId)->count();
+        $scorePercentage = $totalScore > 0 ? ($achievedScore / $totalScore) * 100 : 0;
+        $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
+
+        Results::updateOrCreate(
+            [
+                'user_id'         => $user->id,
+                'exam_attempt_id' => $examAttempt->id,
+            ],
+            [
+                'status'            => 'completed',
+                'exam_name'         => $examName,
+                'module_name'       => ModuleConstants::MODULES[$moduleType] ?? 'General MCQ',
+                'achieved_score'    => $achievedScore,
+                'total_score'       => $totalScore,
+                'score_percentage'  => $scorePercentage,
+                'band_score'        => null,
+                'time_taken_seconds'=> $timeTakenSeconds,
+            ]
+        );
+
+        $this->updateUserExamStatus($user->id, $moduleId, 'completed');
+
+        return response()->json([
+            'message'         => 'Your answers have been submitted successfully!',
+            'achieved_score'  => $achievedScore,
+            'total_score'     => $totalScore,
+            'score_percentage'=> $scorePercentage,
+        ]);
+    }
 
     public function calculateIELTSBand($scorePercentage)
     {
