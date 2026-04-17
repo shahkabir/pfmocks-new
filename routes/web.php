@@ -24,8 +24,8 @@ Route::get('/csrf-token', function () {
     ]);
 });
 
-// Route::get('/register', fn()=>view('auth.register'))->name('register');
-// Route::post('/register/send-otp',[RegisterController::class,'sendOTP'])->name('register.sendOtp');
+Route::get('/register', [RegisterController::class, 'registerView'])->name('register');
+Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
 
 Route::get('/show-otp',[RegisterController::class,'verifyView'])->name('otp.verify.view');
 Route::post('/verify-otp',[RegisterController::class,'verifyOTP'])->name('otp.verify');

@@ -6,8 +6,11 @@
 
 <div class="container-fluid mt-4">
     <div class="card shadow-sm">
-        <div class="card-header bg-amber-400 text-black">
+        <div class="card-header bg-amber-400 text-black d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Users Management</h5>
+            <a href="{{ route('register') }}" class="btn btn-sm btn-primary" target="_blank">
+                <i class="bi bi-person-plus me-1"></i> Register New User
+            </a>
         </div>
 
         <div class="card-body">

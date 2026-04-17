@@ -13,7 +13,8 @@ class UserController extends Controller
     {
         if($request->ajax()){
 
-            $users = User::select(['id', 'name', 'email', 'mobile', 'role', 'is_verified', 'created_at']);
+            $users = User::select(['id', 'name', 'email', 'mobile', 'role', 'is_verified', 'created_at'])
+                 ->orderBy('created_at', 'desc'); // Latest users first
 
             return datatables()->eloquent($users) //of($users)
                 ->addColumn('role', function ($user) {

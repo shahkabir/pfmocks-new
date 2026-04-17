@@ -81,7 +81,10 @@ class RegisterController extends Controller
 
 
 
-            return response()->json(['message' => 'OTP sent to your registered email/phone. Please provide OTP within 5 minutes.'], 200);
+            return response()->json([
+                'message'    => 'OTP sent to your registered email/phone. Please provide OTP within 5 minutes.',
+                'csrf_token' => csrf_token(),
+            ], 200);
             //return redirect()->route('otp.verify.view')->with('message', 'OTP sent to your registered email/phone. Please provide OTP within 5 minutes.');
 
             // return $this->verifyView();
@@ -209,6 +212,31 @@ class RegisterController extends Controller
     }
 
     
+
+    public function registerView()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|max:255|unique:users,email',
+            'mobile'   => 'nullable|string|max:20',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'mobile'   => $request->mobile,
+            'password' => Hash::make($request->password),
+            'role'     => 'user',
+        ]);
+
+        return response()->json(['message' => 'Account created successfully! Please sign in.'], 201);
+    }
 
     public function generateOtp()
     {
