@@ -189,6 +189,7 @@
 
             $parts[$part] = [
                 'header' => $question['question_header'],
+                'passage_instruction' => $question['passage_instruction'],
                 'passage' => $question['passage'],
                 'blocks' => []
             ];
@@ -241,6 +242,7 @@
                     {{-- LEFT: PASSAGE --}}
                     <div class="reading-panel">
                         <h5>Part {{ $partNumber }}</h5>
+                        <p>{!! $partData['passage_instruction'] !!}</p>
                         <p><strong>{{ $partData['header'] }}</strong></p>
                         <div>
                             {{-- {!! nl2br(e($partData['passage'])) !!} --}}
