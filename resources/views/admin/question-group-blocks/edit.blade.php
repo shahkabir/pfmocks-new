@@ -35,11 +35,17 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Instruction Text <span class="text-danger">*</span></label>
-                    <textarea name="instruction_text" class="form-control" rows="3" required>{{ old('instruction_text', $block->instruction_text) }}</textarea>
+                    <textarea name="instruction_text" id="instruction_text" class="form-control">{!! old('instruction_text', $block->instruction_text) !!}</textarea>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Question Option IDs (in this block)</label>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-semibold mb-0">Question Option IDs (in this block)</label>
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="checkbox" id="select_all_options">
+                            <label class="form-check-label small fw-semibold" for="select_all_options">Select All</label>
+                        </div>
+                    </div>
                     <select name="question_option_ids[]" id="options_select"
                             class="form-select" multiple size="8">
                         @foreach($options as $opt)
@@ -49,7 +55,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <div class="form-text">Hold Ctrl/Cmd to multi-select.</div>
+                    <div class="form-text">Hold Ctrl/Cmd to select multiple, or use Select All above.</div>
                 </div>
 
                 <div class="mb-3">
@@ -68,21 +74,55 @@
 </div>
 
 <script>
+const optionsSel   = document.getElementById('options_select');
+const selectAllChk = document.getElementById('select_all_options');
+
 document.getElementById('group_id').addEventListener('change', function () {
     const gId = this.value;
-    const sel = document.getElementById('options_select');
     if (!gId) return;
     fetch('{{ route("admin.ajax.options-by-group", ":id") }}'.replace(':id', gId))
         .then(r => r.json())
         .then(data => {
-            const prevSelected = Array.from(sel.selectedOptions).map(o => parseInt(o.value));
-            sel.innerHTML = '';
+            const prevSelected = Array.from(optionsSel.selectedOptions).map(o => parseInt(o.value));
+            optionsSel.innerHTML = '';
             data.forEach(o => {
                 const label = `#${o.id} [${o.question_type}] — ${(o.actual_question || o.option_text || '').substring(0, 70)}`;
                 const selected = prevSelected.includes(o.id) ? 'selected' : '';
-                sel.innerHTML += `<option value="${o.id}" ${selected}>${label}</option>`;
+                optionsSel.innerHTML += `<option value="${o.id}" ${selected}>${label}</option>`;
             });
+            syncSelectAllState();
         });
 });
+
+selectAllChk.addEventListener('change', function () {
+    Array.from(optionsSel.options).forEach(o => o.selected = this.checked);
+});
+
+optionsSel.addEventListener('change', syncSelectAllState);
+
+function syncSelectAllState() {
+    const opts = Array.from(optionsSel.options);
+    selectAllChk.indeterminate = opts.some(o => o.selected) && !opts.every(o => o.selected);
+    selectAllChk.checked = opts.length > 0 && opts.every(o => o.selected);
+}
+
+syncSelectAllState();
 </script>
 @endsection
+
+@push('page_scripts')
+<script>
+$(function () {
+    $('#instruction_text').summernote({
+        height: 200,
+        toolbar: [
+            ['font',   ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+            ['para',   ['ul', 'ol', 'paragraph']],
+            ['table',  ['table']],
+            ['insert', ['link']],
+            ['view',   ['codeview', 'fullscreen']],
+        ],
+    });
+});
+</script>
+@endpush

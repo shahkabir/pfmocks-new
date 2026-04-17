@@ -77,14 +77,20 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Question Header</label>
-                    <input type="text" name="question_header" class="form-control"
-                           value="{{ old('question_header', $question->question_header) }}">
+                    <label class="form-label fw-semibold">Question Header / Title</label>
+                    <textarea name="question_header" id="question_header" class="form-control wysiwyg-sm">{!! old('question_header', $question->question_header) !!}</textarea>
+                    <div class="form-text">Shown as a heading above this question's group.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Passage Instruction</label>
+                    <textarea name="passage_instruction" id="passage_instruction" class="form-control wysiwyg-md">{!! old('passage_instruction', $question->passage_instruction) !!}</textarea>
+                    <div class="form-text">Instruction shown above the passage (optional).</div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Passage / Source Text</label>
-                    <textarea name="passage" class="form-control" rows="6">{{ old('passage', $question->passage) }}</textarea>
+                    <textarea name="passage" id="passage" class="form-control wysiwyg-lg">{!! old('passage', $question->passage) !!}</textarea>
                 </div>
 
                 <div class="row mb-3">
@@ -125,3 +131,41 @@ document.getElementById('exam_id').addEventListener('change', function () {
 });
 </script>
 @endsection
+
+@push('page_scripts')
+<script>
+$(function () {
+    var toolbarFull = [
+        ['style',  ['style']],
+        ['font',   ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+        ['para',   ['ul', 'ol', 'paragraph']],
+        ['table',  ['table']],
+        ['insert', ['link']],
+        ['view',   ['codeview', 'fullscreen']],
+    ];
+
+    var toolbarMin = [
+        ['font',   ['bold', 'italic', 'underline']],
+        ['para',   ['ul', 'ol']],
+        ['insert', ['link']],
+        ['view',   ['codeview']],
+    ];
+
+    $('#question_header').summernote({
+        height: 150,
+        toolbar: toolbarMin,
+    });
+
+    $('#passage').summernote({
+        height: 320,
+        toolbar: toolbarFull,
+    });
+
+    $('#passage_instruction').summernote({
+        placeholder: 'e.g. Read the passage and answer questions 1–10.',
+        height: 180,
+        toolbar: toolbarMin,
+    });
+});
+</script>
+@endpush

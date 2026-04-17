@@ -52,7 +52,8 @@ class ExamService
 
     private function validate(array $data, ?int $ignoreId = null): array
     {
-        $tagRule = 'required|string|max:100|regex:/^[a-z0-9_]+$/|unique:exams,tag';
+        $tagRule = 'required|string|max:100|regex:/^[a-z0-9_]+$/'; //|unique:exams,tag
+
         if ($ignoreId) {
             $tagRule .= ',' . $ignoreId;
         }

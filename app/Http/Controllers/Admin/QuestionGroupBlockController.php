@@ -36,7 +36,7 @@ class QuestionGroupBlockController extends Controller
 
     public function create(Request $request)
     {
-        $groups  = $this->groupService->getQuery()->get();
+        $groups  = $this->groupService->getQuery()->orderByDesc('id')->get();
         $preselectedGroupId = $request->query('group_id');
         $options = collect();
 

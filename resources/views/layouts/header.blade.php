@@ -68,6 +68,9 @@
 
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.6/css/dataTables.dataTables.css" />
+
+    <!-- Summernote WYSIWYG -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-bs5.min.css" crossorigin="anonymous" />
   
     <!-- jQuery (required for DataTables) -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

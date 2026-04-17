@@ -52,9 +52,10 @@ class QuestionService
         $validator = Validator::make($data, [
             'module_id'       => 'required|exists:modules,id',
             'type'            => 'required|in:mcq_single,mcq_multiple,text,essay,audio,speaking',
-            'question_header' => 'nullable|string',
-            'passage'         => 'nullable|string',
-            'audio_url'       => 'nullable|string|max:500',
+            'question_header'      => 'nullable|string',
+            'passage'              => 'nullable|string',
+            'passage_instruction'  => 'nullable|string',
+            'audio_url'            => 'nullable|string|max:500',
             'image_url'       => 'nullable|string|max:500',
             'marks'           => 'nullable|integer|min:0',
             'sort_order'      => 'nullable|integer|min:0',

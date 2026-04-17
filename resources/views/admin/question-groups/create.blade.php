@@ -16,7 +16,8 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.question-groups.store') }}">
+            <form method="POST" action="{{ route('admin.question-groups.store') }}"
+                  enctype="multipart/form-data">
                 @csrf
 
                 <div class="mb-3">
@@ -37,21 +38,40 @@
                     <div class="col-md-3">
                         <label class="form-label fw-semibold">Part Number</label>
                         <input type="number" name="part_number" class="form-control"
-                               value="{{ old('part_number', 1) }}" min="1" max="10"
-                               placeholder="1">
+                               value="{{ old('part_number', 1) }}" min="1" max="10" placeholder="1">
                         <div class="form-text">IELTS Part 1–4 or section number.</div>
                     </div>
                     <div class="col-md-9">
-                        <label class="form-label fw-semibold">Part Audio URL</label>
-                        <input type="text" name="part_audio_url" class="form-control"
-                               value="{{ old('part_audio_url') }}" placeholder="https://...">
+                        <label class="form-label fw-semibold">
+                            Part Audio
+                            <span class="text-muted fw-normal small">(MP3 or WAV — no size limit)</span>
+                        </label>
+                        <input type="file" name="part_audio_file" id="part_audio_file"
+                               class="form-control @error('part_audio_file') is-invalid @enderror"
+                               accept=".mp3,.wav,audio/mpeg,audio/wav">
+                        @error('part_audio_file')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div id="audio_preview" class="mt-2" style="display:none">
+                            <audio controls class="w-100" style="height:36px"></audio>
+                        </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Part Image URL</label>
-                    <input type="text" name="part_image_url" class="form-control"
-                           value="{{ old('part_image_url') }}" placeholder="https://...">
+                    <label class="form-label fw-semibold">
+                        Part Image
+                        <span class="text-muted fw-normal small">(JPG, PNG or GIF — max {{ number_format(config('upload_image.max_size_kb') / 1024, 0) }} MB)</span>
+                    </label>
+                    <input type="file" name="part_image_file" id="part_image_file"
+                           class="form-control @error('part_image_file') is-invalid @enderror"
+                           accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/png,image/gif">
+                    @error('part_image_file')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                    <div id="image_preview" class="mt-2" style="display:none">
+                        <img src="" alt="Preview" class="img-thumbnail" style="max-height:160px">
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -86,6 +106,32 @@
 </div>
 
 <script>
+// ── Live file previews ────────────────────────────────────────────────────────
+document.getElementById('part_audio_file').addEventListener('change', function () {
+    const wrap  = document.getElementById('audio_preview');
+    const audio = wrap.querySelector('audio');
+    if (this.files[0]) {
+        audio.src = URL.createObjectURL(this.files[0]);
+        wrap.style.display = '';
+    } else {
+        wrap.style.display = 'none';
+        audio.src = '';
+    }
+});
+
+document.getElementById('part_image_file').addEventListener('change', function () {
+    const wrap = document.getElementById('image_preview');
+    const img  = wrap.querySelector('img');
+    if (this.files[0]) {
+        img.src = URL.createObjectURL(this.files[0]);
+        wrap.style.display = '';
+    } else {
+        wrap.style.display = 'none';
+        img.src = '';
+    }
+});
+
+// ── Options multi-select ──────────────────────────────────────────────────────
 const optionsSel   = document.getElementById('options_select');
 const selectAllChk = document.getElementById('select_all_options');
 

@@ -32,6 +32,7 @@
     <!--end::App Wrapper-->
     <!--begin::Script-->
     @include('layouts.scripts')
+    @stack('page_scripts')
     <!--end::Script-->
   </body>
   <!--end::Body-->

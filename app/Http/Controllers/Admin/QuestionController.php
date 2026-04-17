@@ -34,8 +34,8 @@ class QuestionController extends Controller
 
     public function create()
     {
-        $exams   = $this->examService->all()->sortBy('name');
-        $modules = $this->moduleService->all()->sortBy('name');
+        $exams   = $this->examService->all()->sortByDesc('id');
+        $modules = $this->moduleService->all()->sortByDesc('id');
         return view('admin.questions.create', compact('exams', 'modules'));
     }
 

@@ -6,7 +6,7 @@
     <div class="card shadow-sm" style="max-width:640px">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Create Exam</h5>
-            <a href="{{ route('admin2.exams.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+            <a href="{{ route('admin.exams.index') }}" class="btn btn-sm btn-outline-secondary">← Back</a>
         </div>
         <div class="card-body">
 
@@ -16,7 +16,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin2.exams.store') }}">
+            <form method="POST" action="{{ route('admin.exams.store') }}">
                 @csrf
 
                 <div class="mb-3">
@@ -44,7 +44,7 @@
 
                 <div class="d-flex gap-2 mt-4">
                     <button type="submit" class="btn btn-success">Create Exam</button>
-                    <a href="{{ route('admin2.exams.index') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ route('admin.exams.index') }}" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
         </div>

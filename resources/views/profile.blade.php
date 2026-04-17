@@ -100,12 +100,12 @@
                                 @endif
                             </td>
                         </tr>
-                        <tr class="border-bottom">
+                        {{-- <tr class="border-bottom">
                             <td class="text-muted fw-semibold ps-4 py-3">
                                 <i class="bi bi-hash me-2"></i>User ID
                             </td>
                             <td class="py-3 pe-4 text-muted">#{{ $user->id }}</td>
-                        </tr>
+                        </tr> --}}
                         <tr class="border-bottom">
                             <td class="text-muted fw-semibold ps-4 py-3">
                                 <i class="bi bi-calendar-event me-2"></i>Joined

@@ -86,6 +86,7 @@ class ExamController extends Controller
         ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
         ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
         ->where('modules.module_type', $moduleType)
+        ->where('modules.id', $moduleId)
         ->active()
         ->orderBy('questions.sort_order')
         ->select([
@@ -99,7 +100,7 @@ class ExamController extends Controller
         ->toArray();
 
 
-        //dd($questions);
+        // dd($questions, $moduleType);
 
         $showFeedback = false;
 

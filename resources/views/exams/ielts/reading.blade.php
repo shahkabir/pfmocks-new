@@ -243,7 +243,8 @@
                         <h5>Part {{ $partNumber }}</h5>
                         <p><strong>{{ $partData['header'] }}</strong></p>
                         <div>
-                            {!! nl2br(e($partData['passage'])) !!}
+                            {{-- {!! nl2br(e($partData['passage'])) !!} --}}
+                            {!! $partData['passage'] !!}
                         </div>
                     </div>
 

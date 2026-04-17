@@ -7,6 +7,8 @@ use App\Services\QuestionGroupService;
 use App\Services\QuestionOptionsService;
 use App\Services\QuestionService;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class QuestionGroupController extends Controller
 {
@@ -37,16 +39,21 @@ class QuestionGroupController extends Controller
         $questions = $this->questionService->getQuery()->with('module')->orderBy('id', 'desc')->get();
         $preselectedQuestionId = $request->query('question_id');
         $options = $preselectedQuestionId
-            ? $this->optionsService->byQuestion((int)$preselectedQuestionId)
+            ? $this->optionsService->byQuestion((int) $preselectedQuestionId)
             : collect();
         return view('admin.question-groups.create', compact('questions', 'options', 'preselectedQuestionId'));
     }
 
     public function store(Request $request)
     {
-        // dd($request->all());
+        $this->validateFiles($request);
+
         try {
-            $this->service->create($request->all());
+            $data                    = $request->except(['part_audio_file', 'part_image_file']);
+            $data['part_audio_url']  = $this->uploadFile($request->file('part_audio_file'), 'audio');
+            $data['part_image_url']  = $this->uploadFile($request->file('part_image_file'), 'image');
+
+            $this->service->create($data);
             return redirect()->route('admin.question-groups.index')->with('success', 'Question group created successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
@@ -64,8 +71,16 @@ class QuestionGroupController extends Controller
 
     public function update(Request $request, int $id)
     {
+        $this->validateFiles($request);
+
         try {
-            $this->service->update($id, $request->all());
+            $group = $this->service->findOrFail($id);
+
+            $data                   = $request->except(['part_audio_file', 'part_image_file']);
+            $data['part_audio_url'] = $this->uploadFile($request->file('part_audio_file'), 'audio', $group->part_audio_url);
+            $data['part_image_url'] = $this->uploadFile($request->file('part_image_file'), 'image', $group->part_image_url);
+
+            $this->service->update($id, $data);
             return redirect()->route('admin.question-groups.index')->with('success', 'Question group updated successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
@@ -75,10 +90,60 @@ class QuestionGroupController extends Controller
     public function destroy(int $id)
     {
         try {
+            $group = $this->service->findOrFail($id);
+
+            $this->deletePublicFile($group->part_audio_url);
+            $this->deletePublicFile($group->part_image_url);
+
             $this->service->delete($id);
             return response()->json(['status' => 'success', 'message' => 'Group deleted.']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    // ── File helpers ──────────────────────────────────────────────────────────
+
+    private function validateFiles(Request $request): void
+    {
+        $audioMimes = implode(',', config('upload_audio.mimes'));
+        $imageMimes = implode(',', config('upload_image.mimes'));
+        $imageMax   = config('upload_image.max_size_kb');
+
+        $request->validate([
+            'part_audio_file' => ['nullable', 'file', "mimes:{$audioMimes}"],
+            'part_image_file' => ['nullable', 'file', "mimes:{$imageMimes}", "max:{$imageMax}"],
+        ]);
+    }
+
+    private function uploadFile(?UploadedFile $file, string $type, ?string $existing = null): ?string
+    {
+        if (!$file) {
+            return $existing; // no new upload — keep whatever is stored
+        }
+
+        $config = config("upload_{$type}");
+        $dir    = public_path($config['path']);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        // Remove the old file when replacing
+        $this->deletePublicFile($existing);
+
+        $filename = time() . '_' . Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $file->move($dir, $filename);
+
+        return '/' . $config['path'] . '/' . $filename;
+    }
+
+    private function deletePublicFile(?string $relativePath): void
+    {
+        if (!$relativePath) return;
+        $abs = public_path(ltrim($relativePath, '/'));
+        if (file_exists($abs)) {
+            @unlink($abs);
         }
     }
 }

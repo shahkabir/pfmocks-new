@@ -37,6 +37,9 @@
       });
     </script>
     <!--end::OverlayScrollbars Configure-->
+    <!-- Summernote WYSIWYG (after Bootstrap JS) -->
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-bs5.min.js" crossorigin="anonymous"></script>
+
     <!-- OPTIONAL SCRIPTS -->
     <!-- sortablejs -->
     <script

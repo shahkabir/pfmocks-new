@@ -36,7 +36,7 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Instruction Text <span class="text-danger">*</span></label>
-                    <textarea name="instruction_text" class="form-control" rows="3" required
+                    <textarea name="instruction_text" id="instruction_text" class="form-control"
                               placeholder="e.g. Questions 1–5: Choose ONE letter A–D.">{{ old('instruction_text') }}</textarea>
                 </div>
 
@@ -113,9 +113,26 @@ function syncSelectAllState() {
     selectAllChk.checked = opts.length > 0 && opts.every(o => o.selected);
 }
 
-// Auto-load options if group pre-selected (e.g. old() repopulation)
 const preselected = document.getElementById('group_id').value;
 if (preselected) document.getElementById('group_id').dispatchEvent(new Event('change'));
 else syncSelectAllState();
 </script>
 @endsection
+
+@push('page_scripts')
+<script>
+$(function () {
+    $('#instruction_text').summernote({
+        placeholder: 'e.g. Questions 1–5: Choose ONE letter A–D.',
+        height: 200,
+        toolbar: [
+            ['font',   ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+            ['para',   ['ul', 'ol', 'paragraph']],
+            ['table',  ['table']],
+            ['insert', ['link']],
+            ['view',   ['codeview', 'fullscreen']],
+        ],
+    });
+});
+</script>
+@endpush

@@ -18,6 +18,7 @@ class Question extends Model
         'type',
         'question_header',
         'passage', //contains reading/listening passage
+        'passage_instruction',
         'audio_url',
         'image_url',
         'marks',

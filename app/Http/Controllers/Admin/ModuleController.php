@@ -34,7 +34,7 @@ class ModuleController extends Controller
 
     public function create()
     {
-        $exams = $this->examService->all()->sortBy('name');
+        $exams = $this->examService->all()->sortByDesc('id');
         return view('admin.modules.create', compact('exams'));
     }
 
