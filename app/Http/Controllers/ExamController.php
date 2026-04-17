@@ -28,6 +28,17 @@ class ExamController extends Controller
             ->get();
         //dd($exams);
 
+        // dd($user);
+        //Show all exams for admin too for testing (later we can have a separate admin dashboard)
+        // if($user->role === 'admin'){
+        //     $exams = Exam::with('modules.exam')
+        //         ->where('is_active', true)
+        //         ->orderByDesc('created_at')
+        //         ->get();
+        // }
+
+        // dd($exams);
+
         return view('student.dashboard', compact('exams'));
     }
 

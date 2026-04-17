@@ -132,7 +132,7 @@ Empty base controller extending Laravel's `Controller`.
 
 ### `app/Models/Question/QuestionOptions.php`
 - Table: `question_options`
-- Fillable: `question_id`, `actual_question`, `question_type`, `option_text`, `is_correct`, `correct_answer_explanation`, `sort_order`, `is_active`, `ielts_listening_question_line`, `question_image_path`, `question_audio_path`
+- Fillable: `question_id`, `actual_question`, `question_type`, `option_text`, `is_correct`, `correct_answer_explanation`, `sort_order`, `is_active`, `question_image_path`, `question_audio_path`
 - Relations: `belongsTo(Question)`
 - Scopes: `scopeOrdered()`
 

@@ -25,6 +25,7 @@ Route::resource('modules', ModuleController::class)->except(['show']);
 Route::resource('questions', QuestionController::class)->except(['show']);
 
 // Question Options
+Route::post('question-options/csv-import', [QuestionOptionsController::class, 'csvImportStore'])->name('question-options.csv-import');
 Route::resource('question-options', QuestionOptionsController::class)->except(['show']);
 
 // Question Groups

@@ -58,7 +58,6 @@ class QuestionOptionsService
             'correct_answer_explanation'     => 'nullable|string',
             'sort_order'                     => 'nullable|integer|min:0',
             'is_active'                      => 'boolean',
-            'ielts_listening_question_line'  => 'nullable|string|max:255',
             'question_image_path'            => 'nullable|string|max:500',
             'question_audio_path'            => 'nullable|string|max:500',
         ];

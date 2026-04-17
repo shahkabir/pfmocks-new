@@ -183,7 +183,6 @@ Migration: `2025_12_26_082516_create_question_options_table.php`
 | correct_answer_explanation | text | nullable |
 | sort_order | integer | default: 0 |
 | is_active | boolean | |
-| ielts_listening_question_line | string | Line reference in listening script |
 | question_image_path | string | nullable |
 | question_audio_path | string | nullable |
 | created_at / updated_at | timestamps | |

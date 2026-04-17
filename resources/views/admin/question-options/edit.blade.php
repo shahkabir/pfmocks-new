@@ -73,12 +73,6 @@
                     <textarea name="correct_answer_explanation" class="form-control" rows="2">{{ old('correct_answer_explanation', $option->correct_answer_explanation) }}</textarea>
                 </div>
 
-                <div class="mb-3 field-listening-line" style="display:none">
-                    <label class="form-label fw-semibold">Listening Question Line Reference</label>
-                    <input type="text" name="ielts_listening_question_line" class="form-control"
-                           value="{{ old('ielts_listening_question_line', $option->ielts_listening_question_line) }}">
-                </div>
-
                 <div class="mb-3 field-image-path" style="display:none">
                     <label class="form-label fw-semibold">Question Image Path</label>
                     <input type="text" name="question_image_path" class="form-control"
@@ -117,18 +111,18 @@
 
 <script>
 const typeRules = {
-    mcq_single:       { optionText: true,  isCorrect: true,  actualQ: true,  listening: false, image: false, audio: false },
-    mcq_multiple:     { optionText: true,  isCorrect: true,  actualQ: true,  listening: false, image: false, audio: false },
-    fill_in_blanks:   { optionText: false, isCorrect: true,  actualQ: true,  listening: false, image: false, audio: false },
-    writing:          { optionText: false, isCorrect: false, actualQ: true,  listening: false, image: false, audio: false },
-    essay:            { optionText: false, isCorrect: false, actualQ: true,  listening: false, image: false, audio: false },
-    audio:            { optionText: false, isCorrect: false, actualQ: false, listening: false, image: false, audio: true  },
-    speaking:         { optionText: false, isCorrect: false, actualQ: true,  listening: false, image: false, audio: true  },
-    ielts_speaking:   { optionText: false, isCorrect: false, actualQ: false, listening: false, image: true,  audio: true  },
-    no_question:      { optionText: false, isCorrect: false, actualQ: false, listening: true,  image: false, audio: false },
-    generic_question: { optionText: false, isCorrect: false, actualQ: true,  listening: false, image: false, audio: false },
-    highlighting:     { optionText: true,  isCorrect: true,  actualQ: true,  listening: false, image: false, audio: false },
-    reordering:       { optionText: true,  isCorrect: true,  actualQ: true,  listening: false, image: false, audio: false },
+    mcq_single:       { optionText: true,  isCorrect: true,  actualQ: true,  image: false, audio: false },
+    mcq_multiple:     { optionText: true,  isCorrect: true,  actualQ: true,  image: false, audio: false },
+    fill_in_blanks:   { optionText: false, isCorrect: true,  actualQ: true,  image: false, audio: false },
+    writing:          { optionText: false, isCorrect: false, actualQ: true,  image: false, audio: false },
+    essay:            { optionText: false, isCorrect: false, actualQ: true,  image: false, audio: false },
+    audio:            { optionText: false, isCorrect: false, actualQ: false, image: false, audio: true  },
+    speaking:         { optionText: false, isCorrect: false, actualQ: true,  image: false, audio: true  },
+    ielts_speaking:   { optionText: false, isCorrect: false, actualQ: false, image: true,  audio: true  },
+    no_question:      { optionText: false, isCorrect: false, actualQ: false, image: false, audio: false },
+    generic_question: { optionText: false, isCorrect: false, actualQ: true,  image: false, audio: false },
+    highlighting:     { optionText: true,  isCorrect: true,  actualQ: true,  image: false, audio: false },
+    reordering:       { optionText: true,  isCorrect: true,  actualQ: true,  image: false, audio: false },
 };
 function toggle(selector, show) {
     document.querySelectorAll(selector).forEach(el => el.style.display = show ? '' : 'none');
@@ -138,7 +132,6 @@ function applyTypeRules(type) {
     toggle('.field-option-text',    r.optionText);
     toggle('.field-is-correct',     r.isCorrect);
     toggle('.field-actual-question',r.actualQ);
-    toggle('.field-listening-line', r.listening);
     toggle('.field-image-path',     r.image);
     toggle('.field-audio-path',     r.audio);
     document.querySelector('.field-hint-fill_in_blanks').style.display = (type === 'fill_in_blanks') ? '' : 'none';

@@ -28,7 +28,7 @@ class QuestionOptions extends Model
         'correct_answer_explanation',
         'sort_order',
         'is_active',
-        'ielts_listening_question_line', //Question that has no marks but for display only for IELTS Listening
+        //'ielts_listening_question_line', //Question that has no marks but for display only for IELTS Listening
         'question_image_path',
         'question_audio_path'
     ];

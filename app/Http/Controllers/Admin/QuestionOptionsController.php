@@ -3,9 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Imports\QuestionOptionsMcqImport;
+use App\Models\CsvImport;
 use App\Services\QuestionOptionsService;
 use App\Services\QuestionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class QuestionOptionsController extends Controller
 {
@@ -45,11 +49,36 @@ class QuestionOptionsController extends Controller
     public function store(Request $request)
     {
         try {
+            $isMcq = in_array($request->input('question_type'), ['mcq_single', 'mcq_multiple']);
+
+            if ($isMcq && $request->has('options')) {
+                $base = [
+                    'question_id'                => $request->input('question_id'),
+                    'question_type'              => $request->input('question_type'),
+                    'actual_question'            => $request->input('actual_question'),
+                    'correct_answer_explanation' => $request->input('correct_answer_explanation'),
+                    'question_image_path'        => $request->input('question_image_path'),
+                    'question_audio_path'        => $request->input('question_audio_path'),
+                    'is_active'                  => $request->boolean('is_active'),
+                ];
+                $sort = (int) $request->input('sort_order_start', 1);
+                foreach ($request->input('options', []) as $opt) {
+                    $this->service->create(array_merge($base, [
+                        'option_text' => $opt['option_text'] ?? null,
+                        'is_correct'  => !empty($opt['is_correct']),
+                        'sort_order'  => $sort++,
+                    ]));
+                }
+                $count = count($request->input('options'));
+                return redirect()->route('admin.question-options.index')
+                    ->with('success', "{$count} option(s) created successfully.");
+            }
+
             $data = $request->merge([
                 'is_correct' => $request->boolean('is_correct'),
                 'is_active'  => $request->boolean('is_active'),
             ])->all();
-            $option = $this->service->create($data);
+            $this->service->create($data);
             return redirect()->route('admin.question-options.index')->with('success', 'Question option created successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
@@ -74,6 +103,56 @@ class QuestionOptionsController extends Controller
             return redirect()->route('admin.question-options.index')->with('success', 'Question option updated successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
+        }
+    }
+
+    public function csvImportStore(Request $request)
+    {
+        $request->validate([
+            'question_id' => 'required|exists:questions,id',
+            'csv_file'    => [
+                'required',
+                'file',
+                'mimes:csv,txt',
+                'max:' . config('csv_import.max_file_size_kb', 10240),
+            ],
+        ]);
+
+        $file     = $request->file('csv_file');
+        $disk     = config('csv_import.disk', 'local');
+        $path     = config('csv_import.path', 'csv_imports');
+        $stored   = $file->store($path, $disk);
+
+        $import = CsvImport::create([
+            'question_id'       => $request->input('question_id'),
+            'question_type'     => 'mcq_single',
+            'original_filename' => $file->getClientOriginalName(),
+            'stored_filename'   => $stored,
+            'disk'              => $disk,
+            'status'            => 'processing',
+            'imported_by'       => auth()->id(),
+        ]);
+
+        try {
+            Excel::import(
+                new QuestionOptionsMcqImport($import->question_id, $import->id),
+                $stored,
+                $disk,
+                \Maatwebsite\Excel\Excel::CSV
+            );
+
+            $import->refresh();
+            $import->update(['status' => $import->failed_rows > 0 ? 'completed' : 'completed']);
+
+            $msg = "CSV import complete — {$import->processed_rows} question(s) imported";
+            if ($import->failed_rows > 0) {
+                $msg .= ", {$import->failed_rows} row(s) failed";
+            }
+
+            return redirect()->route('admin.question-options.index')->with('success', $msg . '.');
+        } catch (\Throwable $e) {
+            $import->update(['status' => 'failed', 'errors' => [['row' => 0, 'error' => $e->getMessage()]]]);
+            return back()->withErrors(['csv_file' => 'Import failed: ' . $e->getMessage()])->withInput();
         }
     }
 
