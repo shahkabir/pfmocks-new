@@ -360,7 +360,7 @@
 
             // Filter only options belonging to this block
             $optionsInBlock = collect($question['options'])
-                ->whereIn('id', $block['question_option_ids'])
+                ->whereIn('id', json_decode($block['question_option_ids'], true))
                 ->groupBy('actual_question');
 
             //dd($optionsInBlock);

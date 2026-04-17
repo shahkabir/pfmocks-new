@@ -55,7 +55,13 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Grouped Option IDs</label>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-semibold mb-0">Grouped Option IDs</label>
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="checkbox" id="select_all_options">
+                            <label class="form-check-label small fw-semibold" for="select_all_options">Select All</label>
+                        </div>
+                    </div>
                     <div class="form-text mb-2">Select the question options that belong to this group.
                         First select a question above, then the options will load.</div>
                     <select name="question_options_group_ids[]" id="options_select"
@@ -67,7 +73,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <div class="form-text">Hold Ctrl/Cmd to select multiple.</div>
+                    <div class="form-text">Hold Ctrl/Cmd to select multiple, or use Select All above.</div>
                 </div>
 
                 <div class="d-flex gap-2 mt-4">
@@ -80,22 +86,40 @@
 </div>
 
 <script>
+const optionsSel   = document.getElementById('options_select');
+const selectAllChk = document.getElementById('select_all_options');
+
 document.getElementById('question_id').addEventListener('change', function () {
     const qId = this.value;
-    const sel = document.getElementById('options_select');
-    sel.innerHTML = '<option disabled>Loading…</option>';
+    optionsSel.innerHTML = '<option disabled>Loading…</option>';
+    selectAllChk.checked = false;
 
-    if (!qId) { sel.innerHTML = ''; return; }
+    if (!qId) { optionsSel.innerHTML = ''; return; }
 
     fetch('{{ route("admin.ajax.options-by-question", ":id") }}'.replace(':id', qId))
         .then(r => r.json())
         .then(data => {
-            sel.innerHTML = '';
+            optionsSel.innerHTML = '';
             data.forEach(o => {
                 const label = `#${o.id} [${o.question_type}] — ${(o.actual_question || o.option_text || '').substring(0, 70)}`;
-                sel.innerHTML += `<option value="${o.id}">${label}</option>`;
+                optionsSel.innerHTML += `<option value="${o.id}">${label}</option>`;
             });
+            syncSelectAllState();
         });
 });
+
+selectAllChk.addEventListener('change', function () {
+    Array.from(optionsSel.options).forEach(o => o.selected = this.checked);
+});
+
+optionsSel.addEventListener('change', syncSelectAllState);
+
+function syncSelectAllState() {
+    const opts = Array.from(optionsSel.options);
+    selectAllChk.indeterminate = opts.some(o => o.selected) && !opts.every(o => o.selected);
+    selectAllChk.checked = opts.length > 0 && opts.every(o => o.selected);
+}
+
+syncSelectAllState();
 </script>
 @endsection

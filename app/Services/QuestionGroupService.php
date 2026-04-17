@@ -28,6 +28,8 @@ class QuestionGroupService
         $validated['question_options_group_ids'] = json_encode(
             array_map('intval', $validated['question_options_group_ids'] ?? [])
         );
+
+        // dd($validated);
         return $this->repo->create($validated);
     }
 

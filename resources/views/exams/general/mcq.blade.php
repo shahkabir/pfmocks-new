@@ -137,6 +137,7 @@
     </div>
 </div>
 
+
 @php
     $parts = [];
 
@@ -161,7 +162,7 @@
             }
 
             $optionsInBlock = collect($question['options'])
-                ->whereIn('id', $block['question_option_ids'])
+                ->whereIn('id', json_decode($block['question_option_ids'], true))
                 ->groupBy('actual_question');
 
             foreach ($optionsInBlock as $actualQuestion => $options) {
@@ -170,6 +171,8 @@
         }
     }
 @endphp
+
+{{-- {{ dd(get_defined_vars(), $parts) }} --}}
 
 <form class="mcq-form">
     @csrf

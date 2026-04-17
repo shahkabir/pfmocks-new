@@ -48,7 +48,7 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
     // Load questions for a given module
     Route::get('questions-by-module/{moduleId}', function (int $moduleId) {
         $questions = \App\Models\Question\Question::where('module_id', $moduleId)
-            ->orderBy('sort_order')
+            ->orderBy('id')
             ->get(['id', 'question_header', 'type']);
         return response()->json($questions);
     })->name('questions-by-module');
@@ -56,8 +56,9 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
     // Load options for a given question
     Route::get('options-by-question/{questionId}', function (int $questionId) {
         $options = \App\Models\Question\QuestionOptions::where('question_id', $questionId)
-            ->orderBy('sort_order')
+            ->orderBy('id')
             ->get(['id', 'actual_question', 'option_text', 'question_type']);
+
         return response()->json($options);
     })->name('options-by-question');
 
@@ -65,7 +66,7 @@ Route::prefix('ajax')->name('ajax.')->group(function () {
     Route::get('options-by-group/{groupId}', function (int $groupId) {
         $group = \App\Models\Question\QuestionGroup::findOrFail($groupId);
         $options = \App\Models\Question\QuestionOptions::where('question_id', $group->question_id)
-            ->orderBy('sort_order')
+            ->orderBy('id')
             ->get(['id', 'actual_question', 'option_text', 'question_type']);
         return response()->json($options);
     })->name('options-by-group');

@@ -41,7 +41,13 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Question Option IDs (in this block)</label>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label fw-semibold mb-0">Question Option IDs (in this block)</label>
+                        <div class="form-check form-check-inline mb-0">
+                            <input class="form-check-input" type="checkbox" id="select_all_options">
+                            <label class="form-check-label small fw-semibold" for="select_all_options">Select All</label>
+                        </div>
+                    </div>
                     <div class="form-text mb-2">Select the options that appear under this block's instruction.
                         Options load after you choose a group above.</div>
                     <select name="question_option_ids[]" id="options_select"
@@ -53,7 +59,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <div class="form-text">Hold Ctrl/Cmd to select multiple. Order matters for display.</div>
+                    <div class="form-text">Hold Ctrl/Cmd to select multiple, or use Select All above.</div>
                 </div>
 
                 <div class="mb-3">
@@ -72,26 +78,44 @@
 </div>
 
 <script>
+const optionsSel   = document.getElementById('options_select');
+const selectAllChk = document.getElementById('select_all_options');
+
 document.getElementById('group_id').addEventListener('change', function () {
     const gId = this.value;
-    const sel = document.getElementById('options_select');
-    sel.innerHTML = '<option disabled>Loading…</option>';
+    optionsSel.innerHTML = '<option disabled>Loading…</option>';
+    selectAllChk.checked = false;
+    selectAllChk.indeterminate = false;
 
-    if (!gId) { sel.innerHTML = ''; return; }
+    if (!gId) { optionsSel.innerHTML = ''; return; }
 
     fetch('{{ route("admin.ajax.options-by-group", ":id") }}'.replace(':id', gId))
         .then(r => r.json())
         .then(data => {
-            sel.innerHTML = '';
+            optionsSel.innerHTML = '';
             data.forEach(o => {
                 const label = `#${o.id} [${o.question_type}] — ${(o.actual_question || o.option_text || '').substring(0, 70)}`;
-                sel.innerHTML += `<option value="${o.id}">${label}</option>`;
+                optionsSel.innerHTML += `<option value="${o.id}">${label}</option>`;
             });
+            syncSelectAllState();
         });
 });
 
-// Auto-load options if group pre-selected
+selectAllChk.addEventListener('change', function () {
+    Array.from(optionsSel.options).forEach(o => o.selected = this.checked);
+});
+
+optionsSel.addEventListener('change', syncSelectAllState);
+
+function syncSelectAllState() {
+    const opts = Array.from(optionsSel.options);
+    selectAllChk.indeterminate = opts.some(o => o.selected) && !opts.every(o => o.selected);
+    selectAllChk.checked = opts.length > 0 && opts.every(o => o.selected);
+}
+
+// Auto-load options if group pre-selected (e.g. old() repopulation)
 const preselected = document.getElementById('group_id').value;
 if (preselected) document.getElementById('group_id').dispatchEvent(new Event('change'));
+else syncSelectAllState();
 </script>
 @endsection

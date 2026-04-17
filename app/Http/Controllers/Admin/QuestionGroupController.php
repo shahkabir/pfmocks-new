@@ -44,6 +44,7 @@ class QuestionGroupController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         try {
             $this->service->create($request->all());
             return redirect()->route('admin.question-groups.index')->with('success', 'Question group created successfully.');
