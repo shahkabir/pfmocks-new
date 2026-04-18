@@ -64,6 +64,7 @@ resources/views/
 | Axios | 1.11.0 | npm / `resources/js/bootstrap.js` |
 | OverlayScrollbars | 2.11.0 | npm |
 | Yajra DataTables | 12.0 | CDN + `datatables.net-bs5` |
+| SweetAlert2 | 11 | CDN (loaded in `layouts/header.blade.php`) |
 
 ---
 
@@ -140,6 +141,8 @@ TailwindCSS utilities are used primarily for layout helpers and exam UI elements
 - `<textarea>` with live word count
 - Timer shows remaining time
 - Submits to `/ielts-writing/submit`
+- On success, shows a blocking **SweetAlert2** modal ("Answers have been submitted…"); redirects to `route('dashboard')` after user clicks OK
+- On failure, shows a SweetAlert2 error modal
 
 ### Speaking Exam (`speaking.blade.php`)
 - Uses browser `MediaRecorder` API

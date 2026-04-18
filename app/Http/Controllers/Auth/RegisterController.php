@@ -39,6 +39,24 @@ class RegisterController extends Controller
         //dd($user);
         // dd(Auth::attempt($credentials));
 
+        //Bypass OTP for admin, 1 student for testing
+        // if (Auth::attempt($credentials)) {
+        //     $user = Auth::user();
+
+        //     if ($user->role === 'admin' || $user->email === 'shari1909@gmail.com') {
+        //         auth()->login($user);
+                
+        //         if ($user->role === 'admin') {
+                    
+        //             return redirect()->route('dashboard.student');
+        //         } else {
+        //             return redirect()->route('dashboard.student');
+        //         }
+                
+        //         //return response()->json(['message' => 'Login successful. Redirecting...'], 200);
+        //     }
+        // }
+
         if(Auth::attempt($credentials)){
 
             $user = Auth::user();
@@ -180,7 +198,7 @@ class RegisterController extends Controller
         // dd($user);
 
         //OTP matches, log the user in
-        return response()->json(['message'=>'OTP verified successfully. Redirecting to dashboard...'], 200);
+        return response()->json(['message'=>'OTP verified successfully. You will be logged in shortly.'], 200);
         
     }
 

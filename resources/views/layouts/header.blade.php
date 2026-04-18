@@ -77,4 +77,10 @@
 
     <!-- DataTables -->
     <script src="https://cdn.datatables.net/2.3.6/js/dataTables.js"></script>
+
+    <!-- SweetAlert2 -->
+     {{-- import 'sweetalert2/themes/bootstrap-5.css' --}}
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>

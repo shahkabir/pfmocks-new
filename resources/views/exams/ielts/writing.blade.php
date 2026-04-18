@@ -152,14 +152,20 @@
                     {{-- LEFT: QUESTION --}}
                     <div class="question-panel">
 
-                        <h5>Task {{ $index + 1 }}</h5>
+                        {{-- <h5>Task {{ $index + 1 }}</h5> --}}
 
                         <div class="mb-3">
-                            {!! nl2br(e($question['question_header'])) !!}
+                            {!! $question['passage_instruction'] !!}
                         </div>
 
                         <div class="mb-3">
-                            {!! nl2br(e($question['passage'])) !!}
+                            {!! $question['question_header'] !!}
+                        </div>
+
+                        <div class="mb-3">
+                            {{-- {!! nl2br(e($question['passage'])) !!} --}}
+                            {!! $question['passage'] !!}
+
                         </div>
 
                         {{-- UNIQUE IDENTIFIER --}}
@@ -262,12 +268,25 @@
             method: "POST",
             data: formData,
             success: function(response) {
-                alert('Your answers have been submitted successfully!');
-                // Optionally, redirect or perform other actions
-                console.log(response);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Answers Submitted',
+                    text: 'Answers have been submitted. You will be notified once our Evaluators completes evaluation.',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then(function () {
+                    window.location.href = "{{ route('dashboard') }}";
+                });
             },
             error: function(xhr, status, error) {
-                alert('An error occurred while submitting your answers. Please try again.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Submission Failed',
+                    text: 'An error occurred while submitting your answers. Please try again.',
+                    confirmButtonText: 'OK',
+                    theme: 'bootstrap',
+                });
             }
         });
     });
