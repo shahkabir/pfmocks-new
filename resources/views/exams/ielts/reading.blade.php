@@ -15,15 +15,19 @@
         background: #ffffff;
         border-bottom: 1px solid #ddd;
         padding: 10px 15px;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
-        justify-content: space-between;
     }
 
     .exam-topbar-left {
         display: flex;
         align-items: center;
         gap: 15px;
+    }
+
+    .exam-topbar-right {
+        justify-self: end;
     }
 
     .exam-logo {
@@ -38,8 +42,29 @@
     }
 
     .timer {
-        font-weight: bold;
-        font-size: 14px;
+        justify-self: center;
+        font-weight: 700;
+        font-size: 18px;
+        color: #0d6efd;
+        background: #e9f2ff;
+        border: 1px solid #c7ddff;
+        padding: 6px 16px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: .5px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .timer i {
+        font-size: 18px;
+    }
+
+    .timer.warning {
+        color: #b45309;
+        background: #fff4e5;
+        border-color: #ffd8a8;
     }
 
     .top-icons i {
@@ -52,7 +77,7 @@
     /* ===== BODY ===== */
     .exam-body {
         display: flex;
-        height: calc(100vh - 200px);
+        height: calc(100vh - 130px);
         background: #fff;
         border-bottom: 1px solid #ddd;
     }
@@ -115,21 +140,81 @@
     .exam-footer {
         background: #ffffff;
         border-top: 1px solid #ddd;
-        padding: 10px 15px;
+        padding: 12px 16px;
         display: flex;
         align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .footer-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
     }
 
     .footer-right {
         margin-left: auto;
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 10px;
     }
 
-    .current-time {
-        font-weight: bold;
-        font-size: 14px;
+    /* Part nav buttons */
+    .part-btn {
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        background: #f8f9fa;
+        color: #495057;
+        transition: background-color .15s, border-color .15s, color .15s, transform .1s;
+        font-size: 13px;
+    }
+    .part-btn:hover:not(.active) {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+    .part-btn.active {
+        background: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(13,110,253,.25);
+    }
+
+    /* Exam action buttons */
+    .btn-submit-exam {
+        background: #198754;
+        border-color: #198754;
+        color: #fff;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        transition: background-color .15s, box-shadow .15s;
+    }
+    .btn-submit-exam:hover:not(:disabled) {
+        background: #146c43;
+        border-color: #146c43;
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(25,135,84,.25);
+    }
+    .btn-submit-exam:disabled { opacity: .75; }
+
+    .btn-exit-exam {
+        background: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        transition: background-color .15s, color .15s;
+    }
+    .btn-exit-exam:hover {
+        background: #dc3545;
+        color: #fff;
     }
 </style>
 
@@ -299,16 +384,23 @@
     <div class="exam-topbar-left">
         <div class="exam-logo">IELTS</div>
         <div class="candidate-info">
-            <strong>48887345</strong><br>
-            <span class="timer">59 minutes remaining</span>
+            <strong>{{ auth()->user()->name ?? 'Candidate' }}</strong><br>
+            <span class="text-muted">ID: {{ auth()->user()->id ?? '—' }}</span>
         </div>
     </div>
 
-    <div class="top-icons">
-        <i class="fas fa-wifi"></i>
-        <i class="far fa-bell"></i>
-        <i class="fas fa-bars"></i>
-        <i class="far fa-edit"></i>
+    <div class="timer" id="timer">
+        <i class="bi bi-clock-fill"></i>
+        <span id="stopwatch">{{ str_pad((int)($module->duration_minutes ?? 60), 2, '0', STR_PAD_LEFT) }}:00</span>
+    </div>
+
+    <div class="exam-topbar-right">
+        <div class="top-icons">
+            <i class="bi bi-wifi"></i>
+            <i class="bi bi-bell"></i>
+            <i class="bi bi-list"></i>
+            <i class="bi bi-pencil-square"></i>
+        </div>
     </div>
 </div>
 
@@ -516,37 +608,24 @@
     </div>
 
 
-    {{-- ================= Parts ================= --}}
-    <div class="mb-3">
-        @foreach($parts as $partNumber => $partData)
-            <button type="button" class="btn btn-sm btn-primary" onclick="showPart({{ $partNumber }})">
-                Part {{ $partNumber }}
-            </button>
-        @endforeach
-    </div>
-
-    {{-- ================= QUESTION PALETTE ================= --}}
-    {{-- <div class="question-palette">
-        @for($i = 1; $i <= 13; $i++)
-            <button class="palette-btn {{ $i === 1 ? 'active' : '' }}">
-                {{ $i }}
-            </button>
-        @endfor
-    </div> --}}
-
-
-
     {{-- ================= FOOTER ================= --}}
     <div class="exam-footer">
-        <div class="current-time" id="stopwatch">
-            ⏰ 00:00
+        <div class="footer-left">
+            @foreach($parts as $partNumber => $partData)
+                <button type="button"
+                        class="part-btn {{ $partNumber === array_key_first($parts) ? 'active' : '' }}"
+                        data-part="{{ $partNumber }}"
+                        onclick="showPart({{ $partNumber }}, this)">
+                    Part {{ $partNumber }}
+                </button>
+            @endforeach
         </div>
 
         <div class="footer-right">
-            <button type="submit" id="submitAnswersBtn" class="btn btn-success btn-sm">
+            <button type="submit" id="submitAnswersBtn" class="btn btn-submit-exam">
                 <i class="bi bi-check2-circle me-1"></i>Submit Answers
             </button>
-            <button type="button" id="exitBtn" class="btn btn-outline-secondary btn-sm">
+            <button type="button" id="exitBtn" class="btn btn-exit-exam">
                 <i class="bi bi-box-arrow-right me-1"></i>Exit
             </button>
             <input type="hidden" name="module_id" value="{{ $module->id }}">
@@ -620,8 +699,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js"></script>
 <script>
 
-    // ── Stopwatch ──────────────────────────────────────────────────────────
+    // ── Countdown Timer ────────────────────────────────────────────────────
+    const totalSeconds = {{ (int)($module->duration_minutes ?? 60) }} * 60;
     const examStart = Date.now();
+    let remainingSeconds = totalSeconds;
+
     function formatDuration(sec) {
         sec = Math.max(0, Math.floor(sec));
         const h = Math.floor(sec / 3600);
@@ -630,9 +712,20 @@
         const pad = n => String(n).padStart(2, '0');
         return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
     }
+
     const stopwatchTimer = setInterval(() => {
-        const elapsed = (Date.now() - examStart) / 1000;
-        $('#stopwatch').html('⏰ ' + formatDuration(elapsed));
+        const elapsed = Math.floor((Date.now() - examStart) / 1000);
+        remainingSeconds = Math.max(0, totalSeconds - elapsed);
+        $('#stopwatch').text(formatDuration(remainingSeconds));
+
+        // Warning colour under 5 minutes
+        if (remainingSeconds <= 300) {
+            $('#timer').addClass('warning');
+        }
+
+        if (remainingSeconds === 0) {
+            clearInterval(stopwatchTimer);
+        }
     }, 1000);
 
     // ── Submit handler ─────────────────────────────────────────────────────
@@ -743,17 +836,15 @@
     }
 
 
-    function showPart(partNumber) {
+    function showPart(partNumber, btn) {
         document.querySelectorAll('.reading-part').forEach(part => {
             part.style.display = 'none';
         });
         document.getElementById('part-' + partNumber).style.display = 'flex';
 
         // Update active button
-        document.querySelectorAll('.palette-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
+        document.querySelectorAll('.part-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
     }
 
 

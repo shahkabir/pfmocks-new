@@ -127,15 +127,19 @@
         background: #ffffff;
         border-bottom: 1px solid #ddd;
         padding: 10px 15px;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
-        justify-content: space-between;
     }
 
     .exam-topbar-left {
         display: flex;
         align-items: center;
         gap: 15px;
+    }
+
+    .exam-topbar-right {
+        justify-self: end;
     }
 
     .exam-logo {
@@ -145,14 +149,34 @@
     }
 
     .candidate-info {
-        font-size: 15px;
-        /* color: #333; */
-        color: rgb(120, 121, 122);
+        font-size: 13px;
+        color: #333;
     }
 
     .timer {
-        font-weight: bold;
-        font-size: 15px;
+        justify-self: center;
+        font-weight: 700;
+        font-size: 18px;
+        color: #0d6efd;
+        background: #e9f2ff;
+        border: 1px solid #c7ddff;
+        padding: 6px 16px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: .5px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .timer i {
+        font-size: 18px;
+    }
+
+    .timer.warning {
+        color: #b45309;
+        background: #fff4e5;
+        border-color: #ffd8a8;
     }
 
     .top-icons i {
@@ -165,7 +189,7 @@
     /* ===== BODY ===== */
     .exam-body {
         /* display: flex; */
-        height: calc(100vh - 200px);
+        height: calc(100vh - 130px);
         background: #fff;
         /* border-bottom: 1px solid #ddd; */
     }
@@ -204,62 +228,115 @@
         cursor: pointer;
     }
 
-    /* ===== QUESTION PALETTE ===== */
-    .question-palette {
-        background: #f9fafb;
-        /* border-top: 1px solid #ddd; */
-        padding: 5px 20px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .parts-area{
-        margin: 0px !important;
-        padding-left: 20px;
-        display: flex;
-        gap: 15px;
-        background: #f9fafb;
-    }
-
-    .btn-parts {
-       border-radius: 5px;
-    }
-
-    .palette-btn {
-        width: 34px;
-        height: 34px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        background: #676767;
-        font-size: 13px;
-    }
-
-    .palette-btn.active {
-        background: #ffffff;
-        color: #000000;
-        border-color: #676767;
-    }
-
     /* ===== FOOTER ===== */
     .exam-footer {
         background: #ffffff;
         border-top: 1px solid #ddd;
-        padding: 10px 15px;
-        display: flex;
+        padding: 8px 16px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
+        gap: 12px;
+    }
+
+    .footer-left {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-self: start;
+    }
+
+    .footer-center {
+        display: flex;
+        gap: 6px;
+        justify-self: center;
     }
 
     .footer-right {
-        margin-left: auto;
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 8px;
+        justify-self: end;
     }
 
-    .current-time {
-        font-weight: bold;
-        font-size: 14px;
+    /* Small numbered palette buttons */
+    .palette-btn {
+        width: 26px;
+        height: 26px;
+        border-radius: 4px;
+        border: 1px solid #ced4da;
+        background: #f8f9fa;
+        color: #495057;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 0;
+        line-height: 1;
+        transition: background-color .12s, border-color .12s, color .12s;
+    }
+    .palette-btn:hover:not(.active) {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+    .palette-btn.active {
+        background: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+    }
+
+    /* Part buttons */
+    .part-btn {
+        font-weight: 600;
+        padding: 5px 14px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        background: #f8f9fa;
+        color: #495057;
+        transition: background-color .15s, border-color .15s, color .15s;
+        font-size: 13px;
+    }
+    .part-btn:hover:not(.active) {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+    .part-btn.active {
+        background: #0d6efd;
+        border-color: #0d6efd;
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(13,110,253,.25);
+    }
+
+    /* Exam action buttons */
+    .btn-submit-exam {
+        background: #198754;
+        border-color: #198754;
+        color: #fff;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        transition: background-color .15s, box-shadow .15s;
+    }
+    .btn-submit-exam:hover:not(:disabled) {
+        background: #146c43;
+        border-color: #146c43;
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(25,135,84,.25);
+    }
+    .btn-submit-exam:disabled { opacity: .75; }
+
+    .btn-exit-exam {
+        background: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        transition: background-color .15s, color .15s;
+    }
+    .btn-exit-exam:hover {
+        background: #dc3545;
+        color: #fff;
     }
 
     /* ====== Audio Player ====== */
@@ -300,22 +377,24 @@
 {{-- ================= TOP BAR ================= --}}
 <div class="exam-topbar">
     <div class="exam-topbar-left">
-        <div class="exam-logo">IELTS</div>  {{ $module->name }}
-    </div>
-
-    <div class="exam-topbar-center">
-        <div class="time" id="time">
-            <svg xmlns="http://w3.org" width="16" height="16" fill="currentColor" class="bi bi-clock" viewBox="0 0 16 16">
-                <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
-                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0"/>
-            </svg>
-            <strong><span id="timer">{{ $module->duration_minutes }}:00</span></strong>
+        <div class="exam-logo">IELTS</div>
+        <div class="candidate-info">
+            <strong>{{ $user->name }}</strong><br>
+            <span class="text-muted">ID: {{ $user->id }} · {{ $module->name }}</span>
         </div>
     </div>
 
+    <div class="timer" id="timer-pill">
+        <i class="bi bi-clock-fill"></i>
+        <span id="timer">{{ str_pad((int)$module->duration_minutes, 2, '0', STR_PAD_LEFT) }}:00</span>
+    </div>
+
     <div class="exam-topbar-right">
-        <div class="candidate-info">
-            <strong> {{ $user->name }}</strong><br>
+        <div class="top-icons">
+            <i class="bi bi-wifi"></i>
+            <i class="bi bi-bell"></i>
+            <i class="bi bi-list"></i>
+            <i class="bi bi-pencil-square"></i>
         </div>
     </div>
 </div>
@@ -538,29 +617,34 @@
     </div>
 
 
-    {{-- ================= Parts ================= --}}
-    <div class="mb-3 parts-area">
-        @foreach($parts as $partNumber => $partData)
-            <button type="button" class="btn btn-sm btn-secondary btn-parts" onclick="showPart({{ $partNumber }})">
-                Part {{ $partNumber }}
-            </button>
-        @endforeach
-    </div>
-    {{-- {{dd($qNo)}} --}}
-    {{-- ================= QUESTION PALETTE ================= --}}
-    <div class="question-palette">
-        @for($i = 1; $i <= $qNo; $i++)
-            <button type="button" class="palette-btn {{ $i === 1 ? 'active' : '' }}" data-target="question-{{ $i }}">
-                {{ $i }}
-            </button>
-        @endfor
-    </div>
-
     {{-- ================= FOOTER ================= --}}
     <div class="exam-footer">
+        {{-- LEFT: Question navigation palette --}}
+        <div class="footer-left">
+            @for($i = 1; $i <= $qNo; $i++)
+                <button type="button" class="palette-btn {{ $i === 1 ? 'active' : '' }}"
+                        data-target="question-{{ $i }}">
+                    {{ $i }}
+                </button>
+            @endfor
+        </div>
+
+        {{-- CENTER: Part navigation --}}
+        <div class="footer-center">
+            @foreach($parts as $partNumber => $partData)
+                <button type="button"
+                        class="part-btn {{ $partNumber === array_key_first($parts) ? 'active' : '' }}"
+                        data-part="{{ $partNumber }}"
+                        onclick="showPart({{ $partNumber }}, this)">
+                    Part {{ $partNumber }}
+                </button>
+            @endforeach
+        </div>
+
+        {{-- RIGHT: Submit / Exit --}}
         <div class="footer-right">
-            <button type="submit" class="btn btn-success btn-sm">Submit Answers</button>
-            <button class="btn btn-outline-secondary btn-sm">Exit</button>
+            <button type="submit" class="btn-submit-exam">Submit Answers</button>
+            <button type="button" class="btn-exit-exam">Exit</button>
             <input type="hidden" name="module_id" value="{{ $module->id }}">
             <input type="hidden" name="exam_name" value="{{ $module->name }}">
             <input type="hidden" name="module_type" value="{{ $module->module_type }}">
@@ -596,25 +680,22 @@
     });
 
 
-    function showPart(partNumber) {
-        document.querySelectorAll('.listening-part' ,'.audio-div').forEach(part => {
+    function showPart(partNumber, btn) {
+        document.querySelectorAll('.listening-part').forEach(part => {
             part.style.display = 'none';
         });
 
         document.getElementById('part-' + partNumber).style.display = 'flex';
 
-        // Update active button
-        document.querySelectorAll('.palette-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        event.target.classList.add('active');
+        // Update active part button
+        document.querySelectorAll('.part-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
 
         // Update audio source
         const audioPlayer = document.querySelector('.audio-player');
         const partAudioUrl = "{{ asset('') }}" + @json($parts)[partNumber]['part_audio_url'];
         audioPlayer.src = partAudioUrl;
         audioPlayer.load();
-
     }
 
 
@@ -647,16 +728,22 @@
 
 
 
-    // Countdown timer (dummy)
-    let seconds = {{ $module->duration_minutes * 60 }}; // 59 minutes
+    // Countdown timer
+    let seconds = {{ (int)$module->duration_minutes * 60 }};
+    const $timerPill = document.getElementById('timer-pill');
+    const $timerText = document.getElementById('timer');
 
-    setInterval(() => {
-        if (seconds <= 0) return;
+    const countdownInterval = setInterval(() => {
+        if (seconds <= 0) {
+            clearInterval(countdownInterval);
+            return;
+        }
         seconds--;
-        let m = Math.floor(seconds / 60);
-        let s = seconds % 60;
-        document.getElementById('timer').innerText =
-            `${m}:${s.toString().padStart(2, '0')}`;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        $timerText.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+        if (seconds <= 300) $timerPill.classList.add('warning');
     }, 1000);
 
     // Question palette navigation

@@ -6,37 +6,84 @@
 
 {{-- @section('content') --}}
 <style>
+    body { background: #f4f6f9; }
+
+    /* ===== TOP BAR ===== */
     .exam-topbar {
-        background: #343a40;
-        color: #fff;
+        background: #ffffff;
+        border-bottom: 1px solid #ddd;
         padding: 10px 15px;
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
     }
 
-    .timer {
+    .exam-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .exam-topbar-right {
+        justify-self: end;
+    }
+
+    .exam-logo {
         font-weight: bold;
+        font-size: 20px;
+        color: #d32f2f;
+    }
+
+    .candidate-info {
+        font-size: 13px;
+        color: #333;
+    }
+
+    .timer {
+        justify-self: center;
+        font-weight: 700;
+        font-size: 18px;
+        color: #0d6efd;
+        background: #e9f2ff;
+        border: 1px solid #c7ddff;
+        padding: 6px 16px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: .5px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .timer i { font-size: 18px; }
+
+    .timer.warning {
+        color: #b45309;
+        background: #fff4e5;
+        border-color: #ffd8a8;
+    }
+
+    .top-icons i {
         font-size: 16px;
+        margin-left: 15px;
+        cursor: pointer;
+        color: #555;
     }
 
-    .exam-details {
-        background: #f4f6f9;
-        padding: 15px;
-        border-bottom: 1px solid #ddd;
-    }
-
+    /* ===== BODY ===== */
     .exam-body {
         display: flex;
-        height: calc(100vh - 260px);
+        height: calc(100vh - 130px);
+        background: #fff;
+        border-bottom: 1px solid #ddd;
     }
 
     .question-panel {
         width: 45%;
-        padding: 15px;
+        padding: 20px;
         overflow-y: auto;
         border-right: 1px solid #ddd;
-        background: #fff;
+        background: #e5e5e5;
     }
 
     .writing-task {
@@ -53,7 +100,7 @@
 
     .writing-panel {
         width: 55%;
-        padding: 15px;
+        padding: 20px;
         background: #fff;
         display: flex;
         flex-direction: column;
@@ -73,22 +120,6 @@
         margin-top: 5px;
     }
 
-    .exam-footer {
-        background: #f4f6f9;
-        padding: 10px 15px;
-        border-top: 1px solid #ddd;
-        display: flex;
-        align-items: center;
-    }
-
-    .part-nav button {
-        margin-right: 5px;
-    }
-
-    .footer-right {
-        margin-left: auto;
-    }
-
     .feedback {
         margin-top: 15px;
         padding: 10px;
@@ -99,45 +130,112 @@
         color: #495057;
     }
 
-    .palette-btn {
-        width: 45px;
-        height: 34px;
-        border-radius: 4px;
-        border: 1px solid #cccccca2;
-        background: #36cb77;
+    /* ===== FOOTER ===== */
+    .exam-footer {
+        background: #ffffff;
+        border-top: 1px solid #ddd;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .footer-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .footer-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* Part nav buttons */
+    .part-btn {
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        background: #f8f9fa;
+        color: #495057;
+        transition: background-color .15s, border-color .15s, color .15s;
         font-size: 13px;
     }
-
-    .palette-btn.active {
-        background: #007bff;
+    .part-btn:hover:not(.active) {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+    .part-btn.active {
+        background: #0d6efd;
+        border-color: #0d6efd;
         color: #fff;
-        border-color: #007bff;
+        box-shadow: 0 2px 6px rgba(13,110,253,.25);
     }
 
+    /* Exam action buttons */
+    .btn-submit-exam {
+        background: #198754;
+        border-color: #198754;
+        color: #fff;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        transition: background-color .15s, box-shadow .15s;
+    }
+    .btn-submit-exam:hover:not(:disabled) {
+        background: #146c43;
+        border-color: #146c43;
+        color: #fff;
+        box-shadow: 0 2px 6px rgba(25,135,84,.25);
+    }
+    .btn-submit-exam:disabled { opacity: .75; }
+
+    .btn-exit-exam {
+        background: transparent;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        transition: background-color .15s, color .15s;
+    }
+    .btn-exit-exam:hover {
+        background: #dc3545;
+        color: #fff;
+    }
 </style>
 
-{{-- TOP BAR --}}
+{{-- ================= TOP BAR ================= --}}
 <div class="exam-topbar">
-    <div>
-        <strong>Candidate:</strong> {{ $user->name }} – {{ $user->id }}
+    <div class="exam-topbar-left">
+        <div class="exam-logo">IELTS</div>
+        <div class="candidate-info">
+            <strong>{{ $user->name }}</strong><br>
+            <span class="text-muted">ID: {{ $user->id }} · {{ $module->name }}</span>
+        </div>
     </div>
-    <div class="timer">
-        ⏱ <span id="time">59:00</span> minutes left
+
+    <div class="timer" id="timer-pill">
+        <i class="bi bi-clock-fill"></i>
+        <span id="time">{{ str_pad((int)$module->duration_minutes, 2, '0', STR_PAD_LEFT) }}:00</span>
+    </div>
+
+    <div class="exam-topbar-right">
+        <div class="top-icons">
+            <i class="bi bi-wifi"></i>
+            <i class="bi bi-bell"></i>
+            <i class="bi bi-list"></i>
+            <i class="bi bi-pencil-square"></i>
+        </div>
     </div>
 </div>
-
-{{-- EXAM DETAILS --}}
-<div class="exam-details">
-    <strong>IELTS {{ 'test' }} Writing</strong><br>
-    <small>
-        {{-- Task 1 · You should spend about 20 minutes on this task.  
-        Write at least 150 words. --}}
-    </small>
-</div>
-
-{{-- @dd($__data) --}}
-
-{{-- {{ dd(get_defined_vars()) }} --}}
 
 <form class="writing-form">
     @csrf
@@ -211,24 +309,25 @@
         </div>
     </div>
 
-    {{-- FOOTER NAVIGATION --}}
+    {{-- ================= FOOTER ================= --}}
     <div class="exam-footer">
-
-        <div class="part-nav">
-            {{-- btn btn-primary btn-sm --}}
-            {{-- can be made dynamic by for loop for each array  --}}
+        <div class="footer-left">
             @for($i = 0; $i < count($questions); $i++)
-                <button type="button" onclick="showTask({{ $i }})" class="palette-btn {{ $i === 0 ? 'active' : '' }}">
+                <button type="button"
+                        class="part-btn {{ $i === 0 ? 'active' : '' }}"
+                        onclick="showTask({{ $i }}, this)">
                     Part {{ $i + 1 }}
                 </button>
             @endfor
-
-            {{-- <button class="palette-btn" onclick="showTask(1)">Part 1</button> 
-            <button class="palette-btn" onclick="showTask(2)">Part 2</button> --}}
         </div>
 
         <div class="footer-right">
-            <button type="submit" class="btn btn-success btn-sm">Submit Answers</button>
+            <button type="submit" id="submitAnswersBtn" class="btn-submit-exam">
+                <i class="bi bi-check2-circle me-1"></i>Submit Answers
+            </button>
+            <button type="button" id="exitBtn" class="btn-exit-exam">
+                <i class="bi bi-box-arrow-right me-1"></i>Exit
+            </button>
         </div>
     </div>
 </form>
@@ -236,13 +335,7 @@
 {{-- SCRIPT: WORD COUNT + TIMER --}}
 <script>
 
-    // function showTask(index) {
-    //     document.querySelectorAll('.writing-task')
-    //         .forEach((el, i) => {
-    //             el.style.display = i === index ? 'block' : 'none';
-    //         });
-    // }
-    function showTask(index) {
+    function showTask(index, btn) {
         // Hide all tasks first
         $('.writing-task').hide();
 
@@ -252,7 +345,18 @@
             'width': '100%',
             'height': '100%'
         });
+
+        // Update active part button
+        document.querySelectorAll('.part-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
     }
+
+    // Exit button
+    $('#exitBtn').on('click', function () {
+        if (confirm('Exit without submitting? Your answers will be lost.')) {
+            window.location.href = "{{ route('dashboard') }}";
+        }
+    });
 
     // $('.writing-form').on('submit', function(e) {
     //     e.preventDefault();
@@ -305,16 +409,22 @@
 
 
 
-    // Countdown timer (dummy)
-    let seconds = 3540; // 59 minutes
+    // Countdown timer
+    let seconds = {{ (int)$module->duration_minutes * 60 }};
+    const $timerPill = document.getElementById('timer-pill');
+    const $timeText  = document.getElementById('time');
 
-    setInterval(() => {
-        if (seconds <= 0) return;
+    const countdownInterval = setInterval(() => {
+        if (seconds <= 0) {
+            clearInterval(countdownInterval);
+            return;
+        }
         seconds--;
-        let m = Math.floor(seconds / 60);
-        let s = seconds % 60;
-        document.getElementById('time').innerText =
-            `${m}:${s.toString().padStart(2, '0')}`;
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        $timeText.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+        if (seconds <= 300) $timerPill.classList.add('warning');
     }, 1000);
 </script>
 {{-- @endsection --}}
