@@ -221,7 +221,9 @@ class ExamController extends Controller
         $moduleId = $request->input('module_id');
         $moduleType = $request->input('module_type');
         $examName = $request->input('exam_name');
-        //dd($answers);
+        $totalQuestions = $request->input('total_questions');
+        
+        // dd($answers);
 
         //First get the question_type for each question from the request
         // We need this to handle different question types (mcq_single, mcq_multiple, fill_in_blanks) 
@@ -243,7 +245,7 @@ class ExamController extends Controller
                     ->pluck('question_type', 'id')
                     ->toArray();
 
-        //dd($allOptionIds, $questionTypes);
+        // dd($allOptionIds, $questionTypes);
 
         //Update Exam Attempt
         $examAttempt = ExamAttempt::updateOrCreate(
@@ -263,6 +265,8 @@ class ExamController extends Controller
                 
                 //dd($data['question_option_id']);
 
+                // dd($data);
+
                 // Normalize to array (important)
                 // $optionIds = 
                 //     is_array($data['question_option_id'])
@@ -271,8 +275,10 @@ class ExamController extends Controller
 
                 $optionIds = $this->makeArrayLinear($data['question_option_id'])['option_ids'];
                 $fillInBlankAnswers = $this->makeArrayLinear($data['question_option_id'])['fill_in_blank_answers'];
-                
-                //dd($optionIds, $fillInBlankAnswers);
+                // if(in_array(21, $optionIds))
+                // {
+                //     dd($data, $optionIds, $fillInBlankAnswers);
+                // }
   
                 //dd($questionId, $data['question_option_id'], $optionIds);
 
@@ -297,7 +303,7 @@ class ExamController extends Controller
                     //echo "Processing Question ID: $questionId, Option ID: $optionId\n" . "Question Type: $questionType\n";
 
                     //Check if the answer is correct
-                    $isCorrect = QuestionOptions::where('id', $optionId)->value('is_correct');
+                    $isCorrect = $this->CheckIfAnswerIsCorrect($optionId, $fillInBlankAnswers);
                     // $isCorrect = true;
 
                     if ($questionType === 'mcq_multiple') { //For multiselect case
@@ -365,13 +371,15 @@ class ExamController extends Controller
 
         //Save the results for the exam attempt here (calculate score, save to results table, etc.)
         $status = 'completed'; // or 'pending' if you want to evaluate later
-        $achievedScore = Answer::where('exam_attempt_id', $examAttempt->id)
+        $correctAnswer = Answer::where('exam_attempt_id', $examAttempt->id)
                         ->where('is_correct', true)
                         ->count();
 
-        $totalScore = Question::where('module_id', 1)->count(); // Total questions in the module
-        $scorePercentage = $totalScore > 0 ? ($achievedScore / $totalScore) * 100 : 0;
-        $bandScore = $this->calculateIELTSBand($scorePercentage);
+        //$totalScore = Question::where('module_id', 1)->count(); // Total questions in the module
+        
+        
+        $scorePercentage = $totalQuestions > 0 ? ($correctAnswer / $totalQuestions) * 100 : 0;
+        $bandScore = $this->calculateIELTSBand($correctAnswer);
         $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
 
         // Save the result to the results table
@@ -384,8 +392,8 @@ class ExamController extends Controller
                 'status' => $status,
                 'exam_name' => $examName, 
                 'module_name' => ModuleConstants::MODULES[$moduleType] ?? null,
-                'achieved_score' => $achievedScore,
-                'total_score' => $totalScore,
+                'achieved_score' => $correctAnswer,
+                'total_score' => $totalQuestions,
                 'score_percentage' => $scorePercentage,
                 'band_score' => $bandScore,
                 'time_taken_seconds' => $timeTakenSeconds,
@@ -401,14 +409,14 @@ class ExamController extends Controller
             'summary'            => [
                 'exam_name'            => $examName,
                 'module_name'          => ModuleConstants::MODULES[$moduleType] ?? $moduleType,
-                'total_questions'      => $totalScore,
-                'correct_answers'      => $achievedScore,
+                'total_questions'      => $totalQuestions,
+                'correct_answers'      => $correctAnswer,
                 'score_percentage'     => round($scorePercentage, 2),
                 'band_score'           => $bandScore,
                 'time_elapsed_seconds' => $timeTakenSeconds,
             ],
-            'achieved_score'     => $achievedScore,
-            'total_score'        => $totalScore,
+            'achieved_score'     => $correctAnswer,
+            'total_score'        => $totalQuestions,
             'score_percentage'   => $scorePercentage,
             'band_score'         => $bandScore,
         ]);
@@ -593,31 +601,52 @@ class ExamController extends Controller
         ]);
     }
 
-    public function calculateIELTSBand($scorePercentage)
+    public function calculateIELTSBand($correctAnswers) 
     {
-        // This is a simplified example. You can adjust the thresholds based on actual IELTS band score criteria.
-        if ($scorePercentage >= 90) {
-            return 9.0;
-        } elseif ($scorePercentage >= 80) {
-            return 8.0;
-        } elseif ($scorePercentage >= 70) {
-            return 7.0;
-        } elseif ($scorePercentage >= 60) {
-            return 6.0;
-        } elseif ($scorePercentage >= 50) {
-            return 5.0;
-        } elseif ($scorePercentage >= 40) {
-            return 4.0;
-        } elseif ($scorePercentage >= 30) {
-            return 3.0;
-        } elseif ($scorePercentage >= 20) {
-            return 2.0;
-        } elseif ($scorePercentage >= 10) {
-            return 1.0;
-        } else {
-            return 0.0;
-        }
+        if ($correctAnswers >= 39) return 9.0;
+        if ($correctAnswers >= 37) return 8.5;
+        if ($correctAnswers >= 35) return 8.0;
+        if ($correctAnswers >= 33) return 7.5;
+        if ($correctAnswers >= 30) return 7.0;
+        if ($correctAnswers >= 27) return 6.5;
+        if ($correctAnswers >= 23) return 6.0;
+        if ($correctAnswers >= 19) return 5.5;
+        if ($correctAnswers >= 15) return 5.0;
+        if ($correctAnswers >= 13) return 4.5;
+        if ($correctAnswers >= 10) return 4.0;
+        if ($correctAnswers >= 8)  return 3.5;
+        if ($correctAnswers >= 6)  return 3.0;
+        if ($correctAnswers >= 4)  return 2.5;
+        if ($correctAnswers >= 2)  return 2.0;
+        if ($correctAnswers >= 1)  return 1.5;
 
+        return 0.0;
+    }
+
+    /*
+    * Returns true if the selected option ID is correct for MCQs 
+    * or if the fill in the blank answer matches the correct answer.
+    */
+    public function CheckIfAnswerIsCorrect($optionId, $fillInBlankAnswers)
+    {
+        // dd($optionId, $fillInBlankAnswers);
+
+        // Check if the option ID corresponds to a fill in the blanks question
+        if (array_key_exists($optionId, $fillInBlankAnswers)) {
+            // For fill in the blanks, you would compare the user's answer with the correct answer
+            // This is a simplified example, you might want to implement more complex logic (e.g., case-insensitive comparison, partial credit, etc.)
+            $userAnswer = trim($fillInBlankAnswers[$optionId]);
+            $correctAnswer = QuestionOptions::where('id', $optionId)->value('correct_answer_fib');
+            // if($optionId == 21){
+            //     // dd($userAnswer, $correctAnswer);
+            //     dd($userAnswer === trim($correctAnswer));
+            // }
+
+            return $userAnswer === trim($correctAnswer);
+        } else {
+            // For MCQ questions, check if the selected option is marked as correct
+            return QuestionOptions::where('id', $optionId)->value('is_correct');
+        }
     }
 
     public function updateUserExamStatus($userId, $moduleId, $status)

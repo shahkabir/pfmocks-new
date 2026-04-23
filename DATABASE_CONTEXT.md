@@ -181,6 +181,7 @@ Migration: `2025_12_26_082516_create_question_options_table.php`
 | option_text | string | Answer choice label (MCQ) |
 | is_correct | boolean | default: false |
 | correct_answer_explanation | text | nullable |
+| correct_answer_fib |
 | sort_order | integer | default: 0 |
 | is_active | boolean | |
 | question_image_path | string | nullable |

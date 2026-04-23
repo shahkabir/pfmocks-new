@@ -528,7 +528,7 @@
                                                             data-question-id="' . $option['question_id'] . '"
                                                             data-option-id="' . $option['id'] . '"
                                                             data-is-correct="' . ($option['is_correct'] ? '1' : '0') . '"
-                                                            data-correct-text="' . e($option['option_text']) . '">',
+                                                            data-correct-text="' . e($option['correct_answer_fib']) . '">',
                                                     e($option['actual_question'])
                                                 ) !!}
                                             </div>
@@ -567,7 +567,9 @@
                                                 </div>
 
                                             @elseif($option['question_type'] === 'mcq_select')
-                                                <div class="mb-3">
+                                                <div class="mb-3 exam-option"
+                                                     data-option-id="{{ $option['id'] }}"
+                                                     data-is-correct="{{ $option['is_correct'] ? '1' : '0' }}">
                                                     <select class="form-select"
                                                         name="answers[{{ $option['question_id'] }}][question_option_id][{{$qNo}}]">
 
@@ -622,6 +624,7 @@
         </div>
 
         <div class="footer-right">
+
             <button type="submit" id="submitAnswersBtn" class="btn btn-submit-exam">
                 <i class="bi bi-check2-circle me-1"></i>Submit Answers
             </button>
@@ -631,6 +634,7 @@
             <input type="hidden" name="module_id" value="{{ $module->id }}">
             <input type="hidden" name="exam_name" value="{{ $module->name }}">
             <input type="hidden" name="module_type" value="{{ $module->module_type }}">
+            <input type="hidden" name="total_questions" value="{{ $qNo - 1 }}">
         </div>
     </div>
 </form>
@@ -819,8 +823,10 @@
         // Fill-in-the-blanks review
         $('.fill-input').each(function () {
             const $inp = $(this);
+            //console.log('Reviewing input:', $inp.data('question-id'), $inp.data('option-id'));
             const userVal = ($inp.val() || '').trim().toLowerCase();
             const correctVal = ($inp.data('correct-text') || '').trim().toLowerCase();
+            //console.log('User value:', userVal, 'Correct value:', correctVal);
             if (!userVal) return;
             if (userVal === correctVal) $inp.addClass('fill-correct');
             else                        $inp.addClass('fill-wrong');

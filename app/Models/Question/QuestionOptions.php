@@ -20,12 +20,13 @@ class QuestionOptions extends Model
         'question_id',
         'actual_question', //questions for all type - Reading, Listening, Writing, Speaking
         'question_type', //'generic_question','mcq_single','mcq_multiple','fill_in_blanks''writing',
-                         // 'essay','audio','speaking''highlighting','reordering', 
+                         // 'essay','audio','speaking', 'highlighting','reordering', 
                          // 'no_question' (for display only question like in IELTS Listening)
                          // 'ielts_speaking' (for IELTS Speaking question which has no question text but only question image and audio)
         'option_text',
         'is_correct',
         'correct_answer_explanation',
+        'correct_answer_fib', //for fill in the blanks question correct answer text
         'sort_order',
         'is_active',
         //'ielts_listening_question_line', //Question that has no marks but for display only for IELTS Listening
