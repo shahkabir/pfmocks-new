@@ -57,4 +57,9 @@ class QuestionOptions extends Model
     {
         return $query->orderBy('sort_order');
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

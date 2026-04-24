@@ -11,6 +11,7 @@ use App\Repositories\Interfaces\QuestionRepositoryInterface;
 use App\Repositories\Interfaces\QuestionOptionsRepositoryInterface;
 use App\Repositories\Interfaces\QuestionGroupRepositoryInterface;
 use App\Repositories\Interfaces\QuestionGroupBlockRepositoryInterface;
+use App\Repositories\Interfaces\PaymentRepositoryInterface;
 
 // Implementations
 use App\Repositories\ExamRepository;
@@ -19,6 +20,7 @@ use App\Repositories\QuestionRepository;
 use App\Repositories\QuestionOptionsRepository;
 use App\Repositories\QuestionGroupRepository;
 use App\Repositories\QuestionGroupBlockRepository;
+use App\Repositories\PaymentRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -30,5 +32,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(QuestionOptionsRepositoryInterface::class,    QuestionOptionsRepository::class);
         $this->app->bind(QuestionGroupRepositoryInterface::class,      QuestionGroupRepository::class);
         $this->app->bind(QuestionGroupBlockRepositoryInterface::class, QuestionGroupBlockRepository::class);
+        $this->app->bind(PaymentRepositoryInterface::class,            PaymentRepository::class);
     }
 }

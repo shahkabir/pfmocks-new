@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function(){
      Route::get('/dashboard-student', [ExamController::class, 'dashboard'])->name('dashboard.student');
 
     Route::get('/exam/{module}/start', [ExamController::class, 'start'])->name('exam.start');
+    Route::get('/exam/result/{userExamId}', [ExamController::class, 'showResult'])->name('exam.result');
 
     Route::get('/exam~/{examName}', [ExamController::class, 'showExams'])->name('exams.show');
 
@@ -51,6 +52,14 @@ Route::middleware('auth')->group(function(){
         return view('profile', ['user' => auth()->user()]);
     })->name('profile');
 
+    // ── Payment (student-facing) ─────────────────────────────────────────
+    Route::get('/payment/module-info/{moduleId}',
+        [\App\Http\Controllers\PaymentController::class, 'moduleInfo'])
+        ->name('payment.module-info');
+
+    Route::post('/payment/submit',
+        [\App\Http\Controllers\PaymentController::class, 'submit'])
+        ->name('payment.submit');
 });
 
 // Admin CRUD routes (routes/admin.php)

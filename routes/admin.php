@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\QuestionOptionsController;
 use App\Http\Controllers\Admin\QuestionGroupController;
 use App\Http\Controllers\Admin\QuestionGroupBlockController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,13 @@ Route::resource('question-groups', QuestionGroupController::class)->except(['sho
 
 // Question Group Blocks
 Route::resource('question-group-blocks', QuestionGroupBlockController::class)->except(['show']);
+
+// Payments (admin verification)
+Route::get('payments',                    [AdminPaymentController::class, 'index'])->name('payments.index');
+Route::get('payments/list',               [AdminPaymentController::class, 'list'])->name('payments.list');
+Route::get('payments/{id}',               [AdminPaymentController::class, 'show'])->name('payments.show');
+Route::post('payments/{id}/approve',      [AdminPaymentController::class, 'approve'])->name('payments.approve');
+Route::post('payments/{id}/reject',       [AdminPaymentController::class, 'reject'])->name('payments.reject');
 
 // ── AJAX helpers for dependent dropdowns ──────────────────────────────────
 Route::prefix('ajax')->name('ajax.')->group(function () {

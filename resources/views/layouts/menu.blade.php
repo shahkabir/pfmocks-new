@@ -453,6 +453,14 @@
                   </a>
                 </li>
 
+                <li class="nav-item">
+                  <a href="{{ route('admin.payments.index') }}"
+                     class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-cash-coin"></i>
+                    <p>Payments</p>
+                  </a>
+                </li>
+
               @endif
 
               {{-- <li class="nav-item">

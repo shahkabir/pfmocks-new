@@ -216,6 +216,21 @@
         background: #dc3545;
         color: #fff;
     }
+
+    .btn-show-summary {
+        background: transparent;
+        border: 1px solid #0d6efd;
+        color: #0d6efd;
+        font-weight: 500;
+        padding: 4px 12px;
+        font-size: 13px;
+        border-radius: 4px;
+        transition: background-color .15s, color .15s;
+    }
+    .btn-show-summary:hover {
+        background: #0d6efd;
+        color: #fff;
+    }
 </style>
 
 <style>
@@ -505,15 +520,47 @@
                                         ->filter()
                                         ->first();
                                 @endphp
+
+                                
                                 <div class="mb-4 question-block" data-q-no="{{ $qNo }}">
 
                                     <h6 class="mb-2">
-                                             @if(!str_contains($actualQuestion, '[[blank]]'))
+                                        @php $type = $options->first()['question_type']; @endphp
+                                        {{-- {{ $type }} --}}
+                                            
+                                            {{-- @if(!str_contains($actualQuestion, '[[blank]]'))
+                                                
                                                 <b>{{ $qNo }}&nbsp;</b>{{ $actualQuestion }}
-                                             @endif
+                                            @endif --}}
+
+                                            @if($type !== 'fill_in_blanks' && $type !== 'mcq_multiple')
+                                                
+                                                <b>{{ $qNo }}&nbsp;</b>{{ $actualQuestion }}
+                                            @endif
+                                            
+
+                                            @if($type === 'mcq_multiple')
+                                                <b>
+                                                    {{ $qNo }} - {{ $qNo = $qNo+1 }}
+                                                    &nbsp;
+                                                </b>
+                                                {{ $actualQuestion }}
+                                            @endif
+                                            
+                                            {{-- @else
+                                                <b>{{ $qNo }}&nbsp;</b>{{ $actualQuestion }}
+                                            @endif --}}
                                     </h6>
 
                                         @foreach($options as $option)
+
+                                            @php
+                                                $isReview = $reviewMode ?? false;
+                                                $userSel  = $userSelectedOptionIds ?? [];
+                                                $userFill = $userFillAnswers ?? [];
+                                                $wasPicked = in_array($option['id'], $userSel);
+                                                $userText  = $userFill[$option['id']] ?? '';
+                                            @endphp
 
                                             @if($option['question_type'] == 'fill_in_blanks')
 
@@ -528,21 +575,23 @@
                                                             data-question-id="' . $option['question_id'] . '"
                                                             data-option-id="' . $option['id'] . '"
                                                             data-is-correct="' . ($option['is_correct'] ? '1' : '0') . '"
-                                                            data-correct-text="' . e($option['correct_answer_fib']) . '">',
+                                                            data-correct-text="' . e($option['correct_answer_fib'] ?? $option['option_text'] ?? '') . '"
+                                                            value="' . e($userText) . '">',
                                                     e($option['actual_question'])
                                                 ) !!}
                                             </div>
 
                                             @elseif($option['question_type'] == 'mcq_single')
 
-                                                <div class="exam-option"
+                                                <div class="exam-option {{ $isReview && $wasPicked ? 'selected' : '' }}"
                                                      data-option-id="{{ $option['id'] }}"
                                                      data-is-correct="{{ $option['is_correct'] ? '1' : '0' }}">
                                                     <input class="form-check-input"
                                                         type="radio"
                                                         name="answers[{{ $option['question_id'] }}][question_option_id][{{$qNo}}]"
                                                         value="{{ $option['id'] }}"
-                                                        id="option-{{ $option['id'] }}">
+                                                        id="option-{{ $option['id'] }}"
+                                                        {{ $wasPicked ? 'checked' : '' }}>
 
                                                     <label class="form-check-label" for="option-{{ $option['id'] }}">
                                                         {{ $option['option_text'] }}
@@ -551,14 +600,15 @@
 
                                             @elseif($option['question_type'] === 'mcq_multiple')
 
-                                                <div class="mb-1 exam-option"
+                                                <div class="mb-1 exam-option {{ $isReview && $wasPicked ? 'selected' : '' }}"
                                                      data-option-id="{{ $option['id'] }}"
                                                      data-is-correct="{{ $option['is_correct'] ? '1' : '0' }}">
                                                     <input class="form-check-input"
                                                         type="checkbox"
                                                         name="answers[{{ $option['question_id'] }}][question_option_id][{{$qNo}}][]"
                                                         value="{{ $option['id'] }}"
-                                                        id="option-{{ $option['id'] }}">
+                                                        id="option-{{ $option['id'] }}"
+                                                        {{ $wasPicked ? 'checked' : '' }}>
 
                                                     <label class="form-check-label"
                                                         for="option-{{ $option['id'] }}">
@@ -625,6 +675,9 @@
 
         <div class="footer-right">
 
+            <button type="button" id="showSummaryBtn" class="btn btn-show-summary" style="display:none;">
+                <i class="bi bi-info-circle me-1"></i>Show Summary
+            </button>
             <button type="submit" id="submitAnswersBtn" class="btn btn-submit-exam">
                 <i class="bi bi-check2-circle me-1"></i>Submit Answers
             </button>
@@ -735,6 +788,21 @@
     // ── Submit handler ─────────────────────────────────────────────────────
     const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
 
+    // ── Review mode bootstrap (when opened from dashboard "Show Result") ──
+    @if(!empty($reviewMode))
+    $(function () {
+        clearInterval(stopwatchTimer);
+        $('#timer').text('—');
+        $('#timer-pill').removeClass('warning');
+
+        // Pre-populate the modal summary so it's ready when user clicks "Show Details"
+        populateResultModal(@json($summary ?? []));
+
+        // Enter review mode immediately — displays correctness & explanations
+        enterReviewMode();
+    });
+    @endif
+
     $('.reading-form').on('submit', function(e) {
         e.preventDefault();
 
@@ -787,10 +855,15 @@
         }
     });
 
-    // ── Show Details → reveal correctness ──────────────────────────────────
+    // ── Show Details (modal footer) → reveal correctness ──────────────────
     $('#showDetailsBtn').on('click', function () {
         resultModal.hide();
         enterReviewMode();
+    });
+
+    // ── Show Summary (exam footer) → re-open the result modal ─────────────
+    $('#showSummaryBtn').on('click', function () {
+        resultModal.show();
     });
 
     function enterReviewMode() {
@@ -800,6 +873,9 @@
         $('.reading-form :input').not('button').prop('disabled', true);
         $('#submitAnswersBtn').prop('disabled', true)
                               .html('<i class="bi bi-lock-fill me-1"></i>Submitted');
+
+        // Reveal the "Show Details" button so user can re-open the summary
+        $('#showSummaryBtn').show();
 
         // Iterate each rendered option and mark
         $('.exam-option').each(function () {

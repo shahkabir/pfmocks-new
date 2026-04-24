@@ -24,6 +24,7 @@ class ExamController extends Controller
 
         $exams = UserExam::with(['module.exam'])
             ->where('user_id', $user->id)
+            // ->where('exam.is_active', true)
             ->orderByDesc('purchased_at')
             ->get();
         //dd($exams);
@@ -71,7 +72,7 @@ class ExamController extends Controller
 
         $duration = $module->duration_minutes;
         $moduleType = $module->module_type;
-        //dd($module->module_type);
+        // dd($module->module_type);
 
         //Get the questons for the module
         // Works for Writing module
@@ -102,7 +103,6 @@ class ExamController extends Controller
         ->get()
         ->toArray();
 
-
         // dd($questions, $moduleType);
 
         $showFeedback = false;
@@ -124,6 +124,104 @@ class ExamController extends Controller
 
         // Later: create exam_attempt here
         //return view('student.exam-start', compact('moduleId'));
+    }
+
+    /**
+     * Show a completed exam in review mode — pre-populates the user's
+     * previous answers and auto-enters the review view.
+     *
+     * Reuses the same reading/listening/writing/speaking blades
+     * that `start()` renders, but passes extra flags.
+     */
+    public function showResult($userExamId)
+    {
+        $user = auth()->user();
+
+        $userExam = UserExam::where('id', $userExamId)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        $module     = Module::findOrFail($userExam->module_id);
+        $moduleType = $module->module_type;
+
+        // Latest completed attempt for this user + module
+        $examAttempt = ExamAttempt::where('user_id', $user->id)
+            ->where('module_id', $module->id)
+            ->where('status', 'completed')
+            ->latest('ended_at')
+            ->firstOrFail();
+
+        $result = Results::where('exam_attempt_id', $examAttempt->id)->first();
+
+        // Load user's previous answers for this attempt.
+        // Build two lookups for the view:
+        //   $userSelectedOptionIds : flat array of option_id the user selected (MCQ)
+        //   $userFillAnswers       : map of option_id => typed text (fill_in_blanks)
+        $previousAnswers = Answer::where('exam_attempt_id', $examAttempt->id)->get();
+
+        $userSelectedOptionIds = $previousAnswers
+            ->pluck('question_option_id')
+            ->filter()
+            ->map(fn($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $userFillAnswers = [];
+        foreach ($previousAnswers as $a) {
+            if (!empty($a->answer) && $a->question_option_id) {
+                $userFillAnswers[(int) $a->question_option_id] = $a->answer;
+            }
+        }
+
+        // Same question load as start()
+        $questions = Question::with(['options', 'group.blocks'])
+            ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
+            ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
+            ->where('modules.module_type', $moduleType)
+            ->where('modules.id', $module->id)
+            ->active()
+            ->orderBy('questions.sort_order')
+            ->select([
+                'questions.*',
+                'question_groups.question_options_group_ids',
+                'question_groups.part_number',
+                'question_groups.part_audio_url',
+                'question_groups.part_image_url',
+            ])
+            ->get()
+            ->toArray();
+
+        $showFeedback = false;
+        $reviewMode   = true;
+
+        $summary = [
+            'exam_name'            => $result?->exam_name ?? $userExam->module->exam?->name ?? '',
+            'module_name'          => $result?->module_name ?? (ModuleConstants::MODULES[$moduleType] ?? $moduleType),
+            'total_questions'      => (int) ($result?->total_score ?? 0),
+            'correct_answers'      => (int) ($result?->achieved_score ?? 0),
+            'score_percentage'     => (float) ($result?->score_percentage ?? 0),
+            'band_score'           => (float) ($result?->band_score ?? 0),
+            'time_elapsed_seconds' => (int) ($result?->time_taken_seconds ?? 0),
+        ];
+
+        $viewData = compact(
+            'questions', 'user', 'showFeedback', 'module',
+            'reviewMode', 'userSelectedOptionIds', 'userFillAnswers', 'summary'
+        );
+
+        if ($moduleType === 'reading') {
+            return view('exams.ielts.reading', $viewData);
+        } else if ($moduleType === 'listening') {
+            return view('exams.ielts.listening', $viewData);
+        } else if ($moduleType === 'writing') {
+            return view('exams.ielts.writing', $viewData);
+        } else if ($moduleType === 'speaking') {
+            return view('exams.ielts.speaking', $viewData);
+        } else if ($moduleType === 'general_mcq') {
+            return view('exams.general.mcq', $viewData);
+        }
+
+        abort(404, 'Module type not found.');
     }
 
     public function submitIELTSWriting(Request $request)
@@ -245,7 +343,7 @@ class ExamController extends Controller
                     ->pluck('question_type', 'id')
                     ->toArray();
 
-        // dd($allOptionIds, $questionTypes);
+        // dd($request->all(), $allOptionIds, $questionTypes);
 
         //Update Exam Attempt
         $examAttempt = ExamAttempt::updateOrCreate(
@@ -275,12 +373,16 @@ class ExamController extends Controller
 
                 $optionIds = $this->makeArrayLinear($data['question_option_id'])['option_ids'];
                 $fillInBlankAnswers = $this->makeArrayLinear($data['question_option_id'])['fill_in_blank_answers'];
+                
                 // if(in_array(21, $optionIds))
                 // {
                 //     dd($data, $optionIds, $fillInBlankAnswers);
                 // }
-  
-                //dd($questionId, $data['question_option_id'], $optionIds);
+
+                // if(in_array(22, $optionIds)){
+                //     dd($questionId, $data['question_option_id'], $optionIds);
+                // }
+                
 
                 // optionIds contains the IDs of the options selected by the user for this question 
                 // (can be multiple for multiselect, single for single select, 
@@ -307,14 +409,17 @@ class ExamController extends Controller
                     // $isCorrect = true;
 
                     if ($questionType === 'mcq_multiple') { //For multiselect case
-                        
+
+                            //multi select has multiple option IDs for the same question ID, so we will update or create answer for each option ID with the same question ID
+                            //$isCorrect = $this->CheckIfAnswerIsCorrect($optionId, $fillInBlankAnswers);
+                            //dd($isCorrect, $optionId);
                             Answer::updateOrCreate([
                                 'user_id' => $user->id,
                                 'exam_attempt_id' => $examAttempt->id,
                                 'question_id' => $questionId,
+                                'question_option_id' => $optionId, //$nestedId,
                             ],
                             [
-                                'question_option_id' => $optionId, //$nestedId,
                                 'is_correct' => $isCorrect,
                             ]
                             );
