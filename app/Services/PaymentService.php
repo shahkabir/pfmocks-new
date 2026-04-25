@@ -46,14 +46,21 @@ class PaymentService
 
         $module = Module::findOrFail($validated['module_id']);
 
-        return DB::transaction(function () use ($userId, $validated, $method, $module) {
+        // Recompute the referral discount server-side (don't trust the client's
+        // displayed amount). If user has a pending invitation and this is their
+        // first paid order, $finalAmount is the discounted price they actually pay.
+        $gross   = (float) $module->price_in_bdt;
+        $preview = app(ReferralService::class)->previewDiscount($userId, $gross);
+        $finalAmount = $preview ? (float) $preview['final'] : $gross;
+
+        return DB::transaction(function () use ($userId, $validated, $method, $module, $finalAmount) {
 
             // Create or update the UserExam row with payment_pending state
             $userExam = UserExam::updateOrCreate(
                 ['user_id' => $userId, 'module_id' => $module->id],
                 [
                     'type'         => $module->type ?? 'paid',
-                    'price'        => $module->price_in_bdt,
+                    'price'        => $finalAmount,
                     'status'       => 'payment_pending',
                     'purchased_at' => now(),
                 ]
@@ -64,7 +71,7 @@ class PaymentService
                 'module_id'      => $module->id,
                 'user_exam_id'   => $userExam->id,
                 'payment_method' => $method,
-                'amount'         => $module->price_in_bdt,
+                'amount'         => $finalAmount,
                 'transaction_id' => $validated['transaction_id'],
                 'sender_msisdn'  => $validated['sender_msisdn'] ?? null,
                 'status'         => Payment::STATUS_PENDING,
@@ -73,7 +80,8 @@ class PaymentService
     }
 
     /**
-     * Admin approves: mark payment approved, flip UserExam to purchased.
+     * Admin approves: mark payment approved, flip UserExam to purchased,
+     * and redeem any pending referral invitation (if this is the user's first paid order).
      */
     public function approve(int $paymentId, int $adminId, ?string $note = null): Payment
     {
@@ -96,6 +104,10 @@ class PaymentService
                 UserExam::where('id', $payment->user_exam_id)
                     ->update(['status' => 'purchased', 'purchased_at' => now()]);
             }
+
+            // Redeem referral invitation (no-op if user has no pending claim
+            // or this isn't their first paid order)
+            app(\App\Services\ReferralService::class)->redeemForPayment($payment->fresh());
 
             return $payment->fresh();
         });

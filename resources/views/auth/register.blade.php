@@ -162,7 +162,7 @@
                 </div>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="form-label fw-semibold small" for="regPasswordConfirm">Confirm Password <span class="text-danger">*</span></label>
                 <div class="input-icon-group">
                     <input id="regPasswordConfirm" name="password_confirmation" type="password"
@@ -172,6 +172,18 @@
                         <i class="bi bi-eye"></i>
                     </button>
                 </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold small" for="regRef">Referral Code <span class="text-muted">(optional)</span></label>
+                <div class="input-icon-group">
+                    <input id="regRef" name="referral_code" type="text" class="form-control text-uppercase"
+                           placeholder="e.g. PM-AB12CD34" maxlength="20"
+                           value="{{ request()->query('ref') }}"
+                           style="letter-spacing:1px;">
+                    <i class="bi bi-gift field-icon"></i>
+                </div>
+                <div class="form-text">Have a friend's code? Enter it to claim a discount on your first paid module.</div>
             </div>
 
             <div class="d-grid">

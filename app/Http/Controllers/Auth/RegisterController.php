@@ -239,13 +239,14 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|max:255|unique:users,email',
-            'mobile'   => 'nullable|string|max:20',
-            'password' => 'required|string|min:8|confirmed',
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|email|max:255|unique:users,email',
+            'mobile'        => 'nullable|string|max:20',
+            'password'      => 'required|string|min:8|confirmed',
+            'referral_code' => 'nullable|string|max:20',
         ]);
 
-        User::create([
+        $newUser = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'mobile'   => $request->mobile,
@@ -253,7 +254,24 @@ class RegisterController extends Controller
             'role'     => 'user',
         ]);
 
-        return response()->json(['message' => 'Account created successfully! Please sign in.'], 201);
+        // Save a *pending* referral claim if the user signed up with a code
+        // (no discount applied yet — that happens at first paid purchase).
+        $referralMessage = null;
+        if (!empty($request->referral_code)) {
+            $invitation = app(\App\Services\ReferralService::class)
+                ->createPendingInvitation(
+                    $newUser->id,
+                    strtoupper(trim($request->referral_code)),
+                    'register-form'
+                );
+            $referralMessage = $invitation
+                ? ' Your referral code has been applied — discount unlocks on your first paid module.'
+                : ' (Note: the referral code you entered was invalid or could not be applied.)';
+        }
+
+        return response()->json([
+            'message' => 'Account created successfully! Please sign in.' . ($referralMessage ?? ''),
+        ], 201);
     }
 
     public function generateOtp()

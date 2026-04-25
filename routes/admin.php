@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\QuestionOptionsController;
 use App\Http\Controllers\Admin\QuestionGroupController;
 use App\Http\Controllers\Admin\QuestionGroupBlockController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\ReferralProgramController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +35,10 @@ Route::resource('question-groups', QuestionGroupController::class)->except(['sho
 
 // Question Group Blocks
 Route::resource('question-group-blocks', QuestionGroupBlockController::class)->except(['show']);
+
+// Referral Programs (admin CRUD)
+Route::get   ('referral-programs/list',  [ReferralProgramController::class, 'list'])->name('referral-programs.list');
+Route::resource('referral-programs',     ReferralProgramController::class)->except(['show']);
 
 // Payments (admin verification)
 Route::get('payments',                    [AdminPaymentController::class, 'index'])->name('payments.index');

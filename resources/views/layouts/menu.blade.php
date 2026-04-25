@@ -394,6 +394,8 @@
                 </a>
               </li>
 
+              
+
               @if(Auth::user()->role === 'admin')
                 <li class="nav-header">Administration</li>
 
@@ -458,6 +460,14 @@
                      class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                     <i class="nav-icon bi bi-cash-coin"></i>
                     <p>Payments</p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a href="{{ route('admin.referral-programs.index') }}"
+                     class="nav-link {{ request()->routeIs('admin.referral-programs.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-gift-fill"></i>
+                    <p>Referral Programs</p>
                   </a>
                 </li>
 
@@ -539,13 +549,14 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="nav-icon bi bi-person-plus-fill"></i>
-                  <p>
-                    Referal Program
-                    {{-- <i class="nav-icon bi bi-chevron-right"></i> --}}
-                  </p>
+               
+                <a href="{{ route('referral.index') }}"
+                   class="nav-link {{ request()->routeIs('referral.*') ? 'active' : '' }}">
+                  <i class="nav-icon bi bi-gift-fill text-danger"></i>
+                  <p>Refer a Friend</p>
                 </a>
+              
+
                 {{-- <ul class="nav nav-treeview">
                   <li class="nav-item">
                     <a href="#" class="nav-link">

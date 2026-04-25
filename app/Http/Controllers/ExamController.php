@@ -607,11 +607,12 @@ class ExamController extends Controller
     */
     public function submitGeneralMCQ(Request $request)
     {
-        $user = auth()->user();
-        $answers = $request->input('answers', []);
-        $moduleId = $request->input('module_id');
-        $moduleType = $request->input('module_type');
-        $examName = $request->input('exam_name');
+        $user           = auth()->user();
+        $answers        = $request->input('answers', []);
+        $moduleId       = $request->input('module_id');
+        $moduleType     = $request->input('module_type');
+        $examName       = $request->input('exam_name');
+        $totalQuestions = (int) $request->input('total_questions', 0);
 
         $allOptionIds = [];
         foreach ($answers as $questionId => $data) {
@@ -652,9 +653,9 @@ class ExamController extends Controller
                             'user_id'         => $user->id,
                             'exam_attempt_id' => $examAttempt->id,
                             'question_id'     => $questionId,
-                        ],
-                        [
                             'question_option_id' => $optionId,
+                        ],
+                        [       
                             'is_correct'         => $isCorrect,
                         ]
                     );
@@ -674,9 +675,9 @@ class ExamController extends Controller
             }
         }
 
-        $achievedScore   = Answer::where('exam_attempt_id', $examAttempt->id)->where('is_correct', true)->count();
-        $totalScore      = Question::where('module_id', $moduleId)->count();
-        $scorePercentage = $totalScore > 0 ? ($achievedScore / $totalScore) * 100 : 0;
+        $achievedScore    = Answer::where('exam_attempt_id', $examAttempt->id)->where('is_correct', true)->count();
+        $totalScore       = $totalQuestions > 0 ? $totalQuestions : Question::where('module_id', $moduleId)->count();
+        $scorePercentage  = $totalScore > 0 ? ($achievedScore / $totalScore) * 100 : 0;
         $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
 
         Results::updateOrCreate(
@@ -685,24 +686,33 @@ class ExamController extends Controller
                 'exam_attempt_id' => $examAttempt->id,
             ],
             [
-                'status'            => 'completed',
-                'exam_name'         => $examName,
-                'module_name'       => ModuleConstants::MODULES[$moduleType] ?? 'General MCQ',
-                'achieved_score'    => $achievedScore,
-                'total_score'       => $totalScore,
-                'score_percentage'  => $scorePercentage,
-                'band_score'        => null,
-                'time_taken_seconds'=> $timeTakenSeconds,
+                'status'             => 'completed',
+                'exam_name'          => $examName,
+                'module_name'        => ModuleConstants::MODULES[$moduleType] ?? 'General MCQ',
+                'achieved_score'     => $achievedScore,
+                'total_score'        => $totalScore,
+                'score_percentage'   => $scorePercentage,
+                'band_score'         => null,
+                'time_taken_seconds' => $timeTakenSeconds,
             ]
         );
 
         $this->updateUserExamStatus($user->id, $moduleId, 'completed');
 
         return response()->json([
-            'message'         => 'Your answers have been submitted successfully!',
-            'achieved_score'  => $achievedScore,
-            'total_score'     => $totalScore,
-            'score_percentage'=> $scorePercentage,
+            'message'          => 'Your answers have been submitted successfully!',
+            'summary'          => [
+                'exam_name'            => $examName,
+                'module_name'          => ModuleConstants::MODULES[$moduleType] ?? 'General MCQ',
+                'total_questions'      => $totalScore,
+                'correct_answers'      => $achievedScore,
+                'score_percentage'     => round($scorePercentage, 2),
+                'band_score'           => null,
+                'time_elapsed_seconds' => $timeTakenSeconds,
+            ],
+            'achieved_score'   => $achievedScore,
+            'total_score'      => $totalScore,
+            'score_percentage' => $scorePercentage,
         ]);
     }
 

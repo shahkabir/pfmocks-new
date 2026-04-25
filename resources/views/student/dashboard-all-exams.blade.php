@@ -249,10 +249,39 @@
                     </div>
 
                     <div class="col-md-7">
-                        <div class="mb-3">
-                            <div class="small text-muted fw-semibold">Amount to pay</div>
-                            <div class="fs-4 fw-bold text-success">৳ <span id="payAmount">0.00</span></div>
+                        {{-- Pricing block: original / discount / final --}}
+                        <div class="mb-3" id="pricingBlock">
+                            {{-- Loading state shown while moduleInfo() resolves --}}
+                            <div id="pricingLoader" class="text-muted small">
+                                <i class="bi bi-arrow-repeat spin me-1"></i>Loading price…
+                            </div>
+
+                            <div id="pricingDetails" class="d-none">
+                                {{-- Original price (struck through when discount applies) --}}
+                                <div id="originalPriceRow" class="d-none small text-muted mb-1">
+                                    Original price:
+                                    <span class="text-decoration-line-through">৳ <span id="payOriginal">0.00</span></span>
+                                </div>
+
+                                {{-- Discount line --}}
+                                <div id="discountRow" class="d-none small text-success fw-semibold mb-1">
+                                    <i class="bi bi-gift-fill me-1"></i>
+                                    Referral discount:
+                                    <span>− ৳ <span id="payDiscount">0.00</span></span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle ms-1"
+                                          id="refCodeBadge"></span>
+                                </div>
+
+                                {{-- Final amount --}}
+                                <div class="small text-muted fw-semibold">Amount to pay</div>
+                                <div class="fs-4 fw-bold text-success">৳ <span id="payAmount">0.00</span></div>
+                            </div>
                         </div>
+
+                        <style>
+                            .spin { animation: spin .8s linear infinite; display:inline-block; }
+                            @keyframes spin { to { transform: rotate(360deg); } }
+                        </style>
 
                         <div class="mb-3">
                             <div class="small fw-semibold mb-1">Payment steps:</div>
@@ -307,14 +336,48 @@ $(function () {
         const mid   = $btn.data('module-id');
         const mname = $btn.data('module-name');
         const ename = $btn.data('exam-name');
-        const price = parseFloat($btn.data('price') || 0);
 
+        // Reset modal state and show loader
         $alert.addClass('d-none').text('');
         $('#paymentForm')[0].reset();
         $('#payModuleId').val(mid);
-        $('#payAmount').text(price.toFixed(2));
         $('#paymentSubtitle').text(ename + ' — ' + mname);
+
+        $('#pricingDetails').addClass('d-none');
+        $('#pricingLoader').removeClass('d-none');
+        $('#originalPriceRow').addClass('d-none');
+        $('#discountRow').addClass('d-none');
+        $('#refCodeBadge').text('');
+
         paymentModal.show();
+
+        // Pull fresh module info (server applies referral discount if pending claim exists)
+        $.ajax({
+            url: '{{ url("/payment/module-info") }}/' + mid,
+            type: 'GET',
+            success: function (info) {
+                $('#pricingLoader').addClass('d-none');
+                $('#pricingDetails').removeClass('d-none');
+
+                $('#payAmount').text(Number(info.final_amount).toFixed(2));
+
+                if (info.has_referral && info.discount > 0) {
+                    $('#payOriginal').text(Number(info.price_bdt).toFixed(2));
+                    $('#payDiscount').text(Number(info.discount).toFixed(2));
+                    $('#originalPriceRow').removeClass('d-none');
+                    $('#discountRow').removeClass('d-none');
+                    if (info.referral_code) {
+                        $('#refCodeBadge').text('Code: ' + info.referral_code);
+                    }
+                }
+            },
+            error: function () {
+                $('#pricingLoader').addClass('d-none');
+                $('#pricingDetails').removeClass('d-none');
+                $('#payAmount').text(parseFloat($btn.data('price') || 0).toFixed(2));
+                $alert.text('Could not load latest price; showing default.').removeClass('d-none');
+            }
+        });
     });
 
     $('#paymentForm').on('submit', function (e) {

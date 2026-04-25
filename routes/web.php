@@ -60,6 +60,12 @@ Route::middleware('auth')->group(function(){
     Route::post('/payment/submit',
         [\App\Http\Controllers\PaymentController::class, 'submit'])
         ->name('payment.submit');
+
+    // ── Referral (student-facing) ────────────────────────────────────────
+    Route::get ('/referral',           [\App\Http\Controllers\ReferralController::class, 'index'])
+        ->name('referral.index');
+    Route::post('/referral/send-email',[\App\Http\Controllers\ReferralController::class, 'sendEmail'])
+        ->name('referral.send-email');
 });
 
 // Admin CRUD routes (routes/admin.php)
