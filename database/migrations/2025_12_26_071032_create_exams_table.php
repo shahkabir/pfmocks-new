@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('exams', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // IELTS, PTE
+            $table->string('tag', 45);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
          });
