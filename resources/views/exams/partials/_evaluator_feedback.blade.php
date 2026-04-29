@@ -40,7 +40,7 @@
         display: flex;
         justify-content: space-between;
         padding: 6px 0;
-        border-bottom: 1px dashed #f5e9c8;
+        border-bottom: 1px dashed #94741d;
         font-size: .92rem;
     }
     .eval-feedback-panel .band-row:last-of-type { border-bottom: none; }
@@ -49,9 +49,10 @@
         background: linear-gradient(135deg, #d1f4e0, #fffbf2);
         border: 1px solid #a3cfbb;
         border-radius: 10px;
-        padding: 12px 16px;
+        padding: 35px 16px;
         text-align: center;
         margin-top: 10px;
+        height: 90%;
     }
     .eval-feedback-panel .overall-card .num {
         font-size: 2rem;

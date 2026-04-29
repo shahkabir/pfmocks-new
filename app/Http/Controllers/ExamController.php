@@ -173,23 +173,32 @@ class ExamController extends Controller
             }
         }
 
-        // Same question load as start()
-        $questions = Question::with(['options', 'group.blocks'])
-            ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
-            ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
+        $questions = Question::with('options')
+            ->join('modules', 'questions.module_id', '=', 'modules.id')
             ->where('modules.module_type', $moduleType)
             ->where('modules.id', $module->id)
-            ->active()
-            ->orderBy('questions.sort_order')
-            ->select([
-                'questions.*',
-                'question_groups.question_options_group_ids',
-                'question_groups.part_number',
-                'question_groups.part_audio_url',
-                'question_groups.part_image_url',
-            ])
+            ->orderBy('sort_order', 'asc')
             ->get()
             ->toArray();
+
+
+        // Same question load as start()
+        // $questions = Question::with(['options', 'group.blocks'])
+        //     ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
+        //     ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
+        //     ->where('modules.module_type', $moduleType)
+        //     ->where('modules.id', $module->id)
+        //     ->active()
+        //     ->orderBy('questions.sort_order')
+        //     ->select([
+        //         'questions.*',
+        //         'question_groups.question_options_group_ids',
+        //         'question_groups.part_number',
+        //         'question_groups.part_audio_url',
+        //         'question_groups.part_image_url',
+        //     ])
+        //     ->get()
+        //     ->toArray();
 
         $showFeedback = false;
         $reviewMode   = true;

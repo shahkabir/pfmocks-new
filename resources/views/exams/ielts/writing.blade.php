@@ -212,11 +212,6 @@
     }
 </style>
 
-{{-- Evaluator feedback panel (only shown when result view has a completed evaluation) --}}
-@if(!empty($reviewMode) && !empty($evaluation) && $evaluation->isCompleted())
-    @include('exams.partials._evaluator_feedback', ['evaluation' => $evaluation])
-@endif
-
 {{-- ================= TOP BAR ================= --}}
 <div class="exam-topbar">
     <div class="exam-topbar-left">
@@ -313,6 +308,11 @@
             @endforeach
         </div>
     </div>
+
+    {{-- Evaluator feedback panel (shown above Submit/Exit when in review mode) --}}
+    @if(!empty($reviewMode) && !empty($evaluation) && $evaluation->isCompleted())
+        @include('exams.partials._evaluator_feedback', ['evaluation' => $evaluation])
+    @endif
 
     {{-- ================= FOOTER ================= --}}
     <div class="exam-footer">
