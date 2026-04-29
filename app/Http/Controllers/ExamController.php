@@ -74,34 +74,34 @@ class ExamController extends Controller
         $moduleType = $module->module_type;
         // dd($module->module_type);
 
-        //Get the questons for the module
+        // Get the questons for the module
         // Works for Writing module
-        // $questions = Question::with('options')
-        //     ->join('modules', 'questions.module_id', '=', 'modules.id')
-        //     ->where('modules.module_type', $moduleType)
-        //     ->where('modules.id', $moduleId)
-        //     ->orderBy('sort_order', 'asc')
-        //     ->get()
-        //     ->toArray();
+        $questions = Question::with('options')
+            ->join('modules', 'questions.module_id', '=', 'modules.id')
+            ->where('modules.module_type', $moduleType)
+            ->where('modules.id', $moduleId)
+            ->orderBy('sort_order', 'asc')
+            ->get()
+            ->toArray();
 
         // Works for Listening and Reading module with question groups and blocks
         
-        $questions = Question::with(['options','group.blocks'])
-        ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
-        ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
-        ->where('modules.module_type', $moduleType)
-        ->where('modules.id', $moduleId)
-        ->active()
-        ->orderBy('questions.sort_order')
-        ->select([
-            'questions.*',
-            'question_groups.question_options_group_ids',
-            'question_groups.part_number',
-            'question_groups.part_audio_url',
-            'question_groups.part_image_url'
-            ])
-        ->get()
-        ->toArray();
+        // $questions = Question::with(['options','group.blocks'])
+        // ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
+        // ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
+        // ->where('modules.module_type', $moduleType)
+        // ->where('modules.id', $moduleId)
+        // ->active()
+        // ->orderBy('questions.sort_order')
+        // ->select([
+        //     'questions.*',
+        //     'question_groups.question_options_group_ids',
+        //     'question_groups.part_number',
+        //     'question_groups.part_audio_url',
+        //     'question_groups.part_image_url'
+        //     ])
+        // ->get()
+        // ->toArray();
 
         // dd($questions, $moduleType);
 
@@ -204,9 +204,24 @@ class ExamController extends Controller
             'time_elapsed_seconds' => (int) ($result?->time_taken_seconds ?? 0),
         ];
 
+        // Load evaluator feedback if any (writing/speaking)
+        $evaluation = \App\Models\Evaluation\Evaluation::with('evaluator:id,name')
+            ->where('exam_attempt_id', $examAttempt->id)
+            ->first();
+
+        if ($evaluation && $evaluation->isCompleted()) {
+            $summary['evaluator_feedback']  = $evaluation->feedback_text;
+            $summary['evaluator_audio_url'] = $evaluation->feedback_audio_path
+                ? asset($evaluation->feedback_audio_path) : null;
+            $summary['evaluator_name']      = $evaluation->evaluator?->name;
+            $summary['band_scores']         = $evaluation->band_scores ?? [];
+            $summary['overall_band']        = $evaluation->overallBand();
+        }
+
         $viewData = compact(
             'questions', 'user', 'showFeedback', 'module',
-            'reviewMode', 'userSelectedOptionIds', 'userFillAnswers', 'summary'
+            'reviewMode', 'userSelectedOptionIds', 'userFillAnswers', 'summary',
+            'evaluation'
         );
 
         if ($moduleType === 'reading') {
@@ -224,48 +239,6 @@ class ExamController extends Controller
         abort(404, 'Module type not found.');
     }
 
-    public function submitIELTSWriting(Request $request)
-    {
-        //dd($request->all());
-
-        $user = auth()->user();
-        $answers = $request->input('answers', []);
-
-        //Update Exam Attempt
-        $examAttempt = ExamAttempt::updateOrCreate(
-            [
-                'user_id' => $user->id,
-                'module_id' => 1, // IELTS Writing module ID
-                'started_at' => now(),
-                'status' => 'completed',
-            ],
-            [
-                'ended_at' => now(),
-            ]
-        );
-
-        foreach ($answers as $questionId => $data) {
-                Answer::updateOrCreate(
-                        [
-                            'user_id' => $user->id,
-                            'exam_attempt_id' => $examAttempt->id,
-                            'question_id' => $questionId,
-                            'is_correct' => null, // Writing answers are not auto-graded
-                        ],
-                        [
-                            'answer' => $data['answer'],
-                        ]
-                    );
-        }
-
-        // Here you can process the answers, save them to the database, etc.
-        // For demonstration, we'll just return a success message.
-
-        return response()->json([
-            'message' => 'Writing answers submitted successfully!',
-            //'answers' => $answers,
-        ]);
-    }
 
     // This function will convert the nested answer structure into a linear array of option IDs 
     // and also capture fill in the blanks answers
@@ -305,7 +278,7 @@ class ExamController extends Controller
     }
 
     /*
-    * Saves noth IELTS Reading and Listening answers since they have similar 
+    * Saves both IELTS Reading and Listening answers since they have similar 
     * structure and handling (mcq single, mcq multiple, fill in the blanks, etc.
     *
     */
@@ -529,77 +502,204 @@ class ExamController extends Controller
 
     public function submitIeltsSpeakingAudio(Request $request)
     {
-        //dd($request->all());
-
-        $user = auth()->user();
+        $user       = auth()->user();
         $questionId = $request->input('question_id');
-        $audioFile = $request->file('audio');
+        $moduleId   = $request->input('module_id');
+        $audioFile  = $request->file('audio');
 
-        $filename = uniqid().'_'.$audioFile->getClientOriginalName();
+        if (!$audioFile) {
+            return response()->json(['message' => 'No audio file uploaded.'], 400);
+        }
+        if (!$moduleId) {
+            return response()->json(['message' => 'module_id is missing.'], 422);
+        }
 
-        if ($audioFile) {
-            $path = $audioFile->storeAs('speaking-audios', $filename, 'public');
-            $audioUrl = str_replace('public/', 'storage/', $path);
+        $filename = uniqid() . '_' . $audioFile->getClientOriginalName();
+        $path     = $audioFile->storeAs('speaking-audios', $filename, 'public');
+        $audioUrl = str_replace('public/', 'storage/', $path);
 
-        //Update Exam Attempt
-        $examAttempt = ExamAttempt::updateOrCreate(
+        // One in-progress ExamAttempt per (user, module).
+        // Don't put `started_at`/`status` in the lookup keys — they'd diverge each call.
+        $examAttempt = ExamAttempt::firstOrCreate(
             [
-                'user_id' => $user->id,
-                'module_id' => 1, // IELTS Reading module ID
-                'started_at' => now(),
-                'status' => 'completed',
+                'user_id'   => $user->id,
+                'module_id' => $moduleId,
             ],
             [
-                'ended_at' => now(),
+                'started_at' => now(),
+                'status'     => 'in_progress',
             ]
         );
 
-            // Save the audio URL to the database (you can create a new model or use an existing one)
-            Answer::updateOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'question_id' => $questionId,
-                    'exam_attempt_id' => $examAttempt->id,
-                ],
-                [
-                    'answer' => $audioUrl, // Store the audio URL as the answer
-                    'is_correct' => null, // Speaking answers are not auto-graded
-                ]
-            );
+        Answer::updateOrCreate(
+            [
+                'user_id'         => $user->id,
+                'question_id'     => $questionId,
+                'exam_attempt_id' => $examAttempt->id,
+            ],
+            [
+                'answer'             => $audioUrl,
+                'question_option_id' => null,
+                'is_correct'         => null,
+            ]
+        );
 
-            return response()->json([
-                'message' => 'Audio uploaded successfully!',
-                'audio_url' => asset($audioUrl),
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'No audio file uploaded.',
-            ], 400);
-        }
+        return response()->json([
+            'message'   => 'Audio uploaded successfully!',
+            'audio_url' => asset($audioUrl),
+        ]);
     }
 
-    // public function submitIELTSListening(Request $request)
-    // {
-    //     //dd($request->all());
+    /**
+     * Final "Submit" press from the speaking blade — closes out the ExamAttempt,
+     * creates the Results row, and flips UserExam to completed so it lands in
+     * the admin's evaluation DataTable.
+     */
+    public function submitIeltsSpeakingFinalize(Request $request)
+    {
+        $user           = auth()->user();
+        $moduleId       = $request->input('module_id');
+        $moduleType     = $request->input('module_type', 'speaking');
+        $examName       = $request->input('exam_name');
+        $totalQuestions = (int) $request->input('total_questions', 0);
 
-    //     $user = auth()->user();
-    //     $answers = $request->input('answers', []);
-    //     //dd($answers);
+        if (!$moduleId) {
+            return response()->json(['message' => 'module_id is missing.'], 422);
+        }
 
-    //     // The logic for processing listening answers will be similar to reading answers
-    //     // You can reuse the makeArrayLinear function and the way we handle different question types
+        $examAttempt = ExamAttempt::where('user_id', $user->id)
+            ->where('module_id', $moduleId)
+            ->orderByDesc('id')
+            ->first();
 
-    //     // For brevity, I'm not repeating the entire code here, but you would follow a similar structure:
-    //     // 1. Flatten the answers array to get all option IDs and fill in the blank answers
-    //     // 2. Get question types based on option IDs
-    //     // 3. Update or create Answer records based on question type (mcq_single, mcq_multiple, fill_in_blanks, etc.)
-    //     // 4. Calculate score and save results
+        if (!$examAttempt) {
+            $examAttempt = ExamAttempt::create([
+                'user_id'    => $user->id,
+                'module_id'  => $moduleId,
+                'started_at' => now(),
+                'status'     => 'completed',
+                'ended_at'   => now(),
+            ]);
+        } else {
+            $examAttempt->update([
+                'status'   => 'completed',
+                'ended_at' => now(),
+            ]);
+        }
 
-    //     return response()->json([
-    //         'message' => 'Listening answers submitted successfully!',
-    //         //'answers' => $answers,
-    //     ]);
-    // }
+        if ($totalQuestions === 0) {
+            $totalQuestions = Answer::where('exam_attempt_id', $examAttempt->id)->count();
+        }
+
+        $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
+
+        Results::updateOrCreate(
+            [
+                'user_id'         => $user->id,
+                'exam_attempt_id' => $examAttempt->id,
+            ],
+            [
+                'status'             => 'pending', // → manual_review on assign → evaluated on submit
+                'exam_name'          => $examName,
+                'module_name'        => ModuleConstants::MODULES[$moduleType] ?? 'Speaking',
+                'achieved_score'     => 0,
+                'total_score'        => $totalQuestions,
+                'score_percentage'   => 0,
+                'band_score'         => null,
+                'time_taken_seconds' => $timeTakenSeconds,
+            ]
+        );
+
+        $this->updateUserExamStatus($user->id, $moduleId, 'completed');
+
+        return response()->json([
+            'message' => 'Speaking exam submitted. Awaiting evaluator assignment.',
+            'summary' => [
+                'exam_name'            => $examName,
+                'module_name'          => ModuleConstants::MODULES[$moduleType] ?? 'Speaking',
+                'total_questions'      => $totalQuestions,
+                'time_elapsed_seconds' => $timeTakenSeconds,
+            ],
+        ]);
+    }
+
+    public function submitIELTSWriting(Request $request)
+    {
+        $user           = auth()->user();
+        $answers        = $request->input('answers', []);
+        $moduleId       = $request->input('module_id');
+        $moduleType     = $request->input('module_type', 'writing');
+        $examName       = $request->input('exam_name');
+        $totalQuestions = (int) $request->input('total_questions', count($answers));
+
+        if (!$moduleId) {
+            return response()->json(['message' => 'module_id is missing.'], 422);
+        }
+
+        // Find or create the ExamAttempt for this user/module — only one active per pair
+        $examAttempt = ExamAttempt::where('user_id', $user->id)
+            ->where('module_id', $moduleId)
+            ->orderByDesc('id')
+            ->first();
+
+        if (!$examAttempt) {
+            $examAttempt = ExamAttempt::create([
+                'user_id'    => $user->id,
+                'module_id'  => $moduleId,
+                'started_at' => now(),
+                'status'     => 'completed',
+                'ended_at'   => now(),
+            ]);
+        } else {
+            $examAttempt->update([
+                'status'   => 'completed',
+                'ended_at' => now(),
+            ]);
+        }
+
+        // Save each writing answer (one per question)
+        foreach ($answers as $questionId => $data) {
+            Answer::updateOrCreate(
+                [
+                    'user_id'         => $user->id,
+                    'exam_attempt_id' => $examAttempt->id,
+                    'question_id'     => $questionId,
+                ],
+                [
+                    'answer'             => $data['answer'] ?? null,
+                    'question_option_id' => null,
+                    'is_correct'         => null, // Writing answers are graded by evaluator
+                ]
+            );
+        }
+
+        // Save Results row in pending state — evaluator will fill band scores later
+        $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
+        Results::updateOrCreate(
+            [
+                'user_id'         => $user->id,
+                'exam_attempt_id' => $examAttempt->id,
+            ],
+            [
+                'status'             => 'pending',     // → 'manual_review' on assign → 'evaluated' on submit
+                'exam_name'          => $examName,
+                'module_name'        => ModuleConstants::MODULES[$moduleType] ?? 'Writing',
+                'achieved_score'     => 0,
+                'total_score'        => $totalQuestions,
+                'score_percentage'   => 0,
+                'band_score'         => null,
+                'time_taken_seconds' => $timeTakenSeconds,
+            ]
+        );
+
+        // Mark UserExam as completed so it shows on the student dashboard with "Show Result"
+        $this->updateUserExamStatus($user->id, $moduleId, 'completed');
+
+        return response()->json([
+            'message' => 'Writing answers submitted successfully!',
+            //'answers' => $answers,
+        ]);
+    }
 
     /*
     * Saves General MCQ exam answers (mcq_single, mcq_multiple).

@@ -170,17 +170,21 @@
                                         @elseif($status === 'payment_pending')
                                             <span class="chip chip-pending"><i class="bi bi-hourglass-split"></i>Pending</span>
                                         @elseif(($module->type ?? null) === 'free' || (float) $module->price_in_bdt == 0)
-                                            <a href="{{ route('exam.start', $module->id) }}" target="_blank" class="btn btn-buy">
-                                                <i class="bi bi-play-fill"></i> Start
-                                            </a>
+                                             @if(Auth::user()->role !== 'evaluator')
+                                                <a href="{{ route('exam.start', $module->id) }}" target="_blank" class="btn btn-buy">
+                                                    <i class="bi bi-play-fill"></i> Start
+                                                </a>
+                                            @endif
                                         @else
-                                            <button type="button" class="btn btn-buy buy-btn"
-                                                    data-module-id="{{ $module->id }}"
-                                                    data-module-name="{{ $module->name }}"
-                                                    data-exam-name="{{ $exam->name }}"
-                                                    data-price="{{ (float) $module->price_in_bdt }}">
-                                                <i class="bi bi-bag-plus-fill"></i> Buy
-                                            </button>
+                                            @if(Auth::user()->role !== 'evaluator')
+                                                <button type="button" class="btn btn-buy buy-btn"
+                                                        data-module-id="{{ $module->id }}"
+                                                        data-module-name="{{ $module->name }}"
+                                                        data-exam-name="{{ $exam->name }}"
+                                                        data-price="{{ (float) $module->price_in_bdt }}">
+                                                    <i class="bi bi-bag-plus-fill"></i> Buy
+                                                </button>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>

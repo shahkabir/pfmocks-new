@@ -74,6 +74,24 @@ Route::middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(base_path('routes/admin.php'));
 
+// Evaluator routes
+Route::middleware(['auth', 'evaluator'])
+    ->prefix('evaluator')
+    ->name('evaluator.')
+    ->group(function () {
+        Route::get ('/evaluations',
+            [\App\Http\Controllers\Evaluator\EvaluationController::class, 'index'])
+            ->name('evaluations.index');
+
+        Route::get ('/evaluations/{id}',
+            [\App\Http\Controllers\Evaluator\EvaluationController::class, 'show'])
+            ->name('evaluations.show');
+
+        Route::post('/evaluations/{id}',
+            [\App\Http\Controllers\Evaluator\EvaluationController::class, 'update'])
+            ->name('evaluations.update');
+    });
+
 Route::get('/ielts-writing',function(){
     return view('exams.ielts.writing');
 });
@@ -101,6 +119,9 @@ Route::get('/ielts-speaking',function(){
 
 Route::post('/speaking-upload-audio', [ExamController::class, 'submitIeltsSpeakingAudio'])
     ->name('exam.ielts.speaking.upload_audio');
+
+Route::post('/ielts-speaking/submit', [ExamController::class, 'submitIeltsSpeakingFinalize'])
+    ->name('exam.ielts.speaking.submit');
 
 Route::post('/general-mcq/submit', [ExamController::class, 'submitGeneralMCQ'])
     ->name('exam.general.mcq.submit');

@@ -40,10 +40,11 @@
 
 ## Application Roles
 
-| Role | Access |
+| Role | Access | Description
 |---|---|
-| `user` | Student dashboard, exams, profile |
-| `admin` | All student routes + `/admin/*` routes |
+| `user` | Student dashboard, exams, profile | Mock Exam Takers
+| `admin` | All student routes + `/admin/*` routes | Administrative Tasks
+| `evaluator` | Assigned exams for Evaluation, published exams | Evaluates Exams e.g. IELTS speaking, writing in typed feedback or voice recorded
 
 ---
 

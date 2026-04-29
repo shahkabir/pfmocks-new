@@ -19,6 +19,18 @@
         <!--end::Container-->
       </nav>
       <!--end::Header-->
+
+      {{-- Referral discount banner — shown only when the logged-in user has
+           a still-redeemable pending referral claim. --}}
+      @auth
+        @php
+            $refBanner = app(\App\Services\ReferralService::class)
+                            ->pendingBannerForUser(auth()->id());
+        @endphp
+        @if($refBanner)
+            @include('layouts._referral_banner', ['refBanner' => $refBanner])
+        @endif
+      @endauth
       <!--begin::Sidebar-->
       @include('layouts.menu')
       <!--end::Sidebar-->

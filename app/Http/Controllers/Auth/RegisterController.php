@@ -217,6 +217,10 @@ class RegisterController extends Controller
             }else if($user->role == 'user'){
 
                 return redirect()->route('dashboard.student');
+            }else if($user->role == 'evaluator'){
+
+                return redirect()->route('dashboard.student');
+
             }else{
                 //Not defined role, logout
                 Auth::logout();

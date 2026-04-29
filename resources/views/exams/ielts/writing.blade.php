@@ -212,6 +212,11 @@
     }
 </style>
 
+{{-- Evaluator feedback panel (only shown when result view has a completed evaluation) --}}
+@if(!empty($reviewMode) && !empty($evaluation) && $evaluation->isCompleted())
+    @include('exams.partials._evaluator_feedback', ['evaluation' => $evaluation])
+@endif
+
 {{-- ================= TOP BAR ================= --}}
 <div class="exam-topbar">
     <div class="exam-topbar-left">
@@ -290,7 +295,7 @@
                         ></textarea>
 
                         <div class="word-count mt-1">
-                            Word count: <span id="wordCount">0</span>
+                            Word count: <span class="word-count-num">0</span>
                         </div>
 
                         @if($showFeedback)
@@ -328,12 +333,27 @@
             <button type="button" id="exitBtn" class="btn-exit-exam">
                 <i class="bi bi-box-arrow-right me-1"></i>Exit
             </button>
+
+            <input type="hidden" name="module_id" value="{{ $module->id }}">
+            <input type="hidden" name="exam_name" value="{{ $module->exam->name ?? $module->name }}">
+            <input type="hidden" name="module_type" value="{{ $module->module_type }}">
+            <input type="hidden" name="total_questions" value="{{ count($questions) }}">
         </div>
     </div>
 </form>
 
 {{-- SCRIPT: WORD COUNT + TIMER --}}
 <script>
+    // ── Review mode bootstrap (dashboard "Show Result") ──
+    @if(!empty($reviewMode))
+    $(function () {
+        $('.writing-form :input').not('button').prop('disabled', true);
+        $('#submitAnswersBtn').prop('disabled', true)
+                              .html('<i class="bi bi-lock-fill me-1"></i>Submitted');
+        $('#timer-pill').removeClass('warning');
+        $('#time').text('—');
+    });
+    @endif
 
     function showTask(index, btn) {
         // Hide all tasks first
@@ -395,14 +415,15 @@
         });
     });
 
-    // Word count per textarea
+    // Word count per textarea (each writing-task has its own counter)
     document.querySelectorAll('.writing-answer').forEach(textarea => {
-        textarea.addEventListener('input', function () {
-            const words = this.value.trim().split(/\s+/).filter(Boolean);
-            this.closest('.writing-task')
-                .querySelector('.count')
-                .innerText = words.length;
-        });
+        const updateCount = () => {
+            const words   = textarea.value.trim().split(/\s+/).filter(Boolean);
+            const counter = textarea.closest('.writing-task')?.querySelector('.word-count-num');
+            if (counter) counter.innerText = words.length;
+        };
+        textarea.addEventListener('input', updateCount);
+        updateCount(); // initial render (e.g. when reviewMode pre-fills text)
     });
 
 

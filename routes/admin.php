@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\QuestionGroupController;
 use App\Http\Controllers\Admin\QuestionGroupBlockController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ReferralProgramController;
+use App\Http\Controllers\Admin\EvaluationController as AdminEvaluationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,11 @@ Route::resource('question-groups', QuestionGroupController::class)->except(['sho
 
 // Question Group Blocks
 Route::resource('question-group-blocks', QuestionGroupBlockController::class)->except(['show']);
+
+// Evaluations (admin assigns writing/speaking attempts to evaluators)
+Route::get ('evaluations',         [AdminEvaluationController::class, 'index'])->name('evaluations.index');
+Route::get ('evaluations/list',    [AdminEvaluationController::class, 'list'])->name('evaluations.list');
+Route::post('evaluations/assign',  [AdminEvaluationController::class, 'assign'])->name('evaluations.assign');
 
 // Referral Programs (admin CRUD)
 Route::get   ('referral-programs/list',  [ReferralProgramController::class, 'list'])->name('referral-programs.list');

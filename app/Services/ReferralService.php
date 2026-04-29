@@ -54,6 +54,58 @@ class ReferralService
     }
 
     /* ========================================================================
+     | Top-bar banner helper
+     |========================================================================*/
+
+    /**
+     * Returns a small DTO for the layout banner if the user has a pending
+     * (still-redeemable) referral claim. Null otherwise.
+     *
+     *   [
+     *     'code'         => 'PM-AB12CD34',
+     *     'discount_type' => 'percent' | 'fixed',
+     *     'discount_value' => 10,        // raw value
+     *     'display_value' => '10%',      // pre-formatted for human display
+     *     'max_cap'      => 200.0 | null,
+     *   ]
+     */
+    public function pendingBannerForUser(int $userId): ?array
+    {
+        $invitation = ReferralInvitation::with('program')
+            ->where('referred_user_id', $userId)
+            ->pending()
+            ->first();
+
+        if (!$invitation || !$invitation->program || !$invitation->program->isLive()) {
+            return null;
+        }
+
+        // Only show the banner while the discount is still redeemable
+        // (i.e. user has not yet had any payment approved)
+        $hasApproved = \App\Models\Payment\Payment::where('user_id', $userId)
+            ->where('status', \App\Models\Payment\Payment::STATUS_APPROVED)
+            ->exists();
+        if ($hasApproved) return null;
+
+        $program = $invitation->program;
+
+        $value = (float) $program->referee_discount_value;
+        $display = $program->referee_discount_type === 'percent'
+            ? rtrim(rtrim(number_format($value, 2), '0'), '.') . '%'
+            : '৳ ' . number_format($value, 0);
+
+        return [
+            'code'           => $invitation->referral_code_used,
+            'discount_type'  => $program->referee_discount_type,
+            'discount_value' => $value,
+            'display_value'  => $display,
+            'max_cap'        => $program->max_discount_amount !== null
+                                ? (float) $program->max_discount_amount
+                                : null,
+        ];
+    }
+
+    /* ========================================================================
      | Code lookup / validation
      |========================================================================*/
 

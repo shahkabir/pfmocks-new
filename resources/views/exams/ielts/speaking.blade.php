@@ -221,6 +221,11 @@
     }
 </style>
 
+{{-- Evaluator feedback panel (only shown when result view has a completed evaluation) --}}
+@if(!empty($reviewMode) && !empty($evaluation) && $evaluation->isCompleted())
+    @include('exams.partials._evaluator_feedback', ['evaluation' => $evaluation])
+@endif
+
 {{-- ================= TOP BAR ================= --}}
 <div class="exam-topbar">
     <div class="exam-topbar-left">
@@ -411,6 +416,18 @@
 </form>
 
 <script>
+// ── Review mode bootstrap (dashboard "Show Result") ──
+@if(!empty($reviewMode))
+$(function () {
+    $('.speaking-form :input').not('button').prop('disabled', true);
+    $('#submitAnswersBtn').prop('disabled', true)
+                          .html('<i class="bi bi-lock-fill me-1"></i>Submitted');
+    $('.start-btn, .stop-btn').prop('disabled', true);
+    $('#timer-pill').removeClass('warning');
+    $('#timer').text('—');
+});
+@endif
+
 let recorders = {};
 
 document.querySelectorAll('.speaking-question').forEach(container => {
@@ -444,10 +461,12 @@ document.querySelectorAll('.speaking-question').forEach(container => {
 });
 
 function uploadAudio(blob, questionId, hiddenInput) {
+    const moduleId = document.querySelector('input[name="module_id"]')?.value;
 
     let formData = new FormData();
     formData.append('audio', blob, 'speaking.webm');
     formData.append('question_id', questionId);
+    if (moduleId) formData.append('module_id', moduleId);
 
     fetch('/speaking-upload-audio', {
         method: 'POST',
@@ -458,6 +477,40 @@ function uploadAudio(blob, questionId, hiddenInput) {
     })
     .then(res => res.json());
 }
+
+// ── Final "Submit Speaking Test" → finalize endpoint ───────────────────────
+$('.speaking-form').on('submit', function (e) {
+    e.preventDefault();
+
+    const $btn = $('#submitAnswersBtn');
+    const orig = $btn.html();
+    $btn.prop('disabled', true).html('<i class="bi bi-arrow-repeat me-1"></i>Submitting…');
+
+    $.ajax({
+        url: "{{ route('exam.ielts.speaking.submit') }}",
+        type: 'POST',
+        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        data: $(this).serialize(),
+        success: function (res) {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Submitted',
+                    text: res.message || 'Speaking test submitted. You will be notified once an evaluator reviews it.',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                }).then(() => { window.location.href = "{{ route('dashboard') }}"; });
+            } else {
+                alert(res.message || 'Submitted');
+                window.location.href = "{{ route('dashboard') }}";
+            }
+        },
+        error: function (xhr) {
+            $btn.prop('disabled', false).html(orig);
+            alert(xhr.responseJSON?.message || 'Submission failed. Please try again.');
+        }
+    });
+});
 
 // ── Part switcher ──────────────────────────────────────────────────────────
 function showPart(partNumber, btn) {
