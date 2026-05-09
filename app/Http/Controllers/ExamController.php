@@ -76,32 +76,36 @@ class ExamController extends Controller
 
         // Get the questons for the module
         // Works for Writing module
-        $questions = Question::with('options')
+
+        if($moduleType === 'writing' || $moduleType === 'speaking'){
+            $questions = Question::with('options')
             ->join('modules', 'questions.module_id', '=', 'modules.id')
             ->where('modules.module_type', $moduleType)
             ->where('modules.id', $moduleId)
             ->orderBy('sort_order', 'asc')
             ->get()
             ->toArray();
+        }else{
 
         // Works for Listening and Reading module with question groups and blocks
-        
-        // $questions = Question::with(['options','group.blocks'])
-        // ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
-        // ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
-        // ->where('modules.module_type', $moduleType)
-        // ->where('modules.id', $moduleId)
-        // ->active()
-        // ->orderBy('questions.sort_order')
-        // ->select([
-        //     'questions.*',
-        //     'question_groups.question_options_group_ids',
-        //     'question_groups.part_number',
-        //     'question_groups.part_audio_url',
-        //     'question_groups.part_image_url'
-        //     ])
-        // ->get()
-        // ->toArray();
+            
+            $questions = Question::with(['options','group.blocks'])
+            ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
+            ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
+            ->where('modules.module_type', $moduleType)
+            ->where('modules.id', $moduleId)
+            ->active()
+            ->orderBy('questions.sort_order')
+            ->select([
+                'questions.*',
+                'question_groups.question_options_group_ids',
+                'question_groups.part_number',
+                'question_groups.part_audio_url',
+                'question_groups.part_image_url'
+                ])
+            ->get()
+            ->toArray();
+        }
 
         // dd($questions, $moduleType);
 

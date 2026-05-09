@@ -30,6 +30,9 @@ return new class extends Migration
 
             // Ensure strict 1:1 mapping
             $table->unique('question_id');
+
+            $table->string('part_audio_url')->nullable()->after('part_number');
+            $table->string('part_image_url')->nullable()->after('part_audio_url');
         });
     }
 

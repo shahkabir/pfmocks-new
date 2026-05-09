@@ -1,3 +1,23 @@
+<style>
+    /* ===== Top nav bar — brand gradient (#2d4797) ===== */
+    .app-header.navbar {
+        background: linear-gradient(135deg, #2d4797 0%, #3a5cc7 50%, #1e2f63 100%) !important;
+        border-bottom: 1px solid rgba(255,255,255,.12) !important;
+        box-shadow: 0 2px 8px rgba(45, 71, 151, .25);
+    }
+    .app-header .nav-link,
+    .app-header .nav-link i {
+        color: rgba(255,255,255,.92) !important;
+        transition: color .15s;
+    }
+    .app-header .nav-link:hover,
+    .app-header .nav-link:focus { color: #fff !important; }
+    .app-header .nav-link:hover i { color: #fff !important; }
+    .app-header .user-menu .nav-link span { color: #fff; font-weight: 500; }
+    .app-header .user-menu .dropdown-toggle::after { color: rgba(255,255,255,.85); }
+    .app-header .user-image { border-color: rgba(255,255,255,.7) !important; }
+</style>
+
 <ul class="navbar-nav">
             <li class="nav-item">
               <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
@@ -59,21 +79,23 @@
             <!--begin::User Menu Dropdown-->
             <li class="nav-item dropdown user-menu">
               <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                {{-- <img
-                  src="./assets/img/user2-160x160.jpg"
+                <img
+                  src="{{ asset('images/profile.png') }}"
                   class="user-image rounded-circle shadow"
                   alt="User Image"
-                /> --}}
-                <span class="d-none d-md-inline">{{ Auth::user()->name }}</span>
+                  style="width:30px;height:30px;object-fit:cover;border:1px solid #dee2e6;"
+                />
+                <span class="d-none d-md-inline ms-1">{{ Auth::user()->name }}</span>
               </a>
               <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                 <!--begin::User Image-->
                 <li class="user-header text-bg-primary">
-                  {{-- <img
-                    src="./assets/img/user2-160x160.jpg"
+                  <img
+                    src="{{ asset('images/profile.png') }}"
                     class="rounded-circle shadow"
                     alt="User Image"
-                  /> --}}
+                    style="width:80px;height:80px;object-fit:cover;border:3px solid #fff;"
+                  />
                   <p>
                     {{ Auth::user()->name }}
                     <small>{{ Auth::user()->email }}</small>

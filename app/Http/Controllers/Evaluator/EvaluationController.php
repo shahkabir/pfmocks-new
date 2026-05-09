@@ -43,21 +43,39 @@ class EvaluationController extends Controller
         // Mark in_progress on first open
         $this->service->markInProgress($evaluation);
 
-        // Pull all answers for this attempt
+        $module  = $evaluation->attempt->module;
+        $student = $evaluation->attempt->user;
+
+        // SOP modules use a dedicated view with résumé / SOP file uploads
+        if (in_array($module->module_type, \App\Constants\ModuleConstants::SOP_TYPES, true)) {
+            $submission = \App\Models\Sop\SopSubmission::where('user_id', $student->id)
+                ->where('module_id', $module->id)
+                ->latest('id')
+                ->first();
+
+            return view('evaluator.evaluations.sop', [
+                'evaluation' => $evaluation->fresh(),
+                'submission' => $submission,
+                'student'    => $student,
+                'module'     => $module,
+            ]);
+        }
+
+        // IELTS writing/speaking — original flow
         $answers = Answer::with(['question:id,question_header,passage,passage_instruction,type'])
             ->where('exam_attempt_id', $evaluation->exam_attempt_id)
-            ->where('user_id', $evaluation->attempt->user_id)
+            ->where('user_id', $student->id)
             ->get();
 
         return view('evaluator.evaluations.show', [
             'evaluation' => $evaluation->fresh(),
             'answers'    => $answers,
-            'student'    => $evaluation->attempt->user,
-            'module'     => $evaluation->attempt->module,
+            'student'    => $student,
+            'module'     => $module,
         ]);
     }
 
-    /** Persist feedback + scores + optional voice recording. */
+    /** Persist feedback + scores + optional voice recording (or final SOP file). */
     public function update(Request $request, int $id)
     {
         // Validate band fields softly (any valid IELTS half-step 0..9)
@@ -66,6 +84,7 @@ class EvaluationController extends Controller
         $data = $request->validate([
             'feedback_text'      => 'nullable|string|max:8000',
             'feedback_audio'     => 'nullable|file|mimes:webm,mp3,wav,ogg|max:20480',
+            'final_sop'          => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'task_achievement'   => $bandRule,
             'coherence_cohesion' => $bandRule,
             'lexical_resource'   => $bandRule,
@@ -83,6 +102,7 @@ class EvaluationController extends Controller
             evaluationId: $evaluation->id,
             data:         $data,
             audio:        $request->file('feedback_audio'),
+            finalSop:     $request->file('final_sop'),
         );
 
         return redirect()

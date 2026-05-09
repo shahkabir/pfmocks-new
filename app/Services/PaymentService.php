@@ -105,6 +105,14 @@ class PaymentService
                     ->update(['status' => 'purchased', 'purchased_at' => now()]);
             }
 
+            // For SOP modules there is no actual exam to take — the student already
+            // submitted resume/SOP details with the payment. Auto-create a completed
+            // ExamAttempt + pending Results so it lands in the admin evaluation list.
+            $module = $payment->module()->first();
+            if ($module && in_array($module->module_type, \App\Constants\ModuleConstants::SOP_TYPES, true)) {
+                $this->seedSopAttempt($payment->user_id, $module);
+            }
+
             // Redeem referral invitation (no-op if user has no pending claim
             // or this isn't their first paid order)
             app(\App\Services\ReferralService::class)->redeemForPayment($payment->fresh());
@@ -141,5 +149,40 @@ class PaymentService
 
             return $payment->fresh();
         });
+    }
+
+    /**
+     * Create the completed ExamAttempt + pending Results row that the admin's
+     * evaluation DataTable expects. Used for SOP modules where there's no
+     * actual test-taking step.
+     */
+    private function seedSopAttempt(int $userId, Module $module): void
+    {
+        $attempt = \App\Models\Exam\ExamAttempt::firstOrCreate(
+            ['user_id' => $userId, 'module_id' => $module->id],
+            [
+                'started_at' => now(),
+                'ended_at'   => now(),
+                'status'     => 'completed',
+            ]
+        );
+
+        if ($attempt->status !== 'completed') {
+            $attempt->update(['status' => 'completed', 'ended_at' => now()]);
+        }
+
+        \App\Models\Answer\Results::updateOrCreate(
+            ['user_id' => $userId, 'exam_attempt_id' => $attempt->id],
+            [
+                'status'             => 'pending',
+                'exam_name'          => $module->exam?->name ?? 'SOP Service',
+                'module_name'        => \App\Constants\ModuleConstants::MODULES[$module->module_type] ?? $module->module_type,
+                'achieved_score'     => 0,
+                'total_score'        => 1,
+                'score_percentage'   => 0,
+                'band_score'         => null,
+                'time_taken_seconds' => 0,
+            ]
+        );
     }
 }

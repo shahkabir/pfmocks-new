@@ -11,46 +11,48 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('questions', function (Blueprint $table) {
-    $table->id();
+            Schema::create('questions', function (Blueprint $table) {
+            $table->id();
 
-    // Relationship
-    $table->foreignId('module_id')
-          ->constrained()
-          ->cascadeOnDelete();
+            // Relationship
+            $table->foreignId('module_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
-    // Question classification
-    $table->enum('type', [
-        'mcq_single',     // single correct
-        'mcq_multiple',   // multiple correct
-        'text',           // short answer
-        'essay',          // long answer (manual evaluation)
-        'audio',          // listening-based
-        'speaking'        // audio recording
-    ]);
+            // Question classification
+            $table->enum('type', [
+                'mcq_single',     // single correct
+                'mcq_multiple',   // multiple correct
+                'text',           // short answer
+                'essay',          // long answer (manual evaluation)
+                'audio',          // listening-based
+                'speaking'        // audio recording
+            ]);
 
-    // Main question text
-    $table->text('question_text');
+            $table->text('passage_instruction')->nullable()->after('passage');
 
-    // Optional shared content (reading passage / prompt)
-    $table->longText('passage')->nullable();
+            // Main question text
+            $table->text('question_text');
 
-    // Media support
-    $table->string('audio_url')->nullable();
-    $table->string('image_url')->nullable();
+            // Optional shared content (reading passage / prompt)
+            $table->longText('passage')->nullable();
 
-    // Scoring
-    $table->integer('marks')->default(1);
+            // Media support
+            $table->string('audio_url')->nullable();
+            $table->string('image_url')->nullable();
 
-    // Ordering inside module
-    $table->integer('sort_order')->default(0);
+            // Scoring
+            $table->integer('marks')->default(1);
 
-    // Flexible metadata
-    // e.g. time_limit, word_limit, band_mapping, difficulty
-    $table->json('meta')->nullable();
+            // Ordering inside module
+            $table->integer('sort_order')->default(0);
 
-    $table->timestamps();
-});
+            // Flexible metadata
+            // e.g. time_limit, word_limit, band_mapping, difficulty
+            $table->json('meta')->nullable();
+
+            $table->timestamps();
+        });
     }
 
     /**

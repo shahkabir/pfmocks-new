@@ -57,6 +57,8 @@ class RegisterController extends Controller
         //     }
         // }
 
+        // dd(Auth::attempt($credentials));
+
         if(Auth::attempt($credentials)){
 
             $user = Auth::user();
@@ -109,7 +111,7 @@ class RegisterController extends Controller
             // auth()->login($user);
             // return redirect()->route('dashboard');
         }else{
-            $message = 'You are not registered. <a target="_blank" href="' . route('register') . '">Register Here</a>.';
+            $message = 'You are not a member. <a target="_blank" href="' . route('signup') . '">Sign Up Here</a>.';
             return response()->json(['message'=>$message], 422);
         }
         // if(Auth::attempt($credentials)){

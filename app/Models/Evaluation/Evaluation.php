@@ -14,7 +14,7 @@ class Evaluation extends Model
     public const STATUS_COMPLETED   = 'completed';
 
     /** Module types that can currently be evaluated. Extend as needed. */
-    public const EVALUATABLE_MODULE_TYPES = ['writing', 'speaking'];
+    public const EVALUATABLE_MODULE_TYPES = ['writing', 'speaking', 'sop_review', 'sop_new'];
 
     protected $fillable = [
         'exam_attempt_id',

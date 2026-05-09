@@ -54,6 +54,7 @@
     .rec-dot.recording { background:#dc3545; animation:pulse 1.2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.45;} }
 </style>
+{{-- {{ dd($answersByQ, $evaluation, $answers, $student, $module) }} --}}
 
 <div class="container-fluid py-3">
 

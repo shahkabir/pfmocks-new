@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
        Schema::create('user_exams', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-    $table->foreignId('module_id')->constrained()->cascadeOnDelete();
-    $table->enum('type', ['free', 'paid'])->default('paid');
-    $table->decimal('price', 8, 2)->default(0);
-    $table->timestamp('purchased_at');
-    $table->timestamps();
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('module_id')->constrained()->cascadeOnDelete();
+            $table->enum('type', ['free', 'paid'])->default('paid');
+            $table->decimal('price', 8, 2)->default(0);
+            $table->timestamp('purchased_at');
+            $table->timestamps();
 
-    $table->unique(['user_id', 'module_id']);
-});
+            $table->unique(['user_id', 'module_id']);
+        });
     }
 
     /**

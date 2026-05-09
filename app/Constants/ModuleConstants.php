@@ -11,7 +11,15 @@ class ModuleConstants
                             'writing'     => 'Writing',
                             'speaking'    => 'Speaking',
                             'general_mcq' => 'General MCQ',
+                            'sop_review'  => 'SOP Review',
+                            'sop_new'     => 'New SOP Writing',
                         ];
+
+    /** Module types that go through the manual evaluator pipeline. */
+    const EVALUATABLE_TYPES = ['writing', 'speaking', 'sop_review', 'sop_new'];
+
+    /** Module types that are SOP services (resume + university + country form). */
+    const SOP_TYPES = ['sop_review', 'sop_new'];
     
     // const SESSION_TYPE = [
     //                         1 => 'Auto',

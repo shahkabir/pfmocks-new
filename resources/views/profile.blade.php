@@ -9,18 +9,11 @@
         <div class="card shadow-sm mb-4">
             <div class="card-body d-flex align-items-center gap-4 py-4">
 
-                {{-- Initials avatar --}}
-                @php
-                    $words    = array_filter(explode(' ', trim($user->name)));
-                    $initials = strtoupper(implode('', array_map(fn($w) => $w[0], array_slice($words, 0, 2))));
-                    $colors   = ['#4e73df','#1cc88a','#36b9cc','#e74a3b','#f6c23e','#6f42c1','#fd7e14'];
-                    $avatarBg = $colors[ord($initials[0] ?? 'A') % count($colors)];
-                @endphp
-
-                <div class="rounded-circle d-flex align-items-center justify-content-center shrink-0"
-                     style="width:90px;height:90px;background:{{ $avatarBg }};font-size:2rem;font-weight:700;color:#fff;letter-spacing:1px;user-select:none;">
-                    {{ $initials }}
-                </div>
+                {{-- Profile picture --}}
+                <img src="{{ asset('images/profile.png') }}"
+                     alt="{{ $user->name }}"
+                     class="rounded-circle shadow-sm shrink-0"
+                     style="width:90px;height:90px;object-fit:cover;border:3px solid #fff;background:#f8f9fa;">
 
                 <div>
                     <h4 class="mb-1 fw-bold">{{ $user->name }}</h4>

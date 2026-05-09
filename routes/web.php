@@ -24,7 +24,7 @@ Route::get('/csrf-token', function () {
     ]);
 });
 
-Route::get('/register', [RegisterController::class, 'registerView'])->name('register');
+Route::get('/register', [RegisterController::class, 'registerView'])->name('signup');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
 
 Route::get('/show-otp',[RegisterController::class,'verifyView'])->name('otp.verify.view');
@@ -66,6 +66,20 @@ Route::middleware('auth')->group(function(){
         ->name('referral.index');
     Route::post('/referral/send-email',[\App\Http\Controllers\ReferralController::class, 'sendEmail'])
         ->name('referral.send-email');
+
+    // ── SOP services (student-facing) ────────────────────────────────────
+    Route::get ('/services/sop',
+        [\App\Http\Controllers\SopController::class, 'index'])
+        ->name('sop.index');
+    Route::get ('/services/sop/module-info/{moduleId}',
+        [\App\Http\Controllers\SopController::class, 'moduleInfo'])
+        ->name('sop.module-info');
+    Route::post('/services/sop/submit',
+        [\App\Http\Controllers\SopController::class, 'submit'])
+        ->name('sop.submit');
+    Route::get ('/services/sop/{submissionId}/download/{type}',
+        [\App\Http\Controllers\SopController::class, 'download'])
+        ->name('sop.download');
 });
 
 // Admin CRUD routes (routes/admin.php)

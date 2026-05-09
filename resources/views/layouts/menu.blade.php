@@ -25,17 +25,15 @@
         <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
           <!--begin::Brand Link-->
-          <a href="./index.html" class="brand-link">
+          <a href="{{ route('dashboard') }}" class="brand-link d-flex align-items-center justify-content-center w-100"
+             style="padding:8px 12px;">
             <!--begin::Brand Image-->
-            {{-- <img
-              src="./assets/img/AdminLTELogo.png"
-              alt="PerfectMocks Logo"
-              class="brand-image opacity-75 shadow"
-            /> --}}
+            <img
+              src="{{ asset('images/logo.png') }}"
+              alt="PerfectMocks"
+              style="max-width:250px;width:auto;height:auto;object-fit:contain;display:block;"
+            />
             <!--end::Brand Image-->
-            <!--begin::Brand Text-->
-            <span class="brand-text fw-light">PerfectMocks</span>
-            <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
         </div>
@@ -398,7 +396,16 @@
                 </a>
               </li>
 
-              
+              <li class="nav-header">Services</li>
+              <li class="nav-item">
+                <a href="{{ route('sop.index') }}"
+                   class="nav-link {{ request()->routeIs('sop.*') ? 'active' : '' }}">
+                  <i class="nav-icon bi bi-file-earmark-text-fill text-info"></i>
+                  <p>SOP Service
+                    <sup class="badge rounded-pill text-bg-info ms-1" style="font-size: 0.7rem;">New</sup>
+                  </p>
+                </a>
+              </li>
 
               @if(Auth::user()->role === 'admin')
                 <li class="nav-header">Administration</li>

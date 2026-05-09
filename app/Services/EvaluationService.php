@@ -91,13 +91,15 @@ class EvaluationService
 
     /**
      * Evaluator submits typed feedback + optional voice recording + IELTS criteria scores.
+     * For SOP modules, also accepts a final SOP file (the deliverable).
      */
     public function submitFeedback(
         int    $evaluationId,
         array  $data,
-        ?UploadedFile $audio = null
+        ?UploadedFile $audio    = null,
+        ?UploadedFile $finalSop = null
     ): Evaluation {
-        return DB::transaction(function () use ($evaluationId, $data, $audio) {
+        return DB::transaction(function () use ($evaluationId, $data, $audio, $finalSop) {
             /** @var Evaluation $evaluation */
             $evaluation = Evaluation::with(['attempt.user', 'attempt.module.exam'])
                 ->findOrFail($evaluationId);
@@ -112,6 +114,25 @@ class EvaluationService
                 $filename = uniqid('feedback_') . '_' . Str::random(6) . '.webm';
                 $audio->move(public_path('data/audio/feedback'), $filename);
                 $audioPath = 'data/audio/feedback/' . $filename;
+            }
+
+            // SOP final deliverable: store the new SOP file on the linked SopSubmission
+            if ($finalSop) {
+                $student = $evaluation->attempt->user;
+                $module  = $evaluation->attempt->module;
+                $submission = \App\Models\Sop\SopSubmission::where('user_id', $student->id)
+                    ->where('module_id', $module->id)
+                    ->latest('id')
+                    ->first();
+                if ($submission) {
+                    if ($submission->final_sop_path && file_exists(public_path($submission->final_sop_path))) {
+                        @unlink(public_path($submission->final_sop_path));
+                    }
+                    $sopDir  = "data/sop/{$student->id}";
+                    $sopName = uniqid('final_sop_') . '_' . Str::random(6) . '.' . $finalSop->getClientOriginalExtension();
+                    $finalSop->move(public_path($sopDir), $sopName);
+                    $submission->update(['final_sop_path' => "{$sopDir}/{$sopName}"]);
+                }
             }
 
             // Build band scores map (numeric only)

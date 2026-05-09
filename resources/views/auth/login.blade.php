@@ -257,7 +257,7 @@
 
         <div class="text-center" style="font-size:.875rem;">
             <span class="text-muted">New here?</span>
-            <a href="{{ route('register') }}" class="auth-link ms-1">Create an account</a>
+            <a href="{{ route('signup') }}" class="auth-link ms-1">Create an account</a>
         </div>
     </div>
 </div>

@@ -24,6 +24,25 @@ return new class extends Migration
             $table->integer('sort_order')->default(0);
 
             $table->timestamps();
+
+            $table->string('question_type', 50)
+                ->after('actual_question');
+
+            $table->text('correct_answer_fib')
+                ->nullable()
+                ->after('correct_answer_explanation');
+
+            $table->boolean('is_active')
+                ->default(true)
+                ->after('sort_order');
+
+            $table->string('question_image_path')
+                ->nullable()
+                ->after('is_active');
+
+            $table->string('question_audio_path')
+                ->nullable()
+                ->after('question_image_path');
         });
     }
 
