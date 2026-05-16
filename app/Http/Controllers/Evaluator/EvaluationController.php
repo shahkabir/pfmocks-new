@@ -67,6 +67,8 @@ class EvaluationController extends Controller
             ->where('user_id', $student->id)
             ->get();
 
+        // dd($evaluation->toArray(), $answers->toArray());
+
         return view('evaluator.evaluations.show', [
             'evaluation' => $evaluation->fresh(),
             'answers'    => $answers,

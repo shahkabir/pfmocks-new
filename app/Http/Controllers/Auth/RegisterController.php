@@ -79,26 +79,30 @@ class RegisterController extends Controller
             // Mail::to($user->email)->send(new OtpMail($otp));
             // SMS::send($user->mobile, $otp);  
 
-            $mailData = [
-                'otp' => $otp,
-                'name' => $user->name
+            if(env('APP_ENV') === 'Production'){
+
+                Log::info("OTP for user {$user->email}: {$otp}");
+            
+                $mailData = [
+                    'otp' => $otp,
+                    'name' => $user->name
             ];
 
-            $mailBody = "Hello {$mailData['name']},\n\nYour OTP for login is: {$mailData['otp']}\n\n
-            This OTP is valid for 5 minutes.\n\n
-            If you did not request this, please ignore this email.\n\nBest regards,\nPerfectMocks Team";
+                $mailBody = "Hello {$mailData['name']},\n\nYour OTP for login is: {$mailData['otp']}\n\n
+                This OTP is valid for 5 minutes.\n\n
+                If you did not request this, please ignore this email.\n\nBest regards,\nPerfectMocks Team";
 
-            try {
-                Mail::raw($mailBody, function ($message) use ($user) {
-                    $message->to($user->email)
-                            ->subject('PerfectMocks - Your OTP for Login');
-                });
-            } catch (\Exception $e) {
-                // Handle email sending error
-                //Log::error('Failed to send OTP email: ' . $e->getMessage());
-                dd($e->getMessage());
+                try {
+                    Mail::raw($mailBody, function ($message) use ($user) {
+                        $message->to($user->email)
+                                ->subject('PerfectMocks - Your OTP for Login');
+                    });
+                } catch (\Exception $e) {
+                    // Handle email sending error
+                    //Log::error('Failed to send OTP email: ' . $e->getMessage());
+                    dd($e->getMessage());
+                }
             }
-
 
 
             return response()->json([

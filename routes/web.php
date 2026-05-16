@@ -39,7 +39,7 @@ Route::get('/dashboard', [RegisterController::class, 'dashboard'])->name('dashbo
 Route::middleware('auth')->group(function(){
     //Route::get('/dashboard',[DashBoardController::class,'index'])->name('dashboard.admin');
 
-     Route::get('/dashboard-student', [ExamController::class, 'dashboard'])->name('dashboard.student');
+    Route::get('/dashboard-student', [ExamController::class, 'dashboard'])->name('dashboard.student');
 
     Route::get('/exam/{module}/start', [ExamController::class, 'start'])->name('exam.start');
     Route::get('/exam/result/{userExamId}', [ExamController::class, 'showResult'])->name('exam.result');

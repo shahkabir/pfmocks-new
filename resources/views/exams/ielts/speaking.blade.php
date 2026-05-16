@@ -344,17 +344,29 @@
                                         @foreach($options as $option)
 
                                             @if($option['question_type'] == 'ielts_speaking')
+                                                @php
+                                                    $recordedAudio = ($userTextAnswers ?? [])[$option['question_id']] ?? null;
+                                                @endphp
 
                                                 <div class="speaking-question mb-3" data-question-id="{{ $option['question_id'] }}">
 
-                                                    <button type="button" class="btn btn-sm btn-primary start-btn">
-                                                        <i class="bi bi-mic-fill me-1"></i>Start
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-danger stop-btn">
-                                                        <i class="bi bi-stop-fill me-1"></i>Stop
-                                                    </button>
+                                                    @if(empty($reviewMode))
+                                                        <button type="button" class="btn btn-sm btn-primary start-btn">
+                                                            <i class="bi bi-mic-fill me-1"></i>Start
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-danger stop-btn">
+                                                            <i class="bi bi-stop-fill me-1"></i>Stop
+                                                        </button>
+                                                    @endif
 
-                                                    <audio class="preview mt-2" controls></audio>
+                                                    <audio class="preview mt-2" controls
+                                                        @if(!empty($reviewMode) && $recordedAudio) src="{{ asset($recordedAudio) }}" @endif></audio>
+
+                                                    @if(!empty($reviewMode) && !$recordedAudio)
+                                                        <div class="text-muted small mt-1">
+                                                            <i class="bi bi-mic-mute me-1"></i>No recording was submitted for this question.
+                                                        </div>
+                                                    @endif
                                                 </div>
 
                                                 @php break; @endphp
@@ -430,12 +442,17 @@ $(function () {
 
 let recorders = {};
 
+@if(empty($reviewMode))
+{{-- Recorder is only wired during a live exam — in review mode the Start/Stop
+     buttons don't exist and the recordings are simply played back. --}}
 document.querySelectorAll('.speaking-question').forEach(container => {
 
     const startBtn = container.querySelector('.start-btn');
     const stopBtn = container.querySelector('.stop-btn');
     const audioPreview = container.querySelector('.preview');
     const hiddenInput = container.querySelector('.audio-path');
+
+    if (!startBtn || !stopBtn) return;
 
     let mediaRecorder;
     let chunks = [];
@@ -459,6 +476,7 @@ document.querySelectorAll('.speaking-question').forEach(container => {
         stopBtn.onclick = () => mediaRecorder.stop();
     });
 });
+@endif
 
 function uploadAudio(blob, questionId, hiddenInput) {
     const moduleId = document.querySelector('input[name="module_id"]')?.value;
@@ -478,6 +496,10 @@ function uploadAudio(blob, questionId, hiddenInput) {
     .then(res => res.json());
 }
 
+// True when the submission is triggered by the timer running out (not a manual click)
+let autoSubmitMode = false;
+const isReviewMode = {{ !empty($reviewMode) ? 'true' : 'false' }};
+
 // ── Final "Submit Speaking Test" → finalize endpoint ───────────────────────
 $('.speaking-form').on('submit', function (e) {
     e.preventDefault();
@@ -492,6 +514,27 @@ $('.speaking-form').on('submit', function (e) {
         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
         data: $(this).serialize(),
         success: function (res) {
+            if (autoSubmitMode && typeof Swal !== 'undefined') {
+                // Time-up auto-save — student MUST click OK, then the tab closes.
+                Swal.fire({
+                    icon: 'success',
+                    title: "Time's up!",
+                    text: 'Your allotted time has finished. Your answers were saved automatically.',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                }).then(function () {
+                    window.close();
+                    document.body.innerHTML =
+                        '<div style="display:flex;align-items:center;justify-content:center;'
+                      + 'height:100vh;font-family:sans-serif;font-size:1.1rem;color:#198754;'
+                      + 'text-align:center;padding:24px;">'
+                      + '<div><i class="bi bi-check-circle-fill"></i><br>'
+                      + 'Your answers were saved. You may now close this tab.</div></div>';
+                });
+                return;
+            }
+
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
                     icon: 'success',
@@ -511,6 +554,13 @@ $('.speaking-form').on('submit', function (e) {
         }
     });
 });
+
+// Fired once when the countdown hits zero — reuses the form's submit AJAX.
+function triggerAutoSubmit() {
+    if (isReviewMode || autoSubmitMode) return;
+    autoSubmitMode = true;
+    $('.speaking-form').trigger('submit');
+}
 
 // ── Part switcher ──────────────────────────────────────────────────────────
 function showPart(partNumber, btn) {
@@ -556,6 +606,13 @@ const countdownInterval = setInterval(() => {
     $timerText.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
 
     if (seconds <= 300) $timerPill.classList.add('warning');
+
+    // Time's up → auto-save the answers
+    if (seconds <= 0) {
+        clearInterval(countdownInterval);
+        $timerText.innerText = '00:00';
+        triggerAutoSubmit();
+    }
 }, 1000);
 
 // ── Exit button ────────────────────────────────────────────────────────────

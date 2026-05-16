@@ -283,11 +283,11 @@
                                 class="form-control"
                                 placeholder="Write your answer here..."></textarea> --}}
 
-                        {{-- ANSWER --}}
+                        {{-- ANSWER (pre-filled with the student's submission in review mode) --}}
                         <textarea class="form-control writing-answer" name="answers[{{ $question['id'] }}][answer]"
                             rows="10" placeholder="Write your answer here..."
                             data-question-id="{{ $question['id'] }}"
-                        ></textarea>
+                        >{{ old('answers.'.$question['id'].'.answer', ($userTextAnswers ?? [])[$question['id']] ?? '') }}</textarea>
 
                         <div class="word-count mt-1">
                             Word count: <span class="word-count-num">0</span>
@@ -378,9 +378,9 @@
         }
     });
 
-    // $('.writing-form').on('submit', function(e) {
-    //     e.preventDefault();
-    // });
+    // True when the submission is triggered by the timer running out (not a manual click)
+    let autoSubmitMode = false;
+    const isReviewMode = {{ !empty($reviewMode) ? 'true' : 'false' }};
 
     $('.writing-form').on('submit', function(e) {
         e.preventDefault();
@@ -392,6 +392,28 @@
             method: "POST",
             data: formData,
             success: function(response) {
+                if (autoSubmitMode) {
+                    // Time-up auto-save — student MUST click OK, then the tab closes.
+                    Swal.fire({
+                        icon: 'success',
+                        title: "Time's up!",
+                        text: 'Your allotted time has finished. Your answers were saved automatically.',
+                        confirmButtonText: 'OK',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                    }).then(function () {
+                        window.close();
+                        // Fallback when the browser blocks window.close()
+                        document.body.innerHTML =
+                            '<div style="display:flex;align-items:center;justify-content:center;'
+                          + 'height:100vh;font-family:sans-serif;font-size:1.1rem;color:#198754;'
+                          + 'text-align:center;padding:24px;">'
+                          + '<div><i class="bi bi-check-circle-fill"></i><br>'
+                          + 'Your answers were saved. You may now close this tab.</div></div>';
+                    });
+                    return;
+                }
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Answers Submitted',
@@ -414,6 +436,15 @@
             }
         });
     });
+
+    // Fired once when the countdown hits zero — reuses the form's submit AJAX.
+    function triggerAutoSubmit() {
+        if (isReviewMode || autoSubmitMode) return;
+        autoSubmitMode = true;
+        $('#submitAnswersBtn').prop('disabled', true)
+                              .html('<i class="bi bi-arrow-repeat me-1"></i>Time up — saving…');
+        $('.writing-form').trigger('submit');
+    }
 
     // Word count per textarea (each writing-task has its own counter)
     document.querySelectorAll('.writing-answer').forEach(textarea => {
@@ -446,6 +477,13 @@
         $timeText.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
 
         if (seconds <= 300) $timerPill.classList.add('warning');
+
+        // Time's up → auto-save the answers
+        if (seconds <= 0) {
+            clearInterval(countdownInterval);
+            $timeText.innerText = '00:00';
+            triggerAutoSubmit();
+        }
     }, 1000);
 </script>
 {{-- @endsection --}}

@@ -12,6 +12,7 @@ use App\Models\Module\Module;
 use App\Models\Question\Question;
 use App\Models\Question\QuestionOptions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class ExamController extends Controller
 {
@@ -27,7 +28,7 @@ class ExamController extends Controller
             // ->where('exam.is_active', true)
             ->orderByDesc('purchased_at')
             ->get();
-        //dd($exams);
+        // dd($exams);
 
         // dd($user);
         //Show all exams for admin too for testing (later we can have a separate admin dashboard)
@@ -77,12 +78,17 @@ class ExamController extends Controller
         // Get the questons for the module
         // Works for Writing module
 
-        if($moduleType === 'writing' || $moduleType === 'speaking'){
+        if($moduleType === 'writing'){ ///|| $moduleType === 'speaking'
             $questions = Question::with('options')
             ->join('modules', 'questions.module_id', '=', 'modules.id')
             ->where('modules.module_type', $moduleType)
             ->where('modules.id', $moduleId)
-            ->orderBy('sort_order', 'asc')
+            // ->active()
+            ->orderBy('questions.sort_order', 'asc')
+            // Without this select, `SELECT *` pulls `id` from both tables and
+            // modules.id overwrites questions.id — every task ends up with the
+            // same id, so only the last part's answer survives serialization.
+            ->select('questions.*')
             ->get()
             ->toArray();
         }else{
@@ -158,9 +164,11 @@ class ExamController extends Controller
         $result = Results::where('exam_attempt_id', $examAttempt->id)->first();
 
         // Load user's previous answers for this attempt.
-        // Build two lookups for the view:
+        // Build three lookups for the view:
         //   $userSelectedOptionIds : flat array of option_id the user selected (MCQ)
-        //   $userFillAnswers       : map of option_id => typed text (fill_in_blanks)
+        //   $userFillAnswers       : map of option_id  => typed text (fill_in_blanks)
+        //   $userTextAnswers       : map of question_id => text/audio (writing essays,
+        //                            speaking audio URLs — these have a NULL question_option_id)
         $previousAnswers = Answer::where('exam_attempt_id', $examAttempt->id)->get();
 
         $userSelectedOptionIds = $previousAnswers
@@ -171,17 +179,28 @@ class ExamController extends Controller
             ->all();
 
         $userFillAnswers = [];
+        $userTextAnswers = [];
         foreach ($previousAnswers as $a) {
-            if (!empty($a->answer) && $a->question_option_id) {
+            if (empty($a->answer)) {
+                continue;
+            }
+            if ($a->question_option_id) {
+                // fill-in-the-blanks: keyed by the blank's option id
                 $userFillAnswers[(int) $a->question_option_id] = $a->answer;
+            } else {
+                // writing essay / speaking audio: no option, keyed by question id
+                $userTextAnswers[(int) $a->question_id] = $a->answer;
             }
         }
+
+        // dd($userFillAnswers, $userTextAnswers);
 
         $questions = Question::with('options')
             ->join('modules', 'questions.module_id', '=', 'modules.id')
             ->where('modules.module_type', $moduleType)
             ->where('modules.id', $module->id)
-            ->orderBy('sort_order', 'asc')
+            ->orderBy('questions.sort_order', 'asc')
+            ->select('questions.*') // keep questions.id (modules.id would otherwise overwrite it)
             ->get()
             ->toArray();
 
@@ -233,8 +252,8 @@ class ExamController extends Controller
 
         $viewData = compact(
             'questions', 'user', 'showFeedback', 'module',
-            'reviewMode', 'userSelectedOptionIds', 'userFillAnswers', 'summary',
-            'evaluation'
+            'reviewMode', 'userSelectedOptionIds', 'userFillAnswers', 'userTextAnswers',
+            'summary', 'evaluation'
         );
 
         if ($moduleType === 'reading') {
@@ -471,7 +490,8 @@ class ExamController extends Controller
         
         $scorePercentage = $totalQuestions > 0 ? ($correctAnswer / $totalQuestions) * 100 : 0;
         $bandScore = $this->calculateIELTSBand($correctAnswer);
-        $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
+        // abs() — Carbon 3 diffInSeconds is signed; ended_at > started_at yields a negative value
+        $timeTakenSeconds = (int) abs($examAttempt->started_at->diffInSeconds(Carbon::now()));
 
         // Save the result to the results table
         $result = Results::updateOrCreate(
@@ -604,7 +624,8 @@ class ExamController extends Controller
             $totalQuestions = Answer::where('exam_attempt_id', $examAttempt->id)->count();
         }
 
-        $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
+        // abs() — Carbon 3 diffInSeconds is signed; ended_at > started_at yields a negative value
+        $timeTakenSeconds = (int) abs($examAttempt->started_at->diffInSeconds(Carbon::now()));
 
         Results::updateOrCreate(
             [
@@ -638,6 +659,8 @@ class ExamController extends Controller
 
     public function submitIELTSWriting(Request $request)
     {
+        // dd($request->all());
+        
         $user           = auth()->user();
         $answers        = $request->input('answers', []);
         $moduleId       = $request->input('module_id');
@@ -687,7 +710,8 @@ class ExamController extends Controller
         }
 
         // Save Results row in pending state — evaluator will fill band scores later
-        $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
+        // abs() — Carbon 3 diffInSeconds is signed; ended_at > started_at yields a negative value
+        $timeTakenSeconds = (int) abs($examAttempt->started_at->diffInSeconds(Carbon::now()));
         Results::updateOrCreate(
             [
                 'user_id'         => $user->id,
@@ -791,7 +815,8 @@ class ExamController extends Controller
         $achievedScore    = Answer::where('exam_attempt_id', $examAttempt->id)->where('is_correct', true)->count();
         $totalScore       = $totalQuestions > 0 ? $totalQuestions : Question::where('module_id', $moduleId)->count();
         $scorePercentage  = $totalScore > 0 ? ($achievedScore / $totalScore) * 100 : 0;
-        $timeTakenSeconds = $examAttempt->ended_at->diffInSeconds($examAttempt->started_at);
+        // abs() — Carbon 3 diffInSeconds is signed; ended_at > started_at yields a negative value
+        $timeTakenSeconds = (int) abs($examAttempt->started_at->diffInSeconds(Carbon::now()));
 
         Results::updateOrCreate(
             [

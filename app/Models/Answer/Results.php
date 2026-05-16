@@ -17,7 +17,7 @@ class Results extends Model
         'status', //'pending, completed, evaluated, manual_review'
         'module_name',
         'achieved_score',
-        'total_score',
+        'total_score', //not applicable for IELTS writing, speaking as they are manually evaluated, but can be used for other exams
         'score_percentage',
         'band_score',
         'time_taken_seconds',
