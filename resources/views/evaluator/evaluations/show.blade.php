@@ -8,8 +8,9 @@
     $isSpeaking = $module->module_type === 'speaking';
     $bandScores = $evaluation->band_scores ?? [];
 
-    // Group answers by question_id (for writing/speaking, one answer per question)
-    $answersByQ = $answers->keyBy('question_id');
+    // NOTE: do NOT keyBy('question_id') — speaking stores one answer row per
+    // prompt (per question_option_id), and several prompts share a question_id,
+    // so keying by question_id would silently drop all but the last recording.
 
     $writingCriteria = [
         'task_achievement'   => 'Task Achievement',
@@ -79,7 +80,7 @@
                 <i class="bi bi-file-earmark-text me-1"></i>Student's submission
             </h6>
 
-            @forelse($answersByQ as $qid => $answer)
+            @forelse($answers as $answer)
                 @php
                     $q = $answer->question;
                 @endphp
@@ -98,7 +99,7 @@
                     @endif
 
                     @if($isWriting)
-                        <div class="answer-body">{{ $answer->answer ?? '— no answer submitted —' }}</div>
+                        <div class="answer-body">{{ $answer->answer ?: '— no answer submitted —' }}</div>
                         @if($answer->answer)
                             <div class="small text-muted mt-1">
                                 Word count:
@@ -106,22 +107,16 @@
                             </div>
                         @endif
                     @elseif($isSpeaking)
-                        @php
-                            $audio = $answer->question_option_id
-                                ? \App\Models\Question\QuestionOptions::where('id', $answer->question_option_id)->value('option_text')
-                                : null;
-                            // For speaking the audio is uploaded via submitIeltsSpeakingAudio()
-                            // which stores under storage/app/public/speaking-audios/<file>
-                            // and the URL form is "storage/speaking-audios/<file>" — but we don't
-                            // have that link directly. Show the answer.answer field if it holds the path.
-                        @endphp
-                        @if(!empty($answer->answer) && str_contains($answer->answer, 'speaking') )
+                        {{-- speaking answer.answer holds the audio path: storage/speaking-audios/<file> --}}
+                        @if(!empty($answer->answer))
                             <div class="audio-block">
                                 <audio controls src="{{ asset($answer->answer) }}" style="width:100%;"></audio>
                             </div>
                         @else
                             <div class="answer-body">— no recording on file —</div>
                         @endif
+                    @else
+                        <div class="answer-body">{{ $answer->answer ?: '— no answer submitted —' }}</div>
                     @endif
                 </div>
             @empty

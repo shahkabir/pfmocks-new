@@ -194,34 +194,34 @@ class ExamController extends Controller
         }
 
         // dd($userFillAnswers, $userTextAnswers);
-
-        $questions = Question::with('options')
-            ->join('modules', 'questions.module_id', '=', 'modules.id')
-            ->where('modules.module_type', $moduleType)
-            ->where('modules.id', $module->id)
-            ->orderBy('questions.sort_order', 'asc')
-            ->select('questions.*') // keep questions.id (modules.id would otherwise overwrite it)
-            ->get()
-            ->toArray();
-
-
-        // Same question load as start()
-        // $questions = Question::with(['options', 'group.blocks'])
-        //     ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
-        //     ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
-        //     ->where('modules.module_type', $moduleType)
-        //     ->where('modules.id', $module->id)
-        //     ->active()
-        //     ->orderBy('questions.sort_order')
-        //     ->select([
-        //         'questions.*',
-        //         'question_groups.question_options_group_ids',
-        //         'question_groups.part_number',
-        //         'question_groups.part_audio_url',
-        //         'question_groups.part_image_url',
-        //     ])
-        //     ->get()
-        //     ->toArray();
+        if($moduleType === 'writing'){ ///|| $moduleType === 'speaking'
+            $questions = Question::with('options')
+                ->join('modules', 'questions.module_id', '=', 'modules.id')
+                ->where('modules.module_type', $moduleType)
+                ->where('modules.id', $module->id)
+                ->orderBy('questions.sort_order', 'asc')
+                ->select('questions.*') // keep questions.id (modules.id would otherwise overwrite it)
+                ->get()
+                ->toArray();
+        }else{
+                // Same question load as start()
+                $questions = Question::with(['options', 'group.blocks'])
+                    ->leftJoin('modules', 'questions.module_id', '=', 'modules.id')
+                    ->leftJoin('question_groups', 'questions.id', '=', 'question_groups.question_id')
+                    ->where('modules.module_type', $moduleType)
+                    ->where('modules.id', $module->id)
+                    ->active()
+                    ->orderBy('questions.sort_order')
+                    ->select([
+                        'questions.*',
+                        'question_groups.question_options_group_ids',
+                        'question_groups.part_number',
+                        'question_groups.part_audio_url',
+                        'question_groups.part_image_url',
+                    ])
+                    ->get()
+                    ->toArray();
+        }
 
         $showFeedback = false;
         $reviewMode   = true;
@@ -535,16 +535,20 @@ class ExamController extends Controller
 
     public function submitIeltsSpeakingAudio(Request $request)
     {
-        $user       = auth()->user();
-        $questionId = $request->input('question_id');
-        $moduleId   = $request->input('module_id');
-        $audioFile  = $request->file('audio');
+        $user             = auth()->user();
+        $questionId       = $request->input('question_id');
+        $questionOptionId = $request->input('question_option_id');
+        $moduleId         = $request->input('module_id');
+        $audioFile        = $request->file('audio');
 
         if (!$audioFile) {
             return response()->json(['message' => 'No audio file uploaded.'], 400);
         }
         if (!$moduleId) {
             return response()->json(['message' => 'module_id is missing.'], 422);
+        }
+        if (!$questionOptionId) {
+            return response()->json(['message' => 'question_option_id is missing.'], 422);
         }
 
         $filename = uniqid() . '_' . $audioFile->getClientOriginalName();
@@ -564,16 +568,19 @@ class ExamController extends Controller
             ]
         );
 
+        // Key by question_option_id — each speaking prompt is a distinct option,
+        // and several prompts can share the same question_id. Keying only by
+        // question_id would make every recording overwrite the previous one.
         Answer::updateOrCreate(
             [
-                'user_id'         => $user->id,
-                'question_id'     => $questionId,
-                'exam_attempt_id' => $examAttempt->id,
+                'user_id'            => $user->id,
+                'exam_attempt_id'    => $examAttempt->id,
+                'question_id'        => $questionId,
+                'question_option_id' => $questionOptionId,
             ],
             [
-                'answer'             => $audioUrl,
-                'question_option_id' => null,
-                'is_correct'         => null,
+                'answer'     => $audioUrl,
+                'is_correct' => null,
             ]
         );
 
@@ -590,6 +597,8 @@ class ExamController extends Controller
      */
     public function submitIeltsSpeakingFinalize(Request $request)
     {
+        // dd($request->all());
+        
         $user           = auth()->user();
         $moduleId       = $request->input('module_id');
         $moduleType     = $request->input('module_type', 'speaking');

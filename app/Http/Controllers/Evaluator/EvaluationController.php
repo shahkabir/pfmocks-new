@@ -39,6 +39,7 @@ class EvaluationController extends Controller
             ->where('id', $id)
             ->where('assigned_to', auth()->id())
             ->firstOrFail();
+        // dd($evaluation->toArray());
 
         // Mark in_progress on first open
         $this->service->markInProgress($evaluation);

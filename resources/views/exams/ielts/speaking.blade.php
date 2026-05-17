@@ -86,7 +86,7 @@
         width: 100%;
     }
 
-    .listening-part {
+    .speaking-part {
         width: 100%;
     }
 
@@ -303,7 +303,7 @@
         @php $qNo = 1; @endphp
         @foreach($parts as $partNumber => $partData)
 
-                <div class="exam-body listening-part"
+                <div class="exam-body speaking-part"
                     id="part-{{ $partNumber }}"
                     style="{{ $partNumber === array_key_first($parts) ? '' : 'display:none' }}">
 
@@ -345,10 +345,13 @@
 
                                             @if($option['question_type'] == 'ielts_speaking')
                                                 @php
-                                                    $recordedAudio = ($userTextAnswers ?? [])[$option['question_id']] ?? null;
+                                                    // Speaking answers are keyed by option id (each prompt is its own option)
+                                                    $recordedAudio = ($userFillAnswers ?? [])[$option['id']] ?? null;
                                                 @endphp
 
-                                                <div class="speaking-question mb-3" data-question-id="{{ $option['question_id'] }}">
+                                                <div class="speaking-question mb-3"
+                                                     data-question-id="{{ $option['question_id'] }}"
+                                                     data-option-id="{{ $option['id'] }}">
 
                                                     @if(empty($reviewMode))
                                                         <button type="button" class="btn btn-sm btn-primary start-btn">
@@ -360,7 +363,8 @@
                                                     @endif
 
                                                     <audio class="preview mt-2" controls
-                                                        @if(!empty($reviewMode) && $recordedAudio) src="{{ asset($recordedAudio) }}" @endif></audio>
+                                                        @if(!empty($reviewMode) && $recordedAudio) src="{{ asset($recordedAudio) }}" @endif>
+                                                    </audio>
 
                                                     @if(!empty($reviewMode) && !$recordedAudio)
                                                         <div class="text-muted small mt-1">
@@ -450,7 +454,6 @@ document.querySelectorAll('.speaking-question').forEach(container => {
     const startBtn = container.querySelector('.start-btn');
     const stopBtn = container.querySelector('.stop-btn');
     const audioPreview = container.querySelector('.preview');
-    const hiddenInput = container.querySelector('.audio-path');
 
     if (!startBtn || !stopBtn) return;
 
@@ -469,7 +472,9 @@ document.querySelectorAll('.speaking-question').forEach(container => {
 
             audioPreview.src = URL.createObjectURL(blob);
 
-            uploadAudio(blob, container.dataset.questionId, hiddenInput);
+            // Each prompt is a distinct option — send its option id so recordings
+            // don't overwrite each other server-side.
+            uploadAudio(blob, container.dataset.questionId, container.dataset.optionId, container);
         };
 
         startBtn.onclick = () => mediaRecorder.start();
@@ -478,22 +483,36 @@ document.querySelectorAll('.speaking-question').forEach(container => {
 });
 @endif
 
-function uploadAudio(blob, questionId, hiddenInput) {
+function uploadAudio(blob, questionId, optionId, container) {
     const moduleId = document.querySelector('input[name="module_id"]')?.value;
 
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append('audio', blob, 'speaking.webm');
     formData.append('question_id', questionId);
+    formData.append('question_option_id', optionId);
     if (moduleId) formData.append('module_id', moduleId);
 
-    fetch('/speaking-upload-audio', {
+    // Mark this prompt as "uploading" so the final submit can warn if not done
+    if (container) container.dataset.uploadState = 'uploading';
+
+    fetch('{{ route('exam.ielts.speaking.upload_audio') }}', {
         method: 'POST',
         body: formData,
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         }
     })
-    .then(res => res.json());
+    .then(res => res.json().then(data => ({ ok: res.ok, data })))
+    .then(({ ok, data }) => {
+        if (container) container.dataset.uploadState = ok ? 'done' : 'failed';
+        if (!ok) {
+            alert('Recording upload failed: ' + (data.message || 'please re-record this answer.'));
+        }
+    })
+    .catch(() => {
+        if (container) container.dataset.uploadState = 'failed';
+        alert('Recording upload failed due to a network error. Please re-record this answer.');
+    });
 }
 
 // True when the submission is triggered by the timer running out (not a manual click)
@@ -503,6 +522,20 @@ const isReviewMode = {{ !empty($reviewMode) ? 'true' : 'false' }};
 // ── Final "Submit Speaking Test" → finalize endpoint ───────────────────────
 $('.speaking-form').on('submit', function (e) {
     e.preventDefault();
+
+    // Don't finalize while a recording is still uploading (manual submit only —
+    // auto-submit on time-up proceeds regardless).
+    if (!autoSubmitMode) {
+        const stillUploading = document.querySelector('.speaking-question[data-upload-state="uploading"]');
+        if (stillUploading) {
+            alert('A recording is still uploading. Please wait a moment and submit again.');
+            return;
+        }
+        const failed = document.querySelector('.speaking-question[data-upload-state="failed"]');
+        if (failed && !confirm('One or more recordings failed to upload. Submit anyway?')) {
+            return;
+        }
+    }
 
     const $btn = $('#submitAnswersBtn');
     const orig = $btn.html();
@@ -564,7 +597,7 @@ function triggerAutoSubmit() {
 
 // ── Part switcher ──────────────────────────────────────────────────────────
 function showPart(partNumber, btn) {
-    document.querySelectorAll('.listening-part').forEach(part => {
+    document.querySelectorAll('.speaking-part').forEach(part => {
         part.style.display = 'none';
     });
     document.getElementById('part-' + partNumber).style.display = 'flex';
@@ -581,7 +614,7 @@ $(document).on('click', '.palette-btn', function () {
     if (!$target.length) return;
 
     const part = $target.data('part');
-    $('.listening-part').hide();
+    $('.speaking-part').hide();
     $('#part-' + part).show();
 
     $('html, body').animate({ scrollTop: $target.offset().top - 100 }, 300);
