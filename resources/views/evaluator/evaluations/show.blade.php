@@ -80,6 +80,8 @@
                 <i class="bi bi-file-earmark-text me-1"></i>Student's submission
             </h6>
 
+            {{-- {{ dd($answers) }} --}}
+
             @forelse($answers as $answer)
                 @php
                     $q = $answer->question;
@@ -107,10 +109,17 @@
                             </div>
                         @endif
                     @elseif($isSpeaking)
-                        {{-- speaking answer.answer holds the audio path: storage/speaking-audios/<file> --}}
-                        @if(!empty($answer->answer))
+                        @php
+                            // speaking answer.answer holds the audio path. Normalize:
+                            // older rows may lack the "storage/" prefix.
+                            $audioPath = $answer->answer;
+                            if ($audioPath && !\Illuminate\Support\Str::startsWith($audioPath, ['http://', 'https://', 'storage/'])) {
+                                $audioPath = 'storage/' . ltrim($audioPath, '/');
+                            }
+                        @endphp
+                        @if(!empty($audioPath))
                             <div class="audio-block">
-                                <audio controls src="{{ asset($answer->answer) }}" style="width:100%;"></audio>
+                                <audio controls src="{{ asset($audioPath) }}" style="width:100%;"></audio>
                             </div>
                         @else
                             <div class="answer-body">— no recording on file —</div>

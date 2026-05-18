@@ -347,6 +347,10 @@
                                                 @php
                                                     // Speaking answers are keyed by option id (each prompt is its own option)
                                                     $recordedAudio = ($userFillAnswers ?? [])[$option['id']] ?? null;
+                                                    // Normalize: older rows may lack the "storage/" prefix
+                                                    if ($recordedAudio && !\Illuminate\Support\Str::startsWith($recordedAudio, ['http://', 'https://', 'storage/'])) {
+                                                        $recordedAudio = 'storage/' . ltrim($recordedAudio, '/');
+                                                    }
                                                 @endphp
 
                                                 <div class="speaking-question mb-3"

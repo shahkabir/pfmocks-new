@@ -552,8 +552,11 @@ class ExamController extends Controller
         }
 
         $filename = uniqid() . '_' . $audioFile->getClientOriginalName();
+        // storeAs(dir, name, 'public') returns a path RELATIVE to the public disk
+        // root, e.g. "speaking-audios/<file>" — no "public/" prefix to replace.
+        // The browser-facing URL must be prefixed with "storage/" (the symlink).
         $path     = $audioFile->storeAs('speaking-audios', $filename, 'public');
-        $audioUrl = str_replace('public/', 'storage/', $path);
+        $audioUrl = 'storage/' . ltrim($path, '/');
 
         // One in-progress ExamAttempt per (user, module).
         // Don't put `started_at`/`status` in the lookup keys — they'd diverge each call.
