@@ -80,6 +80,11 @@ Route::middleware('auth')->group(function(){
     Route::get ('/services/sop/{submissionId}/download/{type}',
         [\App\Http\Controllers\SopController::class, 'download'])
         ->name('sop.download');
+
+    // ── Scholarships browse (student / evaluator) ──────────────────────
+    Route::get('/scholarships',
+        [\App\Http\Controllers\ScholarshipController::class, 'index'])
+        ->name('scholarships.index');
 });
 
 // Admin CRUD routes (routes/admin.php)

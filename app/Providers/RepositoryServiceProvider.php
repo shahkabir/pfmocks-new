@@ -13,6 +13,7 @@ use App\Repositories\Interfaces\QuestionGroupRepositoryInterface;
 use App\Repositories\Interfaces\QuestionGroupBlockRepositoryInterface;
 use App\Repositories\Interfaces\PaymentRepositoryInterface;
 use App\Repositories\Interfaces\ReferralProgramRepositoryInterface;
+use App\Repositories\Interfaces\ScholarshipRepositoryInterface;
 
 // Implementations
 use App\Repositories\ExamRepository;
@@ -23,6 +24,7 @@ use App\Repositories\QuestionGroupRepository;
 use App\Repositories\QuestionGroupBlockRepository;
 use App\Repositories\PaymentRepository;
 use App\Repositories\ReferralProgramRepository;
+use App\Repositories\ScholarshipRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -36,5 +38,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(QuestionGroupBlockRepositoryInterface::class, QuestionGroupBlockRepository::class);
         $this->app->bind(PaymentRepositoryInterface::class,            PaymentRepository::class);
         $this->app->bind(ReferralProgramRepositoryInterface::class,    ReferralProgramRepository::class);
+        $this->app->bind(ScholarshipRepositoryInterface::class,        ScholarshipRepository::class);
     }
 }

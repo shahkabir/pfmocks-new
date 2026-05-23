@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\QuestionGroupController;
 use App\Http\Controllers\Admin\QuestionGroupBlockController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ReferralProgramController;
+use App\Http\Controllers\Admin\ScholarshipController;
 use App\Http\Controllers\Admin\EvaluationController as AdminEvaluationController;
 
 /*
@@ -41,6 +42,10 @@ Route::resource('question-group-blocks', QuestionGroupBlockController::class)->e
 Route::get ('evaluations',         [AdminEvaluationController::class, 'index'])->name('evaluations.index');
 Route::get ('evaluations/list',    [AdminEvaluationController::class, 'list'])->name('evaluations.list');
 Route::post('evaluations/assign',  [AdminEvaluationController::class, 'assign'])->name('evaluations.assign');
+
+// Scholarships (admin CRUD)
+Route::get   ('scholarships/list',  [ScholarshipController::class, 'list'])->name('scholarships.list');
+Route::resource('scholarships',     ScholarshipController::class)->except(['show']);
 
 // Referral Programs (admin CRUD)
 Route::get   ('referral-programs/list',  [ReferralProgramController::class, 'list'])->name('referral-programs.list');

@@ -407,6 +407,17 @@
                 </a>
               </li>
 
+              <li class="nav-header">Opportunities</li>
+              <li class="nav-item">
+                <a href="{{ route('scholarships.index') }}"
+                   class="nav-link {{ request()->routeIs('scholarships.*') ? 'active' : '' }}">
+                  <i class="nav-icon bi bi-mortarboard-fill text-warning"></i>
+                  <p>Scholarships
+                    <sup class="badge rounded-pill text-bg-warning ms-1" style="font-size: 0.7rem;">New</sup>
+                  </p>
+                </a>
+              </li>
+
               @if(Auth::user()->role === 'admin')
                 <li class="nav-header">Administration</li>
 
@@ -479,6 +490,14 @@
                      class="nav-link {{ request()->routeIs('admin.referral-programs.*') ? 'active' : '' }}">
                     <i class="nav-icon bi bi-gift-fill"></i>
                     <p>Referral Programs</p>
+                  </a>
+                </li>
+
+                <li class="nav-item">
+                  <a href="{{ route('admin.scholarships.index') }}"
+                     class="nav-link {{ request()->routeIs('admin.scholarships.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-mortarboard-fill"></i>
+                    <p>Scholarships</p>
                   </a>
                 </li>
 
