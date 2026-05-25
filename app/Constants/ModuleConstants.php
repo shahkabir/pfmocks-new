@@ -12,7 +12,7 @@ class ModuleConstants
                             'speaking'    => 'Speaking',
                             'general_mcq' => 'General MCQ',
                             'sop_review'  => 'SOP Review',
-                            'sop_new'     => 'New SOP Writing',
+                            'sop_new'     => 'Personalized SOP Writing',
                         ];
 
     /** Module types that go through the manual evaluator pipeline. */

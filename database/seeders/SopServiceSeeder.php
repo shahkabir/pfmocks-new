@@ -37,7 +37,7 @@ class SopServiceSeeder extends Seeder
                 'duration_minutes' => 0,
             ],
             [
-                'name'             => 'New SOP Writing',
+                'name'             => 'Personalized SOP Writing',
                 'module_type'      => 'sop_new',
                 'type'             => 'paid',
                 'price_in_bdt'     => 2000,

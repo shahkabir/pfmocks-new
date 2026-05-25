@@ -16,7 +16,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.questions.store') }}">
+            <form method="POST" action="{{ route('admin.questions.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 {{-- Exam → Module cascade --}}
@@ -88,14 +88,16 @@
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Audio URL</label>
-                        <input type="text" name="audio_url" class="form-control"
-                               value="{{ old('audio_url') }}" placeholder="https://...">
+                        <label class="form-label fw-semibold">Audio File</label>
+                        <input type="file" name="audio_file" class="form-control"
+                               accept="audio/*">
+                        <div class="form-text">Optional. Allowed: {{ implode(', ', config('upload_audio.mimes')) }}.</div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Image URL</label>
-                        <input type="text" name="image_url" class="form-control"
-                               value="{{ old('image_url') }}" placeholder="https://...">
+                        <label class="form-label fw-semibold">Image File</label>
+                        <input type="file" name="image_file" class="form-control"
+                               accept="image/*">
+                        <div class="form-text">Optional. Allowed: {{ implode(', ', config('upload_image.mimes')) }} (max {{ config('upload_image.max_size_kb') }} KB).</div>
                     </div>
                 </div>
 

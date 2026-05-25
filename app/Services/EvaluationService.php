@@ -59,7 +59,9 @@ class EvaluationService
             $student   = $attempt->user;
             $module    = $attempt->module;
             $examName  = $module->exam?->name ?? '';
-            $moduleNm  = ucfirst($module->module_type);
+            // Friendly label — "SOP Review" / "Personalized SOP Writing" / "Writing" / "Speaking"
+            $moduleNm  = \App\Constants\ModuleConstants::MODULES[$module->module_type]
+                      ?? ucfirst($module->module_type);
 
             // Email evaluator
             $this->mailer->send($evaluator->email, new EvaluationAssignedMail(
@@ -168,7 +170,9 @@ class EvaluationService
             $student   = $evaluation->attempt->user;
             $module    = $evaluation->attempt->module;
             $examName  = $module?->exam?->name ?? '';
-            $moduleNm  = ucfirst($module?->module_type ?? 'exam');
+            $moduleNm  = $module
+                ? (\App\Constants\ModuleConstants::MODULES[$module->module_type] ?? ucfirst($module->module_type))
+                : 'Exam';
 
             // Find UserExam id for the result link
             $userExam = \App\Models\Exam\UserExam::where('user_id', $student->id)

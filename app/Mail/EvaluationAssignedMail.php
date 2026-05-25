@@ -28,9 +28,15 @@ class EvaluationAssignedMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $subject = $this->recipientType === 'evaluator'
-            ? "New {$this->moduleName} evaluation assigned"
-            : "Your {$this->moduleName} answers have been sent for evaluation";
+        if ($this->isSop()) {
+            $subject = $this->recipientType === 'evaluator'
+                ? "New {$this->moduleName} request assigned"
+                : "Your {$this->moduleName} request is being processed";
+        } else {
+            $subject = $this->recipientType === 'evaluator'
+                ? "New {$this->moduleName} evaluation assigned"
+                : "Your {$this->moduleName} answers have been sent for evaluation";
+        }
 
         return new Envelope(subject: $subject);
     }
@@ -38,7 +44,7 @@ class EvaluationAssignedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.evaluation-assigned',
+            view: $this->isSop() ? 'emails.sop-assigned' : 'emails.evaluation-assigned',
             with: [
                 'evaluation'    => $this->evaluation,
                 'recipientType' => $this->recipientType,
@@ -46,7 +52,18 @@ class EvaluationAssignedMail extends Mailable
                 'evaluatorName' => $this->evaluatorName,
                 'examName'      => $this->examName,
                 'moduleName'    => $this->moduleName,
+                // Friendly service label for SOP only ("SOP Review" / "Personalized SOP Writing")
+                'sopServiceLabel' => $this->isSop() ? $this->moduleName : null,
             ],
+        );
+    }
+
+    private function isSop(): bool
+    {
+        return in_array(
+            $this->evaluation->module_type,
+            \App\Constants\ModuleConstants::SOP_TYPES,
+            true,
         );
     }
 }

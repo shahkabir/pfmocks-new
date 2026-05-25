@@ -505,7 +505,7 @@
                   <a href="{{ route('admin.evaluations.index') }}"
                      class="nav-link {{ request()->routeIs('admin.evaluations.*') ? 'active' : '' }}">
                     <i class="nav-icon bi bi-clipboard-check"></i>
-                    <p>Evaluations</p>
+                    <p>Evaluations/SOP Assignment</p>
                   </a>
                 </li>
 

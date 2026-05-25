@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<!--
+Project: Travel Shop B2C
+Version: 1.0.0
+-->
+<!--[if IE 8]> <html lang="en" class="ie8 no-js"> <![endif]-->
+<!--[if IE 9]> <html lang="en" class="ie9 no-js"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<!-- BEGIN HEAD -->
+
+<head>
+    <meta charset="utf-8" />
+    <title>Biman Holidays |  Thank you for your booking</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta name="description" content="Find best deals at BimanHolidays for Flight Tickets, Hotels, Holiday Packages, for Bangladesh & International travel. Book cheap air tickets online for Domestic & International airlines, customized holiday packages and special deals on Hotel Bookings." />
+    <meta name="keywords" content="bangladesh travel, travel in bangladesh, cheap air tickets, cheap flights, flight, hotels, hotel, holidays, air travel, air tickets, holiday packages, travel packages,rail, bimanholidays, biman, biman bangladesh, biman bangladesh airlines">
+    <meta name="author" content="DynamicSolversBangladesh" />
+    <meta name="MobileOptimized" content="320">
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-87933682-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <!-- favicon links -->
+    <link href="/content/biman/images/logotitle.png" type="image/jpg" rel="icon">
+    <!--srart theme style -->
+    <link href="/Content/all?v=9_oaoG9qDsG6PvEWhKF-X1JxSg2QZ4PswoGrtVBwOBc1" rel="stylesheet"/>
+
+    <link href="/Content/default?v=22nqMTcXaI_Ebe0yYzrrPkHpYI58x1EocCRGIRu-IcQ1" rel="stylesheet"/>
+
+    <link href="/Content/biman/css/font-awesome.css" rel="stylesheet"/>
+
+    <link href="/Content/biman/css/soap-icon.css" rel="stylesheet"/>
+
+    <link href="/content/biman/css/plugins.css" rel="stylesheet" type="text/css" />
+    <link href="/content/mystyles-biman.css" rel="stylesheet"/>
+
+
+    
+    <link href="/content/mystyles-biman-print.css" rel="stylesheet" />
+
+    <!-- end theme style -->
+
+    <script src="https://apis.google.com/js/api:client.js"></script>
+    <script>
+        var googleUser; // The current user.
+        gapi.load('auth2', function () {
+            gapi.auth2.init({
+                client_id: "1005217977963-b4gdnj1hc7v15qvqfnftfann51djulov.apps.googleusercontent.com",
+                cookiepolicy: 'single_host_origin',
+                scope: "profile email" // this isn't required
+            }).then(function (auth2) {
+                var button = document.querySelector('#google-join-btn');
+                button.addEventListener('click', function () {
+                    auth2.signIn();
+                    googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+                    JoinWithGoogle(googleUser.getAuthResponse().id_token, googleUser.getBasicProfile().getId(), googleUser.getBasicProfile().getEmail(),
+                                    googleUser.getBasicProfile().getGivenName(), googleUser.getBasicProfile().getFamilyName(),
+                                    googleUser.getBasicProfile().getImageUrl());
+                });
+            });
+        });
+    </script>
+    <!-- Facebook Pixel Code -->
+    <script>
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return; n = f.fbq = function () {
+                n.callMethod ?
+                n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+            n.queue = []; t = b.createElement(e); t.async = !0;
+            t.src = v; s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '279530372742883');
+        fbq('track', 'PageView');
+    </script>
+    <noscript>
+        <img height="1" width="1" src="https://www.facebook.com/tr?id=279530372742883&ev=PageView&noscript=1" />
+    </noscript>
+    <!-- End Facebook Pixel Code -->
+</head>
+<body>
+    <button id="google-join-btn" style="display:none;"></button>
+    <!--Page main section start-->
+    <div id="travel_wrapper">
+        
+        <!--Header start-->
+<header id="header_wrapper" class="fixed-xs">
+    <div class="header_top hidden-xs hidden-sm">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5 col-sm-5">
+                    <p><i class="fa fa-phone"></i> For Support? Call Us: <span>+8801879-445 566</span></p>
+                </div>
+                <div class="col-md-7 col-sm-7">
+                    <div class="top_menu">
+                        <ul>
+                                <li><a href="/">Home</a></li>
+                                <li><a href="/about">About Us</a></li>
+                                <li><a href="/contact">Contact Us</a></li>
+                                <li><a class="popup-btn" href="#ts-check">Booking Lookup/Cancel Request</a></li>
+                                <li><a class="popup-btn" href="#ts-login">Login</a></li>
+                                <li><a class="popup-btn" href="#ts-signup">Signup</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header_bottom">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2 col-sm-2 col-xs-12">
+                    <div class="travel_logo">
+                        <a href="/"><img src="/content/biman/images/logo.png" alt="logo" /></a>
+                    </div>
+                </div>
+                <div class="col-md-10 col-sm-10">
+                    <a href="javascript:;" class="menu-toggle"></a>
+
+                    <div class="main_menu">
+                        <ul>
+                            <li><a class="search-box" data-tab="flights" href="/home">flights</a></li>
+                            <li><a class="search-box" data-tab="holidays" href="/home">holidays</a></li>
+                            
+                            <li><a class="search-box" data-tab="car" href="http://bhm.bimanholidays.com/car">car</a></li>
+
+                            <li><a class="search-box" href="http://bhm.bimanholidays.com/visaservice">Visa Services</a></li>
+                            <li>
+                                <a href="#">More Services</a>
+                                <ul class="sub-menu">
+                                    <li><a href="http://bhm.bimanholidays.com/tourplansDetails/102">Medical Tourism</a></li>
+                                    <li><a href="http://bhm.bimanholidays.com/search_service">Airport Services</a></li>
+                                    
+                                   
+                                    
+                                </ul>
+                            </li>
+                            <li class="hidden-sm hidden-md hidden-lg"><a class="popup-btn" href="#ts-check">Booking Lookup</a></li>
+                                <li class="hidden-sm hidden-md hidden-lg"><a class="popup-btn" href="#ts-login">Login</a></li>
+                                <li class="hidden-sm hidden-md hidden-lg"><a class="popup-btn" href="#ts-signup">Signup</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</header>
+<!--Header end-->
+
+
+        
+
+
+<div class="full_width destinaion_sorting_section margin-top-xs">
+    <div class="container">
+        <div class="row space_25">
+            <!-- left sidebar start -->
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="tour_packages_right_section">
+                    <div class=" full_width booking_form_bg">
+                        <div class="booking_form_bg_2" style="background: #ffffff none repeat scroll 0 0;">
+                                <div class="full_width confirmation_msg" data-code="106"> <span>Your air ticket has confirmed. Thank you for using our booking services</span> </div>
+
+                            <div class="information_title">Booking Details</div><br />
+                            <div class="clearfix"></div>
+                            <div style="border: 1px solid #fdb714;padding:20px; margin-bottom:20px;">
+                                
+
+<div id="flight-details-content">
+    <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-8">
+            <div class="details-row" style="text-transform:uppercase;">
+                <strong>Rajshahi to Dhaka</strong>
+                <abbr>&nbsp;|&nbsp; One Way</abbr>
+                <abbr>&nbsp;|&nbsp;Economy</abbr>
+            </div>
+            <div class="details-row">
+                <span style="text-transform:uppercase; font-size: 0.85em;"> 2 Adults</span>
+            </div>
+            <div class="details-row" style="margin-top:10px; margin-bottom:10px;">
+                <abbr style="text-transform:uppercase; text-decoration:underline;color: #ea2227; font-weight: 600;letter-spacing: 1px;">Tuesday, 02 April 2019</abbr>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-4">
+            <table>
+                <tr>
+                    <th style="text-transform:uppercase;">Status</th>
+                    <th style="width:5%;">:</th>
+                    <td>
+                            <span class="label label-success label-bordered">Confirmed</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th style="text-transform:uppercase">Booked On</th>
+                    <th>:</th>
+                    <td>30 March 2019 </td>
+                    
+                </tr>
+                <tr>
+                    <th style="text-transform:uppercase">BOOKING ID #</th>
+                    <th>:</th>
+                    <td>BHF190330033</td>
+                </tr>
+                    <tr>
+                        <th>PNR</th>
+                        <th>:</th>
+                        <td>ADVSD</td>
+                    </tr>
+                                <tr>
+                    <th style="text-transform:uppercase">Contact</th>
+                    <th>:</th>
+                    <td>MR AMM SHAHRIAR KABIR</td>
+                </tr>
+                <tr>
+                    <th style="text-transform:uppercase"></th>
+                    <th></th>
+                    <td>+8801962424219</td>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <td>shari1909@gmail.com</td>
+                </tr>
+            </table>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <br />
+    
+
+    <!--sort_list start -->
+<div class="list_sorting_view">
+    <!-- Desc -->
+    <div class="flight_grid_desc flight_list_desc">
+        <div class="flt-row">
+            <div class="flt-col">
+                    <div>
+                        <div class="flt-route-header">
+                            <span class="flt-route-title">Rajshahi to Dhaka</span>
+                            <span class="flt-route-info">
+                                <span class="info-1"><i class="fa fa-stop"></i>&nbsp;0 Stop</span>
+                                <span class="info-2">&nbsp;&nbsp;<i class="fa fa-clock-o"></i>&nbsp;0h 50m</span>
+                            </span>
+                        </div>
+
+<div class="flt-info-box row">
+    <div class="col-sm-2 col-xs-12">
+
+        <div class="row">
+            <div class="col-xs-4 col-sm-12 no-padding-right-not-xs"><img class="flt-logo" src="https://s3-us-west-2.amazonaws.com/travelshopbd/airlines/BG.png" alt="BG"></div>
+            <div class="col-xs-8 col-sm-12 text-right-xs no-padding-right-not-xs">
+                <span class="flt-airline" title="Biman Bangladesh Airlines">Biman Bangladesh Airlines</span>
+                    <span class="flt-airline" style="margin-top:0px;font-weight: bold; font-size:10px;">Class - G</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3 col-xs-12 text-center">
+        <h5 class="airport-item">RJH <span> 04:45 PM</span></h5>
+        <span class="airline-item">Tue 02 Apr 2019</span>
+        <span class="airline-item">Rajshahi</span>
+        
+    </div>
+    <div class="col-sm-4 col-xs-12 text-center flt-middle flight_section">
+        <div class="flt-time"> 0h 50m</div>
+        <div class="middle_flight_section">
+            <div class="border_line"><i class="fa fa-plane"></i></div>
+        </div>
+        <div class="flt-number">BG-492</div>
+    </div>
+    <div class="col-sm-3 col-xs-12 text-center">
+        <h5 class="airport-item">DAC <span> 05:35 PM</span></h5>
+        <span class="airline-item">Tue 02 Apr 2019</span>
+        <span class="airline-item">Dhaka</span>
+        
+    </div>
+    <div class="clearfix"></div>
+</div>
+                        <div class="clearfix"></div>
+                    </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <!-- title End -->
+    </div><!--  Desc End -->
+    <div class="clearfix"></div>
+</div>
+
+<!--sort_list end-->
+<div class="air-side-box">
+    <span class="air-side-title" style="font-size:14px;">Baggage Info</span>
+    <div class="clearfix"></div>
+</div>
+<div class="travel_checkbox_round  rating_widget">
+    <div class="room-info-tbl">
+        <table class="table" style="margin-bottom:0;">
+            <thead>
+                <tr>
+                    <th style="">Destination</th>
+                    <th style="">Airline</th>
+                    <th style="">Check In</th>
+                    <th style="">Cabin Baggage</th>
+                </tr>
+            </thead>
+            <tbody>
+                    <tr>
+                        <td>RJH&nbsp;&nbsp;<span class="fa fa-plane" style=" transform: rotate(46deg);"></span>&nbsp;&nbsp;DAC</td>
+                        <td>
+                            <span>Biman Bangladesh Airlines</span>
+                            <span class="flt-airline">BG-492</span>
+                        </td>
+                        <td>
+
+                            
+
+                <div>
+                    <span>Adult: </span>
+                        <strong>20 KILO baggage included</strong>
+                </div>
+
+
+                        </td>
+                        <td>
+
+                <div>
+                    <span>Adult: </span>
+                        <strong>1 piece baggage included</strong>
+                </div>
+
+</td>
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="clearfix"></div>
+<!--sort_list end-->
+<div class="air-side-box">
+    <span class="air-side-title" style="font-size:14px;">Pasengers Details</span>
+    <div class="clearfix"></div>
+</div>
+<div class="travel_checkbox_round  rating_widget">
+    <div class="room-info-tbl">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Other Info</th>
+                    <th>Frequent Flyer #</th>
+                    <th>Ticket | PNR</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                    <tr>
+                        <td>1</td>
+                        <td>MRS FARZANA AKTER</td>
+                        <td>Adult</td>
+                        <td>
+                            <span title="Gender">Female</span>
+                                <span>|</span>
+                                <span title="Date Of Birth">01/09/1992</span>
+                                                            <span>|</span>
+                                <span title="Country Of Nationality">BD</span>
+                                                    </td>
+                        <td></td>
+                        <td>
+                                    <span style="display:block;">
+                                        <strong>RJH-DAC :</strong>
+                                            2103571711
+                                        <span> | </span>
+                                            ADVSD
+                                    </span>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>MR AMM SHAHRIAR KABIR</td>
+                        <td>Adult</td>
+                        <td>
+                            <span title="Gender">Male</span>
+                                <span>|</span>
+                                <span title="Date Of Birth">09/01/1990</span>
+                                                            <span>|</span>
+                                <span title="Country Of Nationality">BD</span>
+                                                    </td>
+                        <td></td>
+                        <td>
+                                    <span style="display:block;">
+                                        <strong>RJH-DAC :</strong>
+                                            2103571712
+                                        <span> | </span>
+                                            ADVSD
+                                    </span>
+
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+
+    <div class="clearfix"></div>
+    <div class="air-side-box">
+        <span class="air-side-title" style="font-size:14px;">Fare Details</span>
+        <div class="clearfix"></div>
+    </div>
+    <div class="travel_checkbox_round  rating_widget">
+        <div class="room-info-tbl">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Passenger</th>
+                        <th style="" class="text-right">Base</th>
+                        <th style="" class="text-right">Discount</th>
+                        <th style="" class="text-right">Taxes</th>
+                        
+                        <th style="" class="text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        <tr>
+                            <td>MRS FARZANA AKTER</td>
+                            <td class="text-right">
+                                    <span>2,171.00</span>
+                            </td>
+                            <td class="text-right">
+                                    <span>0.00</span>
+                            </td>
+                            <td class="text-right">
+                                    <span>529.00</span>
+                            </td>
+                            <td class="text-right">
+                                    <span>2,700.00</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>MR AMM SHAHRIAR KABIR</td>
+                            <td class="text-right">
+                                    <span>2,171.00</span>
+                            </td>
+                            <td class="text-right">
+                                    <span>0.00</span>
+                            </td>
+                            <td class="text-right">
+                                    <span>529.00</span>
+                            </td>
+                            <td class="text-right">
+                                    <span>2,700.00</span>
+                            </td>
+                        </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">
+                            <small>
+                                *All amounts are in
+                                    <span> BDT</span>
+                            </small>
+                        </th>
+                        <th class="text-right text-uppercase ">Total</th>
+                        <th class="text-right" style="color:#ca1111; font-size:1.1em;">
+                                <span> 5,400.00</span>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th colspan="5"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="air-side-box">
+        <span class="air-side-title" style="font-size:14px;">Payment Option</span>
+        <div class="clearfix"></div>
+    </div>
+    <div class="travel_checkbox_round  rating_widget">
+        <div class="room-info-tbl">
+
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th class="text-uppercase">Total Amount</th>
+                        <th style="width:1%">:</th>
+                        <td class="text-right">
+                            BDT 5,400.00
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-uppercase">Total Discount</th>
+                        <th>:</th>
+                        <td class="text-right">
+                            BDT 0.00
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="text-uppercase">Amount to be paid</th>
+                        <th>:</th>
+                        <td class="text-right">
+                            <div style="color:#ca1111; font-weight:bold; font-size:1.2em;">BDT 5,400.00</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Visa | City Bank Ltd. | 486294******8035 | 385828 A</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3"></th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+    <div class="row">  
+    <div class="col-xs-12 col-sm-6 col-lg-6 col-md-6 text-center-xs">
+        <img style="width:100px; margin-bottom:10px;" src="https://s3-us-west-2.amazonaws.com/travelshopbd/upload/logos/6f2baa1f-0adb-4ca2-ba4e-a63be6d2dd56.png" />
+        <h4 style="margin: 0px; letter-spacing: 3px;">Biman Holidays</h4>
+        <div style="font-size:.85em;">The Holiday wings of Biman Bangladesh Airlines</div>
+        <div style="margin-top:5px;">Taj Casilina, L-2, Plot-SW(I) 4-25,<br>Gulshan Avenue, Gulshan-1, Dhaka 1212, Bangladesh</div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-lg-6 col-md-6 text-center-xs text-right-sm">
+        <div style="margin-top:45px;"><span class="fa fa-phone" style="width:20px;"></span> +880 1879 44 55 66</div>
+        <div><span class="fa fa-envelope" style="width:20px;"></span>  info@bimanholidays.com</div>
+        <div><span class="fa fa-globe" style="width:20px;"></span>  www.bimanholidays.com</div>
+    </div>
+</div>
+
+
+    <div class="clearfix"></div>
+</div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="full_width information_section">
+                                    <div class="full_width information_table_main">
+                                        <div class="booking_text t_align_c">
+                                            <p>You can send cancel request for your booking via our online self service tool <a href="/flights/bookingdetails/BHF190330033">here. </a></p>
+                                            <span>We Wish You a Safe Journey</span>
+                                        </div>
+                                    </div>
+                                <!-- information_table End -->
+                                <div class="full_width t_align_c">
+                                    <button id="print-btn" class="btn_green proceed_buttton btns" value="proceed to next step" type="button">Print Ticket </button>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div><!-- right main start -->
+            </div> <!-- col-lg-9-end -->
+            <!-- left sidebar end -->
+        </div><!--  row main -->
+    </div> <!-- container -->
+</div>
+
+<div style="display:none;">
+
+    
+
+<div style="margin-top:20px; padding:30px;">
+    <div style="font-size:10px;" id="print-content">
+            <div style="text-transform:uppercase;letter-spacing:2px; text-align:center; padding-bottom:3px; font-size: 14px; margin-bottom: 10px; border-bottom: 1px solid rgb(204, 204, 204); width: 100%; padding-bottom: 1px;">E-Ticket # 2103571711</div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <table style="float:left;">
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">Passenger</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;text-transform:uppercase;">MRS FARZANA AKTER</td>
+                        </tr>
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">Type</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;text-transform:uppercase;">Adult | Female</td>
+                        </tr>
+                            <tr>
+                                <th style="text-transform:uppercase;font-size: 11px;;">DOB</th>
+                                <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                                <td style="font-size: 11px;;text-transform:uppercase;">01/09/1992</td>
+                            </tr>
+
+                                            </table>
+                </div>
+                <div class="col-sm-6">
+                    <table style="float:right">
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">STATUS</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;text-transform:uppercase;">Confirmed</td>
+
+                        </tr>
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">BOOKED ON</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;text-transform:uppercase;">30 Mar, 2019 </td>
+                        </tr>
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">BOOKING ID</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;">BHF190330033</td>
+                        </tr>
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">Airline PNR</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;">ADVSD</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="clearfix"></div>
+
+                <div class="clearfix"></div>
+            </div>
+            <div style="margin-top:20px">
+                    <div class="details-tbl">
+                        <div class="flt-route-header">
+                            <span class="flt-route-title">Rajshahi to Dhaka</span>
+                            <span class="flt-route-info">
+                                    <span>DIRECT FLIGHT</span>
+                            </span>
+                        </div>
+                        <table class="table2">
+                            <thead>
+                                <tr>
+                                    <th style="width:20%; font-size: 11px;;text-transform:uppercase">Airline</th>
+                                    <th style="width:20%; font-size: 11px;;text-transform:uppercase">Deperture</th>
+                                    <th style="width:20%; font-size: 11px;;text-transform:uppercase">Arrival</th>
+                                    <th style="width:10%; font-size: 11px;;text-transform:uppercase">Duration</th>
+                                    <th style="font-size: 11px;;text-transform:uppercase">Other Info</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <tr>
+                                        <td>
+
+    <img style="float:left; margin-top: 5px;" class="flt-logo" src="https://s3-us-west-2.amazonaws.com/travelshopbd/airlines/BG.png" alt="BG">
+    <span style="float:left; margin-left:5px; margin-top: 5px;" class="flt-airline">
+    Biman Bangladesh Airlines <br/> 
+    BG-492 <span> | </span>
+        <span >Cabin Class - G</span>
+    </span>
+    <div class="clearfix"></div>
+    </td>
+<td>
+    <h5 class="airport-item">RJH <span> 04:45 PM</span></h5>
+    <span class="airline-item-time">Tue 02 Apr 2019</span>
+    <span class="airline-item-2">Shah Makhdum Airport, Rajshahi</span>
+        <span class="airline-item-2">Terminal-1</span>
+</td>
+<td>
+    <h5 class="airport-item">DAC <span> 05:35 PM</span></h5>
+    <span class="airline-item-time">Tue 02 Apr 2019</span>
+    <span class="airline-item-2">Hazrat Shahjalal International Airport, Dhaka</span>
+        <span class="airline-item-2">Terminal-1</span>
+</td>
+<td>
+    0h 50m
+</td>
+
+
+                                        <td style="font-size: 11px;;">
+                                            <ul>
+                                                        <li>
+                                                            <strong>TICKET: </strong>
+                                                                2103571711
+                                                            <strong>&nbsp;&nbsp;AIRLINE PNR: </strong>
+                                                                ADVSD
+                                                        </li>
+                                                                                                                <li>
+                                                                    <strong style="text-transform:uppercase;">Baggage:</strong>
+                                                                        <span>20 KILO checked in baggage. </span>
+                                                                </li>
+                                                                <li>
+                                                                    <strong style="text-transform:uppercase;">Baggage:</strong>
+                                                                        <span>1 piece carry on  baggage. </span>
+                                                                </li>
+                                                                                                                                            </ul>
+                                        </td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                        <div class="clearfix"></div>
+                    </div>
+            </div>
+            <div class="clearfix"></div>
+            <table style="width:100%;margin-bottom:30px; margin-top:20px;">
+                <tr>
+                    <td style="width:50%;">
+                        <div style="font-size: 11px; font-weight:bold; text-transform:uppercase;">Fare Details</div>
+                        <div style="border: 1px solid #ccc;padding: 10px;">
+                            <table style="width:100%;">
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Ticket Fare</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">
+                                            <small>BDT</small><span> 2,171.00</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Taxes</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">
+                                            <small>BDT</small><span> 529.00</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Total</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">
+                                            <small>BDT</small><span> 2,700.00</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                    <td style="width:50%;">
+                        <div style="font-size: 11px; font-weight:bold; text-transform:uppercase;">Contact Details</div>
+                        <div style="border: 1px solid #ccc;padding: 10px;">
+                            <table style="width:100%;">
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Contact</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">MR AMM SHAHRIAR KABIR</td>
+                                </tr>
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Mobile</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">+8801962424219</td>
+                                </tr>
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Email</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">shari1909@gmail.com</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                    <tr>
+                        <td style="font-size: 11px;;" colspan="2"><strong style="text-transform:uppercase;">Payment Info: </strong>486294******8035 | AMM SHAHRIAR KABIR | VISA | City Bank Ltd. | 385828 A</td>
+                    </tr>
+            </table>
+            <div class="clearfix"></div>
+            <div>
+                <div style="text-align:center; font-size:16px; text-transform:uppercase;margin-top:10px;">Our Airport Services</div>
+                <ul class="our-services" style=" margin-bottom: 10px;  padding: 10px;text-align: center; font-size: 12px; border: 1px solid #ccc;  margin-top: 2px; margin-bottom:30px;">
+                    <li style="display: inline;  list-style: square;margin-right:5px; color:#000;">Meet & Assist in HSIA & Abroad.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Pick & Drop at HSIA & Abroad. </li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Lounge facilities in Departure area of Concourse hall.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Printed Embarkation Card.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">VISA assistance.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Foreign currency endorsement facility.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Issue all Domestic, International & Soto Tickets.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Book & Issue Domestic, International Resort as per guideline of Bangladesh Bank.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Assist for issue prepaid card BDT & USD.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px;  color:#000;">Assist for Roaming. SIM & Upload facility in HSIA.</li>
+                </ul>
+            </div>
+            <div class="clearfix"></div>
+<div class="row">  
+    <div class="col-xs-12 col-sm-6 col-lg-6 col-md-6 text-center-xs">
+        <img style="width:100px; margin-bottom:10px;" src="https://s3-us-west-2.amazonaws.com/travelshopbd/upload/logos/6f2baa1f-0adb-4ca2-ba4e-a63be6d2dd56.png" />
+        <h4 style="margin: 0px; letter-spacing: 3px;">Biman Holidays</h4>
+        <div style="font-size:.85em;">The Holiday wings of Biman Bangladesh Airlines</div>
+        <div style="margin-top:5px;">Taj Casilina, L-2, Plot-SW(I) 4-25,<br>Gulshan Avenue, Gulshan-1, Dhaka 1212, Bangladesh</div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-lg-6 col-md-6 text-center-xs text-right-sm">
+        <div style="margin-top:45px;"><span class="fa fa-phone" style="width:20px;"></span> +880 1879 44 55 66</div>
+        <div><span class="fa fa-envelope" style="width:20px;"></span>  info@bimanholidays.com</div>
+        <div><span class="fa fa-globe" style="width:20px;"></span>  www.bimanholidays.com</div>
+    </div>
+</div>
+
+            <div class="clearfix"></div>
+            <div style="page-break-before:always; display:block;"></div>
+            <div style="text-transform:uppercase;letter-spacing:2px; text-align:center; padding-bottom:3px; font-size: 14px; margin-bottom: 10px; border-bottom: 1px solid rgb(204, 204, 204); width: 100%; padding-bottom: 1px;">E-Ticket # 2103571712</div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <table style="float:left;">
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">Passenger</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;text-transform:uppercase;">MR AMM SHAHRIAR KABIR</td>
+                        </tr>
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">Type</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;text-transform:uppercase;">Adult | Male</td>
+                        </tr>
+                            <tr>
+                                <th style="text-transform:uppercase;font-size: 11px;;">DOB</th>
+                                <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                                <td style="font-size: 11px;;text-transform:uppercase;">09/01/1990</td>
+                            </tr>
+
+                                            </table>
+                </div>
+                <div class="col-sm-6">
+                    <table style="float:right">
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">STATUS</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;text-transform:uppercase;">Confirmed</td>
+
+                        </tr>
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">BOOKED ON</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;text-transform:uppercase;">30 Mar, 2019 </td>
+                        </tr>
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">BOOKING ID</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;">BHF190330033</td>
+                        </tr>
+                        <tr>
+                            <th style="text-transform:uppercase;font-size: 11px;;">Airline PNR</th>
+                            <th style="font-size: 11px;;">&nbsp;:&nbsp;&nbsp;</th>
+                            <td style="font-size: 11px;;">ADVSD</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="clearfix"></div>
+
+                <div class="clearfix"></div>
+            </div>
+            <div style="margin-top:20px">
+                    <div class="details-tbl">
+                        <div class="flt-route-header">
+                            <span class="flt-route-title">Rajshahi to Dhaka</span>
+                            <span class="flt-route-info">
+                                    <span>DIRECT FLIGHT</span>
+                            </span>
+                        </div>
+                        <table class="table2">
+                            <thead>
+                                <tr>
+                                    <th style="width:20%; font-size: 11px;;text-transform:uppercase">Airline</th>
+                                    <th style="width:20%; font-size: 11px;;text-transform:uppercase">Deperture</th>
+                                    <th style="width:20%; font-size: 11px;;text-transform:uppercase">Arrival</th>
+                                    <th style="width:10%; font-size: 11px;;text-transform:uppercase">Duration</th>
+                                    <th style="font-size: 11px;;text-transform:uppercase">Other Info</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    <tr>
+                                        <td>
+
+    <img style="float:left; margin-top: 5px;" class="flt-logo" src="https://s3-us-west-2.amazonaws.com/travelshopbd/airlines/BG.png" alt="BG">
+    <span style="float:left; margin-left:5px; margin-top: 5px;" class="flt-airline">
+    Biman Bangladesh Airlines <br/> 
+    BG-492 <span> | </span>
+        <span >Cabin Class - G</span>
+    </span>
+    <div class="clearfix"></div>
+    </td>
+<td>
+    <h5 class="airport-item">RJH <span> 04:45 PM</span></h5>
+    <span class="airline-item-time">Tue 02 Apr 2019</span>
+    <span class="airline-item-2">Shah Makhdum Airport, Rajshahi</span>
+        <span class="airline-item-2">Terminal-1</span>
+</td>
+<td>
+    <h5 class="airport-item">DAC <span> 05:35 PM</span></h5>
+    <span class="airline-item-time">Tue 02 Apr 2019</span>
+    <span class="airline-item-2">Hazrat Shahjalal International Airport, Dhaka</span>
+        <span class="airline-item-2">Terminal-1</span>
+</td>
+<td>
+    0h 50m
+</td>
+
+
+                                        <td style="font-size: 11px;;">
+                                            <ul>
+                                                        <li>
+                                                            <strong>TICKET: </strong>
+                                                                2103571712
+                                                            <strong>&nbsp;&nbsp;AIRLINE PNR: </strong>
+                                                                ADVSD
+                                                        </li>
+                                                                                                                <li>
+                                                                    <strong style="text-transform:uppercase;">Baggage:</strong>
+                                                                        <span>20 KILO checked in baggage. </span>
+                                                                </li>
+                                                                <li>
+                                                                    <strong style="text-transform:uppercase;">Baggage:</strong>
+                                                                        <span>1 piece carry on  baggage. </span>
+                                                                </li>
+                                                                                                                                            </ul>
+                                        </td>
+                                    </tr>
+                            </tbody>
+                        </table>
+                        <div class="clearfix"></div>
+                    </div>
+            </div>
+            <div class="clearfix"></div>
+            <table style="width:100%;margin-bottom:30px; margin-top:20px;">
+                <tr>
+                    <td style="width:50%;">
+                        <div style="font-size: 11px; font-weight:bold; text-transform:uppercase;">Fare Details</div>
+                        <div style="border: 1px solid #ccc;padding: 10px;">
+                            <table style="width:100%;">
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Ticket Fare</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">
+                                            <small>BDT</small><span> 2,171.00</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Taxes</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">
+                                            <small>BDT</small><span> 529.00</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Total</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">
+                                            <small>BDT</small><span> 2,700.00</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                    <td style="width:50%;">
+                        <div style="font-size: 11px; font-weight:bold; text-transform:uppercase;">Contact Details</div>
+                        <div style="border: 1px solid #ccc;padding: 10px;">
+                            <table style="width:100%;">
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Contact</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">MR AMM SHAHRIAR KABIR</td>
+                                </tr>
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Mobile</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">+8801962424219</td>
+                                </tr>
+                                <tr>
+                                    <th style="text-transform:uppercase;font-size: 11px;;">Email</th>
+                                    <th style="font-size: 11px;;">:</th>
+                                    <td style="font-size: 11px;;">shari1909@gmail.com</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                    <tr>
+                        <td style="font-size: 11px;;" colspan="2"><strong style="text-transform:uppercase;">Payment Info: </strong>486294******8035 | AMM SHAHRIAR KABIR | VISA | City Bank Ltd. | 385828 A</td>
+                    </tr>
+            </table>
+            <div class="clearfix"></div>
+            <div>
+                <div style="text-align:center; font-size:16px; text-transform:uppercase;margin-top:10px;">Our Airport Services</div>
+                <ul class="our-services" style=" margin-bottom: 10px;  padding: 10px;text-align: center; font-size: 12px; border: 1px solid #ccc;  margin-top: 2px; margin-bottom:30px;">
+                    <li style="display: inline;  list-style: square;margin-right:5px; color:#000;">Meet & Assist in HSIA & Abroad.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Pick & Drop at HSIA & Abroad. </li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Lounge facilities in Departure area of Concourse hall.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Printed Embarkation Card.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">VISA assistance.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Foreign currency endorsement facility.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Issue all Domestic, International & Soto Tickets.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Book & Issue Domestic, International Resort as per guideline of Bangladesh Bank.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px; margin-left: 5px; color:#000;">Assist for issue prepaid card BDT & USD.</li>
+                    <li style="display: inline;  list-style: square;color:#000;">|</li>
+                    <li style="display: inline;  list-style: square;margin-right:5px;  color:#000;">Assist for Roaming. SIM & Upload facility in HSIA.</li>
+                </ul>
+            </div>
+            <div class="clearfix"></div>
+<div class="row">  
+    <div class="col-xs-12 col-sm-6 col-lg-6 col-md-6 text-center-xs">
+        <img style="width:100px; margin-bottom:10px;" src="https://s3-us-west-2.amazonaws.com/travelshopbd/upload/logos/6f2baa1f-0adb-4ca2-ba4e-a63be6d2dd56.png" />
+        <h4 style="margin: 0px; letter-spacing: 3px;">Biman Holidays</h4>
+        <div style="font-size:.85em;">The Holiday wings of Biman Bangladesh Airlines</div>
+        <div style="margin-top:5px;">Taj Casilina, L-2, Plot-SW(I) 4-25,<br>Gulshan Avenue, Gulshan-1, Dhaka 1212, Bangladesh</div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-lg-6 col-md-6 text-center-xs text-right-sm">
+        <div style="margin-top:45px;"><span class="fa fa-phone" style="width:20px;"></span> +880 1879 44 55 66</div>
+        <div><span class="fa fa-envelope" style="width:20px;"></span>  info@bimanholidays.com</div>
+        <div><span class="fa fa-globe" style="width:20px;"></span>  www.bimanholidays.com</div>
+    </div>
+</div>
+
+            <div class="clearfix"></div>
+            <div style="page-break-before:always; display:block;"></div>
+    </div>
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!--footer start-->
+<footer id="footer_wrapper" class="hidden-xs">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <aside class="widget widget_text">
+                        <a href="/">
+                            <img style="width:40%; float:left;" src="/content/biman/images/logo.png" alt="footer logo" />
+                        </a>
+                        <a href="http://www.iata.org">
+                            <img alt="footer logo" src="/content/biman/images/iata.png" style="float: left; width: 24%; margin-left:15px;">
+                        </a>
+                        <div style="clear:both;">
+                            Biman Bangladesh country's oldest airliner and our national carrier introducing its own holiday wing. We are here for the change and letting people travel with a difference. 
+                        </div>
+                        
+                    </aside>
+                    
+                </div>
+                <div class="col-md-2">
+                    <aside class="widget widget_links" style="margin-bottom:0px">
+                        <h4 class="widget-title" style="margin-bottom:15px">Useful Links</h4>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/about">About Us</a></li>
+                            <li><a href="/contact">Contact Us</a></li>
+                            <li><a href="/terms">Terms and Conditions </a></li>
+                            <li><a href="/privacy">Privacy Policy</a></li>
+                            
+                        </ul>
+                    </aside>
+                </div>
+                <div class="col-md-2">
+                    <aside class="widget widget_links" style="margin-bottom:15px">
+                        <h4 class="widget-title hidden-xs" style="margin-bottom:15px">&nbsp;</h4>
+                        <ul>
+                            <li><a href="/promocodes">Promo Codes</a></li>
+                            <li><a href="http://bhm.bimanholidays.com/carBookingRequest">Car Booking Request</a></li>
+                            <li><a href="http://bhm.bimanholidays.com/flightBookByAgent">Flight Booking Request</a></li>
+                            <li><a href="/about">About Us</a></li>
+                            <li><a href="/contact">Contact Us</a></li>
+                            
+                            
+                            
+                        </ul>
+                    </aside>
+                </div>
+                <div class="col-md-4">
+                    
+                    <aside class="widget widget_links">
+                        <h4 class="widget-title" style="margin-bottom:15px">Stay Connected with Us</h4>
+                        <div class="socials-icon">
+                            <a href="https://www.facebook.com/bimanholidays/" target="_blank"><i style="color:#4d6daa;" class="fa fa-facebook-square"></i></a>
+                            <a target="_blank" href="https://plus.google.com/u/0/117064544448191127433"><i style="color:#ea2227;" class="fa fa-google-plus-square"></i></a>
+                            <a target="_blank" href="https://twitter.com/BimanHolidays"><i style="color:#1c9ddf;" class="fa fa-twitter-square"></i></a>
+                            <a target="_blank" href="https://www.youtube.com/channel/UC5TBp8pYcbV15odc7FahvfQ/featured"><i style="color:red;" class="fa fa-youtube-square"></i></a>
+                        </div>
+
+                    </aside>
+                    <aside class="widget payment_method">
+                        <h4 class="widget-title">Supported Payment Method</h4>
+                        <div class="footer-payments">
+                            <img src="/content/images/payment-icons/p-visa.png" />
+                            <img src="/content/images/payment-icons/p-master.png" />
+                            <img src="/content/images/payment-icons/p-amex.png" />
+                            
+                        </div>
+                        
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </footer>
+<!--footer end-->
+<div class="copyright hidden-xs">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-sm-6">
+                
+                
+                <div>
+                    <span class="contact-phone"><i class="soap-icon-phone"></i> +8801879-445 566, +8801988-188 188</span><br />
+                    <span class="contact-phone"><i class="soap-icon-message"></i> info@bimanholidays.com</span>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-6 text-right"> <span><i class="fa fa-copyright"></i> 2019 Biman Holidays. All right reserved.</span> <br /><span style="font-size:.85em;display:none;">Developed By - <a style="margin-left: 0;" target="_blank" href="http://dynamicsolversbd.com">Dynamic Solvers Bangladesh</a></span> </div>
+        </div>
+    </div>
+</div>
+
+
+    </div>
+    <!--Page main section end-->
+    <div style="display:none;">
+    <div id="ts-signup" class="white-popup mfp-hide customer-account popup_inner" style="max-width:500px;">
+        <div class="white-popup-header">
+            <h3>Sign up</h3>
+            <button class="mfp-close" type="button" title="Close (Esc)" onclick="ResetForm('signup');">×</button>
+        </div>
+        <div class="white-popup-content-login">
+            <div class="regi-boxes">
+                <form method="post" action="#" class="form-horizontal regi-form" role="form" data-cls="regi-form" data-btn="regi-btn">
+                    
+                    <div class="form-group has-feedback">
+                        <div class="col-sm-12">
+                            <input class="input_login" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-length="The field Email must be a string with a maximum length of 50." data-val-length-max="50" data-val-required="The Email field is required." id="Email" name="Email" placeholder="Enter your email address" type="text" value="" />
+                            <i id="email-checking" style="font-size:1.7em;color: #01b7f2;display:none;" class="fa fa-spinner fa-spin input_login-feedback"></i>
+                            <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input class="input_login" data-val="true" data-val-length="The Password must be at least 6 characters long." data-val-length-max="20" data-val-length-min="6" data-val-required="The Password field is required." id="Password" name="Password" placeholder="Enter bimanholidays.com password" type="password" />
+                            <span class="field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    
+                    
+                    <div>
+                        <button type="submit" class="sub_signup ladda-button disabled-item" id="regi-btn" data-style="slide-left">SIGN UP</button>
+                    </div>
+                </form>
+                
+            </div>
+            <div class="text-center">
+                <div class="alert alert-success regi-success-box" style="display:none;"></div>
+                <div class="alert alert-warning regi-error-box" style="display:none;"></div>
+                <div class="regi-close-box" style="display:none;">
+                    <a href="javascript::void(0)" class="btn" onclick="CloseModal();ResetForm('regi');">Close</a>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="or_line2"></div>
+            <div style="font-size:.85em;">
+                
+                By creating an account, you're agreeing with our <a href="#">Terms and Conditions</a> and <a href="#">Privacy Statement</a>.
+            </div>
+
+        </div>
+    </div>
+</div>
+    <div style="display:none;">
+    <div id="ts-login" class="white-popup mfp-hide customer-account popup_inner" style="max-width:500px;">
+        <div class=" white-popup-header">
+            <h3>Login</h3>
+            <button class="mfp-close" type="button" title="Close (Esc)" onclick="ResetForm('login');">×</button>
+        </div>
+        <div class="white-popup-content-login">
+            <div class="login-boxes">
+                <form method="post" action="#" class="form-horizontal login-form" role="form" data-cls="login-form" data-btn="login-btn">
+                    <input class="post-back-url" id="Url" name="Url" type="hidden" value="" />
+                    <div class="form-group ">
+                        <div class="col-sm-12">
+                            <input class="input_login" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-required="The Email field is required." id="Email" name="Email" placeholder="Enter email address" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <input class="input_login" data-val="true" data-val-required="The Password field is required." id="Password" name="Password" placeholder="Enter bimanholidays.com password" type="password" />
+                            <span class="field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="">
+                        <a class="popup-btn forgot_link" href="#ts-forgot">Forget password?</a>
+                    </div>
+                    <div>
+                        <button type="submit" class="sub_signup ladda-button disabled-item" id="login-btn" data-style="slide-left">LOGIN</button>
+                    </div>
+                </form>
+                
+            </div>
+            <div class="col-sm-12 text-center">
+                <div class="alert alert-success login-success-box" style="display:none;"></div>
+                <div class="alert alert-warning login-error-box" style="display:none;"></div>
+            </div>
+            <div class="clearfix"></div>
+            
+        </div>
+    </div>
+</div>
+    <div style="display:none;">
+    <div id="ts-forgot" class="white-popup mfp-hide customer-account popup_inner" style="max-width:500px;">
+        <div class="white-popup-header">
+            <h3>Recover Password</h3>
+            <button class="mfp-close" type="button" title="Close (Esc)" onclick="ResetForm('signup');">×</button>
+        </div>
+        <div class="white-popup-content-login">
+            <div class="forgot-boxes">
+                <form method="post" action="#" class="form-horizontal forgot-form" role="form">
+                    <div class="form-group ">
+                        <div class="col-sm-12">
+                            <input class="input_login" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-required="The Email field is required." id="Email" name="Email" placeholder="Enter email address" type="text" value="" />
+                            <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-12">
+                            <button type="submit" class="sub_signup ladda-button" id="forgot-btn" data-style="slide-left">RECOVER PASSWORD</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="text-center">
+                <div id="forgot-success-box" class="alert alert-success" style="display:none;"></div>
+                <div id="forgot-error-box" class="alert alert-warning" style="display:none;"></div>
+                <div id="forgot-close-box" style="display:none;">
+                    <button type="button" class="btn" onclick="CloseModal(); ResetForm('forgot');">Close</button>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="or_line2"></div>
+            <div class="already_member"> Already member? <a class="popup-btn" href="#ts-login">login here</a></div>
+            <div class="have_an_acnt">
+                <p>Dont have an account? <a class="popup-btn" href="#ts-signup">Sign up</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+    <div style="display:none;">
+    <div id="ts-check" class="white-popup mfp-hide customer-account popup_inner" style="max-width:500px">
+        <div class="white-popup-header">
+            <h3>Booking Lookup Or Cancel Request</h3>
+            <button class="mfp-close" type="button" title="Close (Esc)">×</button>
+        </div>
+        <div class="white-popup-content-login">
+            <form method="post" action="#" class="form-horizontal check-form">
+                <div class="form-group ">
+                    <div class="col-sm-12" style="margin-bottom:5px;"><strong>Booking ID</strong></div>
+                    <div class="col-sm-12">
+                        <input type="text" value="" placeholder="Enter Booking ID. i.e BHF180524005" name="BookingCode" id="BookingCode" data-val-required="The Booking Number is required." data-val="true" class="input_login">
+                        <span data-valmsg-replace="true" data-valmsg-for="BookingCode" class="field-validation-valid"></span>
+                    </div>
+                </div>
+                <div class="form-group ">
+                    <div class="col-sm-12" style="margin-bottom:5px;"><strong>Contact Last Name</strong></div>
+                    <div class="col-sm-12">
+                        <input type="text" value="" placeholder="Enter Last Name" name="BookingLastName" id="BookingLastName" data-val-required="The Last Name is required." data-val="true" class="input_login">
+                        <span data-valmsg-replace="true" data-valmsg-for="BookingLastName" class="field-validation-valid"></span>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom:0;">
+                    <div class="col-sm-12">
+                        <button style="margin-bottom:0;" type="submit" class="sub_signup ladda-button" id="check-btn" data-style="slide-left">GO TO MY BOOKING</button>
+                    </div>
+                </div>
+            </form>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+    <div style="display:none;">
+    <a id="delete-popup" href="#delete-modal" class="popup-btn mfp-hide"></a>
+    <div id="delete-modal" class="white-popup mfp-hide popup_inner" style="width:500px;">
+        <div class="white-popup-header" style="background-color: #d9534f">
+            <h3>CONFIRMATION</h3>
+            <button class="mfp-close" type="button" title="Close (Esc)">×</button>
+        </div>
+        <div class="white-popup-content">
+            <div>
+                <i style="font-size:3em; color: #d9534f; float:left;margin-right:20px;" class="fa fa-exclamation-triangle"></i>
+                <span style="font-size:18px;"> Are you sure want to delete <strong id="modal-delete-name"></strong>?</span>
+            </div>
+            <div class="clearfix"></div>
+            <div id="modal-delete-footer" class="modal-footer" style="margin-top:20px;padding: 15px 0 0;">
+                <button name="" id="delete-ok-button" class="btn btn-danger ladda-button" data-style="slide-left" type="button">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    
+
+    <script src="/bundles/theme?v=9ucsRgyE85K4W_ckPkMggeL70xRwDRdR0T2KXXkPoyM1"></script>
+
+    <script src="/bundles/jqueryval?v=NOVQDySGO89wzMzO5x7mWS4C_uAdynpZe_Lk2y-xEM41"></script>
+
+    
+    <script src="/content/biman/js/plugin/print-this/printThis.js"></script>
+    <script>
+        $("body").on("click", "#print-btn", function (event) {
+            event.preventDefault();
+
+            $("#print-content").printThis({
+                debug: false,              //show the iframe for debugging
+                importCSS: true,           //import page CSS
+                printContainer: true,      //grab outer container as well as the contents of the selector
+                //loadCSS: "", //path to additional css file
+                pageTitle: "",             //add title to print page
+                removeInline: false        // remove all inline styles from print elements
+            });
+        });
+    </script>
+
+    
+
+
+
+    <!--main js file end-->
+    <script>
+        if (window.location.href.indexOf('#_=_') > 0) {
+            window.location = window.location.href.replace(/#.*/, '');
+        }
+
+        $('.popup-btn').magnificPopup({
+            type: 'inline',
+            closeOnBgClick: true,
+            midClick: true,
+        });
+
+        $('.popup-btn-loading').magnificPopup({
+            type: 'inline',
+            closeOnBgClick: false,
+            midClick: true,
+            showCloseBtn: false
+        });
+
+        //$(window).bind('scroll', function () {
+        //    if ($(window).scrollTop() > 35) {
+        //        $('.header_bottom').addClass('fixed_top_menu');
+        //    } else {
+        //        $('.header_bottom').removeClass('fixed_top_menu');
+        //    }
+        //});
+        $(document).ready(function () {
+            $('#travel_wrapper').addClass('travel_body_loaded');
+        });
+    </script>
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        (function () {
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/59a644ef7ab2de3aea9d7412/default';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
+    </script>
+    <!--End of Tawk.to Script-->
+</body>
+</html>

@@ -24,7 +24,7 @@ class EvaluationCompletedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Your {$this->moduleName} evaluation is ready",
+            subject: "Your {$this->moduleName} evaluation is ready!",
         );
     }
 

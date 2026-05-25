@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><title>Evaluation assigned</title></head>
+<head><meta charset="utf-8"><title>SOP request assigned</title></head>
 <body style="margin:0;padding:0;background:#f4f6f9;font-family:Arial,sans-serif;color:#212529;">
     <table cellpadding="0" cellspacing="0" border="0" style="width:100%;padding:32px 0;">
         <tr><td align="center">
@@ -16,9 +16,9 @@
                     </div>
                     <div style="font-size:.88rem;opacity:.9;margin-top:4px;">
                         @if($recipientType === 'evaluator')
-                            New {{ $moduleName }} evaluation assigned
+                            New {{ $sopServiceLabel }} request assigned
                         @else
-                            Your {{ $moduleName }} answers are being evaluated
+                            Your {{ $sopServiceLabel }} request is being processed
                         @endif
                     </div>
                 </td></tr>
@@ -27,21 +27,27 @@
                 <tr><td style="padding:26px 32px;line-height:1.6;font-size:14.5px;">
 
                     @if($recipientType === 'student')
-                        {{-- ─────────── Student copy ─────────── --}}
+                        {{-- ─────────── Student copy (per spec) ─────────── --}}
                         <p style="margin:0 0 12px;">Hello {{ $studentName }},</p>
 
                         <p style="margin:0 0 14px;">
-                            Your <strong>{{ $moduleName }}</strong> answers for
-                            <strong>{{ $examName }}</strong> have been assigned to one of our
-                            experienced evaluators.
+                            Your <strong>{{ $sopServiceLabel }}</strong> request has been assigned
+                            to one of our experienced evaluators.
                         </p>
 
                         <div style="background:#fff7e6;border:1px solid #f5e9c8;border-radius:10px;
                                     padding:14px 18px;margin:14px 0;font-size:.92rem;color:#5a3e00;">
                             <strong>Expected turnaround:</strong>
-                            Up to <strong>24 hours</strong> for {{ $moduleName }} evaluation. You will
-                            receive an email notification with your band score as soon as the evaluation has been completed.
+                            <ul style="margin:6px 0 0 18px;padding:0;">
+                                <li>Up to <strong>24 hours</strong> for SOP Review services.</li>
+                                <li>Up to <strong>72 hours</strong> for Personalized SOP Writing services.</li>
+                            </ul>
                         </div>
+
+                        <p style="margin:0 0 14px;">
+                            You will receive an email notification as soon as your request has been
+                            completed.
+                        </p>
 
                         <p style="margin:0 0 14px;">
                             Thank you for your patience and for choosing our service.
@@ -57,13 +63,12 @@
                         <p style="margin:0 0 12px;">Hello {{ $evaluatorName }},</p>
 
                         <p style="margin:0 0 12px;">
-                            You have been assigned a new <strong>{{ $moduleName }}</strong> evaluation.
+                            You have been assigned a new <strong>{{ $sopServiceLabel }}</strong> request.
                         </p>
 
                         <ul style="margin:0 0 14px 18px;padding:0;">
                             <li><strong>Student:</strong> {{ $studentName }}</li>
-                            <li><strong>Exam:</strong> {{ $examName }}</li>
-                            <li><strong>Module:</strong> {{ $moduleName }}</li>
+                            <li><strong>Service:</strong> {{ $sopServiceLabel }}</li>
                             <li><strong>Assigned at:</strong> {{ $evaluation->assigned_at?->format('Y-m-d H:i') }}</li>
                         </ul>
 
@@ -71,11 +76,13 @@
                             <a href="{{ url('/evaluator/evaluations/' . $evaluation->id) }}"
                                style="display:inline-block;background:#0d6efd;color:#fff;
                                       text-decoration:none;font-weight:600;padding:11px 24px;
-                                      border-radius:8px;">Open evaluation</a>
+                                      border-radius:8px;">Open request</a>
                         </div>
 
                         <p style="margin:0 0 14px;font-size:.92rem;color:#6c757d;">
-                            Please complete this evaluation within <strong>48 hours</strong> of assignment.
+                            Please complete this request within
+                            @if($evaluation->module_type === 'sop_review') 24 hours @else 72 hours @endif
+                            of assignment.
                         </p>
 
                         <p style="margin:18px 0 0;">

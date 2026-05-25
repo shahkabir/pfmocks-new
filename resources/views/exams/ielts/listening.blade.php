@@ -1104,7 +1104,8 @@
     const $timerPill = document.getElementById('timer-pill');
     const $timerText = document.getElementById('timer');
 
-    const countdownInterval = setInterval(() => {
+    // Don't start the countdown in review mode — the exam is already over.
+    const countdownInterval = @if(!empty($reviewMode)) null @else setInterval(() => {
         if (seconds <= 0) {
             clearInterval(countdownInterval);
             return;
@@ -1115,7 +1116,7 @@
         $timerText.innerText = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
 
         if (seconds <= 300) $timerPill.classList.add('warning');
-    }, 1000);
+    }, 1000) @endif;
 
     // Question palette navigation
     $(document).on('click', '.palette-btn', function () {

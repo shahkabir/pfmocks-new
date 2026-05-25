@@ -22,7 +22,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.questions.update', $question->id) }}">
+            <form method="POST" action="{{ route('admin.questions.update', $question->id) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -95,14 +95,25 @@
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Audio URL</label>
-                        <input type="text" name="audio_url" class="form-control"
-                               value="{{ old('audio_url', $question->audio_url) }}">
+                        <label class="form-label fw-semibold">Audio File</label>
+                        @if($question->audio_path)
+                            <div class="mb-2">
+                                <audio src="{{ asset(ltrim($question->audio_path, '/')) }}" controls style="max-width:100%"></audio>
+                                <div class="form-text">Current: <a href="{{ asset(ltrim($question->audio_path, '/')) }}" target="_blank">{{ basename($question->audio_path) }}</a></div>
+                            </div>
+                        @endif
+                        <input type="file" name="audio_file" class="form-control" accept="audio/*">
+                        <div class="form-text">Optional. Upload a new file to replace. Allowed: {{ implode(', ', config('upload_audio.mimes')) }}.</div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Image URL</label>
-                        <input type="text" name="image_url" class="form-control"
-                               value="{{ old('image_url', $question->image_url) }}">
+                        <label class="form-label fw-semibold">Image File</label>
+                        @if($question->image_path)
+                            <div class="mb-2">
+                                <img src="{{ asset(ltrim($question->image_path, '/')) }}" alt="" style="max-width:160px;max-height:120px;border:1px solid #dee2e6;border-radius:4px;">
+                            </div>
+                        @endif
+                        <input type="file" name="image_file" class="form-control" accept="image/*">
+                        <div class="form-text">Optional. Upload a new file to replace. Allowed: {{ implode(', ', config('upload_image.mimes')) }} (max {{ config('upload_image.max_size_kb') }} KB).</div>
                     </div>
                 </div>
 

@@ -126,7 +126,7 @@ Empty base controller extending Laravel's `Controller`.
 
 ### `app/Models/Question/Question.php`
 - Table: `questions`
-- Fillable: `module_id`, `type`, `question_header`, `passage`, `audio_url`, `image_url`, `marks`, `sort_order`, `meta`
+- Fillable: `module_id`, `type`, `question_header`, `passage`, `audio_path`, `image_path`, `marks`, `sort_order`, `meta`
 - Relations: `belongsTo(Module)`, `hasMany(QuestionOptions)`, `hasMany(Answer)`, `hasOne(QuestionGroup)`
 - Scopes: `scopeOrdered()`, `scopeActive()`
 

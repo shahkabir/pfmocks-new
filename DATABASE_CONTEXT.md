@@ -160,8 +160,8 @@ Migration: `2025_12_26_082359_create_questions_table.php`
 | question_header | text | block-level heading shown above question group |
 | question_text | text | per-question body text |
 | passage | longText | nullable — reading/listening source text |
-| audio_url | string | nullable |
-| image_url | string | nullable |
+| audio_path | string | nullable |
+| image_path | string | nullable |
 | marks | integer | default: 1 |
 | sort_order | integer | default: 0 |
 | meta | JSON | nullable — flexible extras (time_limit, word_limit, etc.) |

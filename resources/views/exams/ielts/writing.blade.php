@@ -264,6 +264,20 @@
                             {{-- {!! nl2br(e($question['passage'])) !!} --}}
                             {!! $question['passage'] !!}
 
+                            @if(!empty($question['image_path']))
+                                <div class="mt-3">
+                                    <img src="{{ asset(ltrim($question['image_path'], '/')) }}"
+                                         alt="Question image"
+                                         style="max-width:100%;height:auto;border-radius:6px;">
+                                </div>
+                            @endif
+
+                            @if(!empty($question['audio_path']))
+                                <div class="mt-3">
+                                    <audio src="{{ asset(ltrim($question['audio_path'], '/')) }}"
+                                           controls style="width:100%;"></audio>
+                                </div>
+                            @endif
                         </div>
 
                         {{-- UNIQUE IDENTIFIER --}}
@@ -466,7 +480,8 @@
     const $timerPill = document.getElementById('timer-pill');
     const $timeText  = document.getElementById('time');
 
-    const countdownInterval = setInterval(() => {
+    // Don't start the countdown in review mode — the exam is already over.
+    const countdownInterval = @if(!empty($reviewMode)) null @else setInterval(() => {
         if (seconds <= 0) {
             clearInterval(countdownInterval);
             return;
@@ -484,6 +499,6 @@
             $timeText.innerText = '00:00';
             triggerAutoSubmit();
         }
-    }, 1000);
+    }, 1000) @endif;
 </script>
 {{-- @endsection --}}

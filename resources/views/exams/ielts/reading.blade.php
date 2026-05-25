@@ -770,7 +770,8 @@
         return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
     }
 
-    const stopwatchTimer = setInterval(() => {
+    // Don't start the countdown in review mode — the exam is already over.
+    const stopwatchTimer = @if(!empty($reviewMode)) null @else setInterval(() => {
         const elapsed = Math.floor((Date.now() - examStart) / 1000);
         remainingSeconds = Math.max(0, totalSeconds - elapsed);
         $('#stopwatch').text(formatDuration(remainingSeconds));
@@ -783,7 +784,7 @@
         if (remainingSeconds === 0) {
             clearInterval(stopwatchTimer);
         }
-    }, 1000);
+    }, 1000) @endif;
 
     // ── Submit handler ─────────────────────────────────────────────────────
     const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
