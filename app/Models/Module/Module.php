@@ -14,6 +14,7 @@ class Module extends Model
         'exam_id',
         'name',
         'module_type',
+        'module_information',
         'type', //free, paid
         'price_in_bdt',
         'price_in_usd',

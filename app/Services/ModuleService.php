@@ -55,7 +55,8 @@ class ModuleService
         $validator = Validator::make($data, [
             'exam_id'          => 'required|exists:exams,id',
             'name'             => 'required|string|max:255',
-            'module_type'      => 'required|in:reading,writing,listening,speaking,general_mcq',
+            'module_type'        => 'required|in:reading,writing,listening,speaking,general_mcq',
+            'module_information' => 'nullable|string',
             'type'             => 'required|in:free,paid',
             'price_in_bdt'     => 'nullable|numeric|min:0',
             'price_in_usd'     => 'nullable|numeric|min:0',

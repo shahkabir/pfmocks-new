@@ -77,6 +77,13 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Module Information</label>
+                    <textarea name="module_information" class="form-control" rows="4"
+                              placeholder="Description shown on the business website (optional).">{{ old('module_information', $module->module_information) }}</textarea>
+                    <div class="form-text">Public-facing description exposed via the business website API.</div>
+                </div>
+
                 <div class="d-flex gap-2 mt-4">
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                     <a href="{{ route('admin.modules.index') }}" class="btn btn-secondary">Cancel</a>

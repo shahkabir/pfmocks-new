@@ -59,9 +59,11 @@ class ExamService
         }
 
         $validator = Validator::make($data, [
-            'name'      => 'required|string|max:255',
-            'tag'       => $tagRule,
-            'is_active' => 'boolean',
+            'name'             => 'required|string|max:255',
+            'tag'              => $tagRule,
+            'exam_information'  => 'nullable|string',
+            'is_public_visible' => 'boolean',
+            'is_active'         => 'boolean',
         ]);
 
         if ($validator->fails()) {

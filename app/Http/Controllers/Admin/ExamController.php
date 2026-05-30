@@ -36,7 +36,10 @@ class ExamController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = $request->merge(['is_active' => $request->boolean('is_active')])->all();
+            $data = $request->merge([
+                'is_active'         => $request->boolean('is_active'),
+                'is_public_visible' => $request->boolean('is_public_visible'),
+            ])->all();
             $this->service->create($data);
             return redirect()->route('admin.exams.index')->with('success', 'Exam created successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -53,7 +56,10 @@ class ExamController extends Controller
     public function update(Request $request, int $id)
     {
         try {
-            $data = $request->merge(['is_active' => $request->boolean('is_active')])->all();
+            $data = $request->merge([
+                'is_active'         => $request->boolean('is_active'),
+                'is_public_visible' => $request->boolean('is_public_visible'),
+            ])->all();
             $this->service->update($id, $data);
             return redirect()->route('admin.exams.index')->with('success', 'Exam updated successfully.');
         } catch (\Illuminate\Validation\ValidationException $e) {

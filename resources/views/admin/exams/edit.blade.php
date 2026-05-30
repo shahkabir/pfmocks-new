@@ -35,11 +35,27 @@
                 </div>
 
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Exam Information</label>
+                    <textarea name="exam_information" class="form-control" rows="4"
+                              placeholder="Description shown on the business website (optional).">{{ old('exam_information', $exam->exam_information) }}</textarea>
+                    <div class="form-text">Public-facing description exposed via the business website API.</div>
+                </div>
+
+                <div class="mb-3">
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1"
                                {{ old('is_active', $exam->is_active) ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_active">Active</label>
                     </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="is_public_visible" id="is_public_visible" value="1"
+                               {{ old('is_public_visible', $exam->is_public_visible) ? 'checked' : '' }}>
+                        <label class="form-check-label" for="is_public_visible">Visible on Business Website (public API)</label>
+                    </div>
+                    <div class="form-text">If off, this exam will not be exposed by the public API.</div>
                 </div>
 
                 <div class="d-flex gap-2 mt-4">

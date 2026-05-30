@@ -11,11 +11,14 @@ class Exam extends Model
     protected $fillable = [
         'name',
         'tag',
+        'exam_information',
+        'is_public_visible',
         'is_active',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'         => 'boolean',
+        'is_public_visible' => 'boolean',
     ];
 
     /**
