@@ -10,7 +10,7 @@
             <div class="card-body d-flex align-items-center gap-4 py-4">
 
                 {{-- Profile picture --}}
-                <img src="{{ asset('images/profile.png') }}"
+                <img src="{{ asset('profile.png') }}"
                      alt="{{ $user->name }}"
                      class="rounded-circle shadow-sm shrink-0"
                      style="width:90px;height:90px;object-fit:cover;border:3px solid #fff;background:#f8f9fa;">

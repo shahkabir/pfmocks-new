@@ -21,9 +21,12 @@ class User extends Authenticatable
         'name',
         'email',
         'mobile',
+        'google_id',
+        'avatar',
         'password',
         'role',
         'is_verified',
+        'sms_terms_accepted_at',
     ];
 
     /**

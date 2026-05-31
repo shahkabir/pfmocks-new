@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>PerfectMocks — Sign In</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
@@ -29,30 +30,23 @@
         }
 
         .auth-card-header {
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
-            padding: 2rem;
+            background: #fff;
+            padding: 1rem;
             text-align: center;
-            color: #fff;
+            border-bottom: 4px solid #0d6efd;
         }
 
-        .auth-card-header .brand {
-            font-size: 1.9rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .auth-card-header .brand span {
-            font-weight: 300;
-        }
-
-        .auth-card-header .subtitle {
-            font-size: .85rem;
-            opacity: .85;
-            margin-top: .25rem;
+        .auth-card-header img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 160px;
+            object-fit: contain;
         }
 
         .auth-card-body {
             padding: 2rem;
+            background: #eaf2ff;
         }
 
         .form-floating label {
@@ -217,8 +211,7 @@
 
 <div class="auth-card fade-up">
     <div class="auth-card-header">
-        <div class="brand">Perfect<span>Mocks</span></div>
-        <div class="subtitle">Sign in to your account</div>
+        <img src="{{ asset('logo.png') }}" alt="PerfectMocks">
     </div>
 
     <div class="auth-card-body">
@@ -255,9 +248,21 @@
 
         <div class="divider">or</div>
 
-        <div class="text-center" style="font-size:.875rem;">
+        <div class="text-center mb-3" style="font-size:.875rem;">
             <span class="text-muted">New here?</span>
-            <a href="{{ route('signup') }}" class="auth-link ms-1">Create an account</a>
+            <a href="{{ route('register') }}" class="auth-link ms-1">Create an account</a>
+        </div>
+
+        <div class="d-grid">
+            <a href="{{ route('auth.google.redirect') }}" class="btn btn-outline-secondary btn-signin d-flex align-items-center justify-content-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
+                    <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35.5 24 35.5c-6.4 0-11.5-5.1-11.5-11.5S17.6 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.9 6.5 29.2 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5c10.9 0 19.5-8 19.5-19.5 0-1.3-.1-2.3-.4-3.5z"/>
+                    <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.9 6.5 29.2 4.5 24 4.5 16.3 4.5 9.7 8.9 6.3 14.7z"/>
+                    <path fill="#4CAF50" d="M24 43.5c5.1 0 9.7-1.9 13.2-5.1l-6.1-5c-1.9 1.4-4.4 2.3-7.1 2.3-5.3 0-9.7-3.1-11.3-7.5l-6.5 5C9.5 39 16.2 43.5 24 43.5z"/>
+                    <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.4l6.1 5c4.3-3.9 7-9.7 7-15.9 0-1.3-.1-2.3-.4-3.5z"/>
+                </svg>
+                <span>Sign in with Google</span>
+            </a>
         </div>
     </div>
 </div>

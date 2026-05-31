@@ -249,19 +249,24 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'          => 'required|string|max:255',
-            'email'         => 'required|email|max:255|unique:users,email',
-            'mobile'        => 'nullable|string|max:20',
-            'password'      => 'required|string|min:8|confirmed',
-            'referral_code' => 'nullable|string|max:20',
+            'name'             => 'required|string|max:255',
+            'email'            => 'required|email|max:255|unique:users,email',
+            'mobile'           => 'required|string|max:20|unique:users,mobile',
+            'password'         => 'required|string|min:8|confirmed',
+            'referral_code'    => 'nullable|string|max:20',
+            'sms_terms_agreed' => 'required|accepted',
+        ], [
+            'sms_terms_agreed.required' => 'You must agree to receive SMS with the terms and conditions of services from PerfectMocks.com.',
+            'sms_terms_agreed.accepted' => 'You must agree to receive SMS with the terms and conditions of services from PerfectMocks.com.',
         ]);
 
         $newUser = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'mobile'   => $request->mobile,
-            'password' => Hash::make($request->password),
-            'role'     => 'user',
+            'name'                  => $request->name,
+            'email'                 => $request->email,
+            'mobile'                => $request->mobile,
+            'password'              => Hash::make($request->password),
+            'role'                  => 'user',
+            'sms_terms_accepted_at' => now(),
         ]);
 
         // Save a *pending* referral claim if the user signed up with a code

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>PerfectMocks — Register</title>
+    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
@@ -30,17 +31,24 @@
         }
 
         .auth-card-header {
-            background: linear-gradient(135deg, #0d6efd, #0a58ca);
-            padding: 1.75rem 2rem;
+            background: #fff;
+            padding: 1rem;
             text-align: center;
-            color: #fff;
+            border-bottom: 4px solid #0d6efd;
         }
 
-        .auth-card-header .brand { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.5px; }
-        .auth-card-header .brand span { font-weight: 300; }
-        .auth-card-header .subtitle { font-size: .85rem; opacity: .85; margin-top: .25rem; }
+        .auth-card-header img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 160px;
+            object-fit: contain;
+        }
 
-        .auth-card-body { padding: 2rem; }
+        .auth-card-body {
+            padding: 2rem;
+            background: #eaf2ff;
+        }
 
         .form-control {
             border-radius: 8px;
@@ -112,14 +120,27 @@
 
 <div class="auth-card fade-up">
     <div class="auth-card-header">
-        <div class="brand">Perfect<span>Mocks</span></div>
-        <div class="subtitle">Create your account</div>
+        <img src="{{ asset('logo.png') }}" alt="PerfectMocks">
     </div>
 
     <div class="auth-card-body">
 
         <div id="formAlert" class="alert alert-danger alert-inline d-none" role="alert"></div>
         <div id="formSuccess" class="alert alert-success alert-inline d-none" role="alert"></div>
+
+        <div class="d-grid mb-3">
+            <a href="{{ route('auth.google.redirect') }}" class="btn btn-outline-secondary btn-submit d-flex align-items-center justify-content-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
+                    <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35.5 24 35.5c-6.4 0-11.5-5.1-11.5-11.5S17.6 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.9 6.5 29.2 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5c10.9 0 19.5-8 19.5-19.5 0-1.3-.1-2.3-.4-3.5z"/>
+                    <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.9 6.5 29.2 4.5 24 4.5 16.3 4.5 9.7 8.9 6.3 14.7z"/>
+                    <path fill="#4CAF50" d="M24 43.5c5.1 0 9.7-1.9 13.2-5.1l-6.1-5c-1.9 1.4-4.4 2.3-7.1 2.3-5.3 0-9.7-3.1-11.3-7.5l-6.5 5C9.5 39 16.2 43.5 24 43.5z"/>
+                    <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.3 4.1-4.2 5.4l6.1 5c4.3-3.9 7-9.7 7-15.9 0-1.3-.1-2.3-.4-3.5z"/>
+                </svg>
+                <span>Sign up with Google</span>
+            </a>
+        </div>
+
+        <div class="divider">or sign up with email</div>
 
         <form id="registerForm" novalidate>
             @csrf
@@ -128,7 +149,7 @@
                 <label class="form-label fw-semibold small" for="regName">Full Name <span class="text-danger">*</span></label>
                 <div class="input-icon-group">
                     <input id="regName" name="name" type="text" class="form-control"
-                           placeholder="John Doe" autocomplete="name" required />
+                           autocomplete="name" required />
                     <i class="bi bi-person field-icon"></i>
                 </div>
             </div>
@@ -137,16 +158,16 @@
                 <label class="form-label fw-semibold small" for="regEmail">Email Address <span class="text-danger">*</span></label>
                 <div class="input-icon-group">
                     <input id="regEmail" name="email" type="email" class="form-control"
-                           placeholder="you@example.com" autocomplete="email" required />
+                           autocomplete="email" required />
                     <i class="bi bi-envelope field-icon"></i>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label class="form-label fw-semibold small" for="regMobile">Mobile Number</label>
+                <label class="form-label fw-semibold small" for="regMobile">Mobile Number <span class="text-danger">*</span></label>
                 <div class="input-icon-group">
                     <input id="regMobile" name="mobile" type="tel" class="form-control"
-                           placeholder="01XXXXXXXXX" autocomplete="tel" />
+                           autocomplete="tel" required />
                     <i class="bi bi-phone field-icon"></i>
                 </div>
             </div>
@@ -155,7 +176,7 @@
                 <label class="form-label fw-semibold small" for="regPassword">Password <span class="text-danger">*</span></label>
                 <div class="input-icon-group">
                     <input id="regPassword" name="password" type="password" class="form-control"
-                           placeholder="Min. 8 characters" autocomplete="new-password" required />
+                           autocomplete="new-password" required />
                     <button type="button" class="password-toggle" data-target="regPassword">
                         <i class="bi bi-eye"></i>
                     </button>
@@ -166,7 +187,7 @@
                 <label class="form-label fw-semibold small" for="regPasswordConfirm">Confirm Password <span class="text-danger">*</span></label>
                 <div class="input-icon-group">
                     <input id="regPasswordConfirm" name="password_confirmation" type="password"
-                           class="form-control" placeholder="Repeat password"
+                           class="form-control"
                            autocomplete="new-password" required />
                     <button type="button" class="password-toggle" data-target="regPasswordConfirm">
                         <i class="bi bi-eye"></i>
@@ -174,16 +195,24 @@
                 </div>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-3">
                 <label class="form-label fw-semibold small" for="regRef">Referral Code <span class="text-muted">(optional)</span></label>
                 <div class="input-icon-group">
                     <input id="regRef" name="referral_code" type="text" class="form-control text-uppercase"
-                           placeholder="e.g. PM-AB12CD34" maxlength="20"
+                           maxlength="20"
                            value="{{ request()->query('ref') }}"
                            style="letter-spacing:1px;">
                     <i class="bi bi-gift field-icon"></i>
                 </div>
                 <div class="form-text">Have a friend's code? Enter it to claim a discount on your first paid module.</div>
+            </div>
+
+            <div class="form-check mb-4">
+                <input class="form-check-input" type="checkbox" name="sms_terms_agreed" id="smsTermsAgreed" value="1" required>
+                <label class="form-check-label small" for="smsTermsAgreed">
+                    I agree to receive SMS with all terms and conditions of services from PerfectMocks.com
+                    <span class="text-danger">*</span>
+                </label>
             </div>
 
             <div class="d-grid">

@@ -29,7 +29,7 @@
              style="padding:8px 12px;">
             <!--begin::Brand Image-->
             <img
-              src="{{ asset('images/logo.png') }}"
+              src="{{ asset('logo.png') }}"
               alt="PerfectMocks"
               style="max-width:250px;width:auto;height:auto;object-fit:contain;display:block;"
             />

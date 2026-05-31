@@ -6,6 +6,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\DashBoardController;
 use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Models\User;
 use Termwind\Components\Raw;
@@ -24,11 +25,14 @@ Route::get('/csrf-token', function () {
     ]);
 });
 
-Route::get('/register', [RegisterController::class, 'registerView'])->name('signup');
+Route::get('/register', [RegisterController::class, 'registerView'])->name('register');
 Route::post('/register', [RegisterController::class, 'register'])->name('register.submit');
 
 Route::get('/show-otp',[RegisterController::class,'verifyView'])->name('otp.verify.view');
 Route::post('/verify-otp',[RegisterController::class,'verifyOTP'])->name('otp.verify');
+
+Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
 Route::get('/login',[RegisterController::class,'loginView'])->name('login');
 Route::post('/login',[RegisterController::class,'validateLogin'])->name('login.submit');
