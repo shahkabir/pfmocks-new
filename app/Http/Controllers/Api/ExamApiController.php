@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Exam\Exam;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 /**
  * Public, read-only API consumed by the external business website.
@@ -35,32 +36,39 @@ class ExamApiController extends Controller
     /** GET /api/exams/{tag}  — single exam (by tag) with its modules */
     public function show(string $tag): JsonResponse
     {
-        $exam = Exam::with(['modules' => fn ($q) => $q->orderBy('id')])
+        $exam = Exam::with(
+                ['modules' => fn ($q) => $q->orderBy('id')]
+            )
             ->where('tag', $tag)
             ->where('is_active', true)
             ->where('is_public_visible', true)
-            ->firstOrFail();
+            ->get();
 
-        return response()->json(['data' => $this->shape($exam)]);
+        return response()->json(
+            ['data' => $this->shape($exam)]
+        );
     }
 
-    private function shape(Exam $exam): array
+    private function shape(Collection $exams): array
     {
-        return [
-            'id'               => $exam->id,
-            'name'             => $exam->name,
-            'tag'              => $exam->tag,
-            'exam_information' => $exam->exam_information,
-            'modules'          => $exam->modules->map(fn ($m) => [
-                'id'                 => $m->id,
-                'name'                => $m->name,
-                'module_type'         => $m->module_type,
-                'module_information'  => $m->module_information,
-                'type'                => $m->type, // free | paid
-                'duration_minutes'    => (int) $m->duration_minutes,
-                'price_in_bdt'        => (float) $m->price_in_bdt,
-                'price_in_usd'        => (float) $m->price_in_usd,
-            ])->values(),
-        ];
+        return $exams->map(function ($exam){
+        
+            return [
+                'id'               => $exam->id,
+                'name'             => $exam->name,
+                'tag'              => $exam->tag,
+                'exam_information' => $exam->exam_information,
+                'modules'          => $exam->modules->map(fn ($m) => [
+                        'id'                 => $m->id,
+                        'name'                => $m->name,
+                        'module_type'         => $m->module_type,
+                        'module_information'  => $m->module_information,
+                        'type'                => $m->type, // free | paid
+                        'duration_minutes'    => (int) $m->duration_minutes,
+                        'price_in_bdt'        => (float) $m->price_in_bdt,
+                        'price_in_usd'        => (float) $m->price_in_usd,
+                    ])->values(),
+            ];
+        })->values()->toArray();
     }
 }
