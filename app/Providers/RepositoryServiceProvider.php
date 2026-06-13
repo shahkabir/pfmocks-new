@@ -14,6 +14,11 @@ use App\Repositories\Interfaces\QuestionGroupBlockRepositoryInterface;
 use App\Repositories\Interfaces\PaymentRepositoryInterface;
 use App\Repositories\Interfaces\ReferralProgramRepositoryInterface;
 use App\Repositories\Interfaces\ScholarshipRepositoryInterface;
+use App\Repositories\Interfaces\Pte\PteSectionRepositoryInterface;
+use App\Repositories\Interfaces\Pte\PteQuestionSubTypeRepositoryInterface;
+use App\Repositories\Interfaces\Pte\PteModuleRepositoryInterface;
+use App\Repositories\Interfaces\Pte\PteQuestionGranularRepositoryInterface;
+use App\Repositories\Interfaces\Pte\PteModuleWiseQuestionRepositoryInterface;
 
 // Implementations
 use App\Repositories\ExamRepository;
@@ -25,6 +30,11 @@ use App\Repositories\QuestionGroupBlockRepository;
 use App\Repositories\PaymentRepository;
 use App\Repositories\ReferralProgramRepository;
 use App\Repositories\ScholarshipRepository;
+use App\Repositories\Pte\PteSectionRepository;
+use App\Repositories\Pte\PteQuestionSubTypeRepository;
+use App\Repositories\Pte\PteModuleRepository;
+use App\Repositories\Pte\PteQuestionGranularRepository;
+use App\Repositories\Pte\PteModuleWiseQuestionRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -39,5 +49,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PaymentRepositoryInterface::class,            PaymentRepository::class);
         $this->app->bind(ReferralProgramRepositoryInterface::class,    ReferralProgramRepository::class);
         $this->app->bind(ScholarshipRepositoryInterface::class,        ScholarshipRepository::class);
+
+        // PTE
+        $this->app->bind(PteSectionRepositoryInterface::class,              PteSectionRepository::class);
+        $this->app->bind(PteQuestionSubTypeRepositoryInterface::class,      PteQuestionSubTypeRepository::class);
+        $this->app->bind(PteModuleRepositoryInterface::class,               PteModuleRepository::class);
+        $this->app->bind(PteQuestionGranularRepositoryInterface::class,     PteQuestionGranularRepository::class);
+        $this->app->bind(PteModuleWiseQuestionRepositoryInterface::class,   PteModuleWiseQuestionRepository::class);
     }
 }

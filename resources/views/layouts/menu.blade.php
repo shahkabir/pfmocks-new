@@ -445,36 +445,93 @@
                   </a>
                 </li>
 
-                <li class="nav-item">
-                  <a href="{{ route('admin.questions.index') }}"
-                     class="nav-link {{ request()->routeIs('admin.questions.*') ? 'active' : '' }}">
-                    <i class="nav-icon bi bi-patch-question-fill"></i>
-                    <p>Questions</p>
+                {{-- IELTS / Others — collapses the legacy question CRUD --}}
+                <li class="nav-item {{ request()->routeIs('admin.questions.*','admin.question-options.*','admin.question-groups.*','admin.question-group-blocks.*') ? 'menu-open' : '' }}">
+                  <a href="#" class="nav-link {{ request()->routeIs('admin.questions.*','admin.question-options.*','admin.question-groups.*','admin.question-group-blocks.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-journal-text"></i>
+                    <p>
+                      IELTS / Others
+                      <i class="nav-arrow bi bi-chevron-right"></i>
+                    </p>
                   </a>
+                  <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <a href="{{ route('admin.questions.index') }}"
+                         class="nav-link {{ request()->routeIs('admin.questions.*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-patch-question-fill"></i>
+                        <p>Questions</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{ route('admin.question-options.index') }}"
+                         class="nav-link {{ request()->routeIs('admin.question-options.*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-ui-radios"></i>
+                        <p>Question Options</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{ route('admin.question-groups.index') }}"
+                         class="nav-link {{ request()->routeIs('admin.question-groups.*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-diagram-3-fill"></i>
+                        <p>Question Groups</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{ route('admin.question-group-blocks.index') }}"
+                         class="nav-link {{ request()->routeIs('admin.question-group-blocks.*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-layout-text-sidebar-reverse"></i>
+                        <p>Group Blocks</p>
+                      </a>
+                    </li>
+                  </ul>
                 </li>
 
-                <li class="nav-item">
-                  <a href="{{ route('admin.question-options.index') }}"
-                     class="nav-link {{ request()->routeIs('admin.question-options.*') ? 'active' : '' }}">
-                    <i class="nav-icon bi bi-ui-radios"></i>
-                    <p>Question Options</p>
+                {{-- PTE — all PTE question authoring lives here --}}
+                <li class="nav-item {{ request()->routeIs('admin.pte.*') ? 'menu-open' : '' }}">
+                  <a href="#" class="nav-link {{ request()->routeIs('admin.pte.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-grid-3x3-gap-fill"></i>
+                    <p>
+                      PTE
+                      <i class="nav-arrow bi bi-chevron-right"></i>
+                    </p>
                   </a>
-                </li>
-
-                <li class="nav-item">
-                  <a href="{{ route('admin.question-groups.index') }}"
-                     class="nav-link {{ request()->routeIs('admin.question-groups.*') ? 'active' : '' }}">
-                    <i class="nav-icon bi bi-diagram-3-fill"></i>
-                    <p>Question Groups</p>
-                  </a>
-                </li>
-
-                <li class="nav-item">
-                  <a href="{{ route('admin.question-group-blocks.index') }}"
-                     class="nav-link {{ request()->routeIs('admin.question-group-blocks.*') ? 'active' : '' }}">
-                    <i class="nav-icon bi bi-layout-text-sidebar-reverse"></i>
-                    <p>Group Blocks</p>
-                  </a>
+                  <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                      <a href="{{ route('admin.pte.sections.index') }}"
+                         class="nav-link {{ request()->routeIs('admin.pte.sections.*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-bookmarks-fill"></i>
+                        <p>Sections</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{ route('admin.pte.sub-types.index') }}"
+                         class="nav-link {{ request()->routeIs('admin.pte.sub-types.*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-tags-fill"></i>
+                        <p>Question Sub-types</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{ route('admin.pte.modules.index') }}"
+                         class="nav-link {{ request()->routeIs('admin.pte.modules.*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-collection"></i>
+                        <p>Module ↔ Section</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{ route('admin.pte.questions.index') }}"
+                         class="nav-link {{ request()->routeIs('admin.pte.questions.*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-patch-question-fill"></i>
+                        <p>Question Bank</p>
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a href="{{ route('admin.pte.module-questions.index') }}"
+                         class="nav-link {{ request()->routeIs('admin.pte.module-questions.*') ? 'active' : '' }}">
+                        <i class="nav-icon bi bi-list-ol"></i>
+                        <p>Mock Test Assembly</p>
+                      </a>
+                    </li>
+                  </ul>
                 </li>
 
                 <li class="nav-item">

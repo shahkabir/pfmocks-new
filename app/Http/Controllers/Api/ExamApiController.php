@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Exam\Exam;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 
 /**
  * Public, read-only API consumed by the external business website.
@@ -29,7 +29,7 @@ class ExamApiController extends Controller
         $exams = $query->orderBy('name')->get();
 
         return response()->json([
-            'data' => $exams->map(fn (Exam $e) => $this->shape($e))->values(),
+            'data' => $this->shape($exams),
         ]);
     }
 

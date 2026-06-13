@@ -11,6 +11,11 @@ use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ReferralProgramController;
 use App\Http\Controllers\Admin\ScholarshipController;
 use App\Http\Controllers\Admin\EvaluationController as AdminEvaluationController;
+use App\Http\Controllers\Admin\Pte\PteSectionController;
+use App\Http\Controllers\Admin\Pte\PteQuestionSubTypeController;
+use App\Http\Controllers\Admin\Pte\PteModuleController as AdminPteModuleController;
+use App\Http\Controllers\Admin\Pte\PteQuestionGranularController;
+use App\Http\Controllers\Admin\Pte\PteModuleWiseQuestionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +62,15 @@ Route::get('payments/list',               [AdminPaymentController::class, 'list'
 Route::get('payments/{id}',               [AdminPaymentController::class, 'show'])->name('payments.show');
 Route::post('payments/{id}/approve',      [AdminPaymentController::class, 'approve'])->name('payments.approve');
 Route::post('payments/{id}/reject',       [AdminPaymentController::class, 'reject'])->name('payments.reject');
+
+// ── PTE ─────────────────────────────────────────────────────────────────────
+Route::prefix('pte')->name('pte.')->group(function () {
+    Route::resource('sections',          PteSectionController::class)->except(['show']);
+    Route::resource('sub-types',         PteQuestionSubTypeController::class)->except(['show']);
+    Route::resource('modules',           AdminPteModuleController::class)->except(['show']);
+    Route::resource('questions',         PteQuestionGranularController::class)->except(['show']);
+    Route::resource('module-questions',  PteModuleWiseQuestionController::class)->except(['show']);
+});
 
 // ── AJAX helpers for dependent dropdowns ──────────────────────────────────
 Route::prefix('ajax')->name('ajax.')->group(function () {
