@@ -1,6 +1,19 @@
 @extends('layouts.app')
 @section('title', 'Edit PTE Module Question')
 
+@php
+    use App\Models\Pte\PteQuestionGranular;
+
+    // Questions available in the current module's section, grouped by sub-type.
+    $availableQuestions = PteQuestionGranular::with('subType:id,name,tag,display_order')
+        ->whereHas('subType', fn ($q) => $q->where('pte_section_id', $mapping->pteModule?->pte_section_id))
+        ->where('is_active', true)
+        ->orderBy('pte_sub_type_id')
+        ->orderBy('id')
+        ->get()
+        ->groupBy(fn ($q) => ($q->subType?->tag ?? '—') . ' · ' . ($q->subType?->name ?? ''));
+@endphp
+
 @section('content')
 <div class="container-fluid mt-4">
     <div class="card shadow-sm" style="max-width:720px">
@@ -29,12 +42,25 @@
                             </option>
                         @endforeach
                     </select>
+                    <div class="form-text">Changing the module will not refilter the question list on this page.</div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Question (Granular ID) <span class="text-danger">*</span></label>
-                    <input type="number" name="pte_question_granular_id" class="form-control"
-                           value="{{ old('pte_question_granular_id', $mapping->pte_question_granular_id) }}" required>
+                    <label class="form-label fw-semibold">Question <span class="text-danger">*</span></label>
+                    <select name="pte_question_granular_id" class="form-select" required>
+                        <option value="">— Select Question —</option>
+                        @foreach($availableQuestions as $groupLabel => $items)
+                            <optgroup label="{{ $groupLabel }}">
+                                @foreach($items as $q)
+                                    <option value="{{ $q->id }}"
+                                        {{ old('pte_question_granular_id', $mapping->pte_question_granular_id) == $q->id ? 'selected' : '' }}>
+                                        {{ $q->question_granular_id }} — {{ \Illuminate\Support\Str::limit(strip_tags((string) $q->question_text), 80) }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endforeach
+                    </select>
+                    <div class="form-text">List is filtered to the current mapping's section.</div>
                 </div>
 
                 <div class="row mb-3">

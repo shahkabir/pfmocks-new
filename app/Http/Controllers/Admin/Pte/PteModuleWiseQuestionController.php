@@ -41,19 +41,29 @@ class PteModuleWiseQuestionController extends Controller
     public function edit(int $id)
     {
         return view('admin.pte.module-questions.edit', [
-            'mapping'    => $this->service->findOrFail($id),
+            'mapping'    => $this->service->findOrFail($id)->load('pteModule.section'),
             'pteModules' => $this->pteModuleService->getQuery()->get(),
         ]);
     }
 
     public function store(Request $request)
     {
-        try {
-            $this->service->create($request->all());
-            return redirect()->route('admin.pte.module-questions.index')->with('success', 'Mapping created.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return back()->withErrors($e->errors())->withInput();
-        }
+        $data = $request->validate([
+            'pte_module_id'                 => 'required|exists:pte_module,id',
+            'pte_question_granular_ids'     => 'required|array|min:1',
+            'pte_question_granular_ids.*'   => 'integer|exists:pte_question_granular,id',
+        ]);
+
+        $created = $this->service->bulkCreate(
+            (int) $data['pte_module_id'],
+            $data['pte_question_granular_ids'],
+        );
+
+        $msg = $created > 0
+            ? "{$created} question(s) added to the PTE module."
+            : 'No new mappings created — all selected questions were already attached.';
+
+        return redirect()->route('admin.pte.module-questions.index')->with('success', $msg);
     }
 
     public function update(Request $request, int $id)
