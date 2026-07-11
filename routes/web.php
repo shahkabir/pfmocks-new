@@ -50,6 +50,18 @@ Route::middleware('auth')->group(function(){
 
     Route::get('/exam~/{examName}', [ExamController::class, 'showExams'])->name('exams.show');
 
+    // ── PTE exam (student-facing) ────────────────────────────────────────
+    Route::get ('/pte/exam/{module}/start',
+        [\App\Http\Controllers\PteExamController::class, 'start'])->name('pte.exam.start');
+    Route::get ('/pte/exam/attempt/{attempt}',
+        [\App\Http\Controllers\PteExamController::class, 'play'])->name('pte.exam.play');
+    Route::post('/pte/exam/attempt/{attempt}/answer',
+        [\App\Http\Controllers\PteExamController::class, 'saveAnswer'])->name('pte.exam.answer');
+    Route::post('/pte/exam/attempt/{attempt}/intro',
+        [\App\Http\Controllers\PteExamController::class, 'saveIntro'])->name('pte.exam.intro');
+    Route::post('/pte/exam/attempt/{attempt}/submit',
+        [\App\Http\Controllers\PteExamController::class, 'submit'])->name('pte.exam.submit');
+
     Route::post('/logout',[AuthController::class,'logout'])->name('logout');
 
     Route::get('/profile', function () {

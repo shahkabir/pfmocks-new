@@ -19,6 +19,8 @@ use App\Repositories\Interfaces\Pte\PteQuestionSubTypeRepositoryInterface;
 use App\Repositories\Interfaces\Pte\PteModuleRepositoryInterface;
 use App\Repositories\Interfaces\Pte\PteQuestionGranularRepositoryInterface;
 use App\Repositories\Interfaces\Pte\PteModuleWiseQuestionRepositoryInterface;
+use App\Repositories\Interfaces\Pte\PteAttemptRepositoryInterface;
+use App\Repositories\Interfaces\Pte\PteAnswerRepositoryInterface;
 
 // Implementations
 use App\Repositories\ExamRepository;
@@ -35,6 +37,8 @@ use App\Repositories\Pte\PteQuestionSubTypeRepository;
 use App\Repositories\Pte\PteModuleRepository;
 use App\Repositories\Pte\PteQuestionGranularRepository;
 use App\Repositories\Pte\PteModuleWiseQuestionRepository;
+use App\Repositories\Pte\PteAttemptRepository;
+use App\Repositories\Pte\PteAnswerRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -56,5 +60,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PteModuleRepositoryInterface::class,               PteModuleRepository::class);
         $this->app->bind(PteQuestionGranularRepositoryInterface::class,     PteQuestionGranularRepository::class);
         $this->app->bind(PteModuleWiseQuestionRepositoryInterface::class,   PteModuleWiseQuestionRepository::class);
+        $this->app->bind(PteAttemptRepositoryInterface::class,              PteAttemptRepository::class);
+        $this->app->bind(PteAnswerRepositoryInterface::class,               PteAnswerRepository::class);
     }
 }
