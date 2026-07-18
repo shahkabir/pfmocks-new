@@ -45,6 +45,24 @@
     .pte-qtimer-secs  { font-size:2rem; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
     .pte-qtimer-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color:#6c757d; }
 
+    /* ── Circled play button for recorded audio ── */
+    .pte-play-btn {
+        width:56px; height:56px; border-radius:50%;
+        border:2px solid #0d6efd; background:#fff; color:#0d6efd;
+        display:inline-flex; align-items:center; justify-content:center;
+        font-size:1.5rem; cursor:pointer; flex:0 0 auto;
+        transition:background .2s, color .2s, transform .1s;
+    }
+    .pte-play-btn:hover  { transform:scale(1.06); }
+    .pte-play-btn.playing { background:#0d6efd; color:#fff; }
+
+    /* ── Full-screen pre-exam loader ── */
+    #examLoader {
+        display:none; position:fixed; inset:0; z-index:2000;
+        background:rgba(244,246,249,.97);
+        flex-direction:column; align-items:center; justify-content:center; text-align:center;
+    }
+
     .pte-footer {
         position: sticky; bottom:0; z-index:1015;
         background:#f8f9fa; border-top:1px solid #dee2e6;
@@ -69,6 +87,13 @@
             <i class="bi bi-box-arrow-right me-1"></i>Exit
         </a>
     </div>
+</div>
+
+{{-- ── Full-screen loader shown just before the exam begins ── --}}
+<div id="examLoader">
+    <div class="spinner-border text-primary" style="width:3.5rem;height:3.5rem;"></div>
+    <div class="mt-3 fs-5 fw-semibold text-primary">Take a deep breath!</div>
+    <div class="text-muted">We are preparing your exam.</div>
 </div>
 
 <div class="container-fluid mt-2">
@@ -102,6 +127,12 @@
                 </thead>
                 <tbody>
                     @php $totalQ = 0; $totalMin = 0; @endphp
+                    <tr>
+                        <td class="text-center fw-semibold">0</td>
+                        <td class="text-center fw-semibold">Self-Introduction</td>
+                        <td class="text-center"></td>
+                        <td class="text-center">25 sec</td>
+                    </tr>
                     @foreach($structure as $i => $pm)
                         @php
                             $cnt = $pm->moduleQuestions->count();
@@ -109,7 +140,7 @@
                             $totalMin += (int) ($pm->section?->time_allowed_minutes ?? 0);
                         @endphp
                         <tr>
-                            <td class="text-center fw-semibold">{{ $i + 1 }}</td>
+                            <td class="text-center fw-semibold">{{ $i + 1}}</td>
                             <td>{{ $pm->section?->name }} <span class="badge bg-info text-dark ms-1">{{ $pm->section?->tag }}</span></td>
                             <td class="text-center">{{ $cnt }}</td>
                             <td class="text-center">{{ $pm->section?->time_allowed_minutes ? $pm->section->time_allowed_minutes . ' min' : '—' }}</td>
@@ -208,7 +239,13 @@
                 <span class="badge bg-secondary" id="inStatus">Idle</span>
                 <span class="fw-bold" id="inCountdown" style="font-variant-numeric:tabular-nums;">25s</span>
             </div>
-            <audio id="inPlayback" controls style="display:none;max-width:480px;width:100%;"></audio>
+            <div class="d-flex align-items-center gap-2 mt-2">
+                <audio id="inPlayback" style="display:none;"></audio>
+                <button type="button" class="pte-play-btn" id="inPlayBtn" style="display:none;">
+                    <i class="bi bi-play-fill"></i>
+                </button>
+                <span class="small text-muted" id="inPlayHint" style="display:none;">Play your introduction</span>
+            </div>
             <div class="small text-muted mt-2" id="inHint">Recording stops automatically after 25 seconds.</div>
         </div>
     </div>
@@ -227,6 +264,7 @@
     {{-- All question cards are rendered hidden; JS reveals one at a time --}}
     <div id="qContainer">
     @php $globalIndex = 0; @endphp
+    {{-- {{ dd(get_defined_vars()) }} --}}
     @foreach($structure as $pm)
         @php $section = $pm->section; @endphp
         @foreach($pm->moduleQuestions as $idx => $mwq)
@@ -295,11 +333,17 @@
                             </button>
                             <span class="ms-2 small text-muted" data-role="rec-timer">00:00</span>
                         </div>
-                        @if($saved?->response_audio_url)
-                            <audio data-role="rec-playback" controls src="{{ asset(ltrim($saved->response_audio_url, '/')) }}" style="width:100%;"></audio>
-                        @else
-                            <audio data-role="rec-playback" controls style="display:none;width:100%;"></audio>
-                        @endif
+                        <div class="d-flex align-items-center gap-2 mt-2" data-role="rec-play-wrap">
+                            <audio data-role="rec-playback"
+                                   @if($saved?->response_audio_url) src="{{ asset(ltrim($saved->response_audio_url, '/')) }}" @endif
+                                   style="display:none;"></audio>
+                            <button type="button" class="pte-play-btn" data-role="rec-play"
+                                    style="{{ $saved?->response_audio_url ? '' : 'display:none;' }}">
+                                <i class="bi bi-play-fill"></i>
+                            </button>
+                            <span class="small text-muted" data-role="rec-play-hint"
+                                  style="{{ $saved?->response_audio_url ? '' : 'display:none;' }}">Play your recording</span>
+                        </div>
                         @break
 
                     @case('text_write')
@@ -489,8 +533,9 @@
             .catch(() => setStatus($card, 'error', 'error'));
     }
 
-    // ─── Per-card response widgets ─────────────────────────────────────
-    $('.pte-question-card').each(function () {
+    // ─── Per-card response widgets (scoped to real questions only —
+    //     pre-screens reuse .pte-question-card for styling) ────────────
+    $('#qContainer .pte-question-card').each(function () {
         const $c   = $(this);
         const resp = $c.data('resp');
 
@@ -566,7 +611,8 @@
                     recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
                     recorder.onstop = () => {
                         const blob = new Blob(chunks, { type: 'audio/webm' });
-                        $play.attr('src', URL.createObjectURL(blob)).show();
+                        $play.attr('src', URL.createObjectURL(blob));
+                        $c.find('[data-role=rec-play],[data-role=rec-play-hint]').show();
                         postAnswer($c, {}, blob);
                         stream.getTracks().forEach(t => t.stop());
                         recorder = null;
@@ -598,7 +644,7 @@
     });
 
     // ─── One-at-a-time navigation ──────────────────────────────────────
-    const $cards    = $('.pte-question-card');
+    const $cards    = $('#qContainer .pte-question-card');
     const total     = $cards.length;
     $('#qTotal').text(total);
 
@@ -736,10 +782,32 @@
     function startExam() {
         preSteps.hide();
         $preFooter.hide();
-        $('#qHeaderRow').show();
-        $('#examFooter').css('display', 'flex');
-        showCurrent();
+        // Breathing-room loader before the first question appears
+        $('#examLoader').css('display', 'flex');
+        setTimeout(() => {
+            $('#examLoader').hide();
+            $('#qHeaderRow').show();
+            $('#examFooter').css('display', 'flex');
+            showCurrent();
+        }, 2200);
     }
+
+    // ── Circled play/pause for recorded audio (answers + intro) ──────────
+    $(document).on('click', '.pte-play-btn', function () {
+        const $btn  = $(this);
+        const audio = $btn.closest('div').find('audio')[0];
+        if (!audio || !audio.src) return;
+
+        const setPlaying = on => {
+            $btn.toggleClass('playing', on)
+                .find('i').attr('class', on ? 'bi bi-stop-fill' : 'bi bi-play-fill');
+        };
+        audio.onplay  = () => setPlaying(true);
+        audio.onpause = audio.onended = () => setPlaying(false);
+
+        if (audio.paused) audio.play();
+        else { audio.pause(); audio.currentTime = 0; }
+    });
 
     $preBack.on('click', () => { if (preStep > 0) showPreScreen(preStep - 1); });
     $preNext.on('click', () => {
@@ -852,7 +920,7 @@
                 recorder.onstop = () => {
                     const blob = new Blob(chunks, { type: 'audio/webm' });
                     player.src = URL.createObjectURL(blob);
-                    player.style.display = 'block';
+                    $('#inPlayBtn, #inPlayHint').show();
                     stream.getTracks().forEach(t => t.stop());
                     clearInterval(tick);
                     $rec.html('<i class="bi bi-arrow-repeat me-1"></i>Re-record').removeClass('btn-danger').addClass('btn-outline-danger');

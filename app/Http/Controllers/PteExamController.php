@@ -58,7 +58,8 @@ class PteExamController extends Controller
 
         // Optional audio upload (for audio_record sub-types)
         if ($request->hasFile('audio_blob')) {
-            $request->validate(['audio_blob' => 'file|mimes:webm,mp3,wav,ogg|max:51200']);
+            // Loose validation: MediaRecorder blobs often sniff as octet-stream and fail mimes:
+            $request->validate(['audio_blob' => 'file|max:51200']);
             $file = $request->file('audio_blob');
             $dir  = "data/audio/pte/{$attempt->id}";
             $name = uniqid('pte_ans_') . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
@@ -84,7 +85,9 @@ class PteExamController extends Controller
             return response()->json(['ok' => false, 'message' => 'Attempt already submitted.'], 422);
         }
 
-        $request->validate(['audio_blob' => 'required|file|mimes:webm,mp3,wav,ogg|max:51200']);
+        // NOTE: strict mimes:webm validation rejects many MediaRecorder blobs whose
+        // headers sniff as application/octet-stream — that's why saving silently failed.
+        $request->validate(['audio_blob' => 'required|file|max:51200']);
 
         // Replace any previous intro recording
         if ($attempt->intro_audio_url && file_exists(public_path($attempt->intro_audio_url))) {
@@ -92,13 +95,48 @@ class PteExamController extends Controller
         }
 
         $file = $request->file('audio_blob');
-        $dir  = "data/audio/pte/{$attempt->id}";
-        $name = uniqid('pte_intro_') . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+
+        // User-wise folder derived from the email, e.g. data/audio/pte/intro/skabir-cse-gmail-com
+        $email    = (string) ($attempt->user?->email ?? '');
+        $userSlug = Str::slug(str_replace(['@', '.'], '-', $email)) ?: 'user-' . $attempt->user_id;
+        $dir      = "data/audio/pte/intro/{$userSlug}";
+
+        $ext  = strtolower($file->getClientOriginalExtension() ?: 'webm');
+        $name = "intro_attempt{$attempt->id}_" . time() . ".{$ext}";
         $file->move(public_path($dir), $name);
+        $relative = "{$dir}/{$name}";
 
-        $attempt->update(['intro_audio_url' => "{$dir}/{$name}"]);
+        // Store as mp3 when ffmpeg is available on the server; otherwise keep the original container
+        if ($mp3 = $this->convertToMp3(public_path($relative))) {
+            @unlink(public_path($relative));
+            $relative = "{$dir}/" . basename($mp3);
+        }
 
-        return response()->json(['ok' => true, 'intro_audio_url' => asset("{$dir}/{$name}")]);
+        $attempt->update(['intro_audio_url' => $relative]);
+
+        return response()->json(['ok' => true, 'intro_audio_url' => asset($relative)]);
+    }
+
+    /** Transcode an audio file to mp3 via ffmpeg when installed. Returns the mp3 path or null. */
+    private function convertToMp3(string $absPath): ?string
+    {
+        if (!function_exists('exec')) {
+            return null;
+        }
+
+        @exec('ffmpeg -version 2>&1', $probe, $probeCode);
+        if ($probeCode !== 0) {
+            return null; // ffmpeg not on PATH — keep the uploaded format
+        }
+
+        $mp3 = preg_replace('/\.[A-Za-z0-9]+$/', '.mp3', $absPath);
+        if ($mp3 === $absPath) {
+            $mp3 = $absPath . '.mp3';
+        }
+
+        @exec('ffmpeg -y -i ' . escapeshellarg($absPath) . ' -vn -ab 128k ' . escapeshellarg($mp3) . ' 2>&1', $out, $code);
+
+        return ($code === 0 && file_exists($mp3)) ? $mp3 : null;
     }
 
     /** POST /pte/exam/attempt/{attempt}/submit — close the attempt. */
