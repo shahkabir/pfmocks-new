@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="People shopping at outdoor market stalls">
+  <rect width="800" height="500" fill="#bfe3f5"/>
+  <circle cx="700" cy="70" r="40" fill="#f9d548"/>
+  <rect y="420" width="800" height="80" fill="#a8a29a"/>
+  <g>
+    <rect x="50" y="130" width="12" height="230" fill="#6b4423"/><rect x="340" y="130" width="12" height="230" fill="#6b4423"/>
+    <path d="M30 140l40-70h250l40 70z" fill="#c0392b"/><path d="M110 70l-20 70h60l10-70zM210 70l10 70h60l-20-70z" fill="#fff"/>
+    <rect x="50" y="300" width="302" height="90" fill="#8a5a2b"/>
+    <g fill="#e74c3c"><circle cx="85" cy="288" r="18"/><circle cx="120" cy="288" r="18"/><circle cx="102" cy="266" r="18"/></g>
+    <g fill="#f39c12"><circle cx="180" cy="288" r="18"/><circle cx="215" cy="288" r="18"/><circle cx="197" cy="266" r="18"/></g>
+    <g fill="#27ae60"><circle cx="275" cy="288" r="18"/><circle cx="310" cy="288" r="18"/><circle cx="292" cy="266" r="18"/></g>
+  </g>
+  <g>
+    <rect x="450" y="130" width="12" height="230" fill="#6b4423"/><rect x="740" y="130" width="12" height="230" fill="#6b4423"/>
+    <path d="M430 140l40-70h250l40 70z" fill="#2980b9"/><path d="M510 70l-20 70h60l10-70zM610 70l10 70h60l-20-70z" fill="#fff"/>
+    <rect x="450" y="300" width="302" height="90" fill="#8a5a2b"/>
+    <g fill="#f1c40f"><ellipse cx="500" cy="282" rx="30" ry="14"/><ellipse cx="560" cy="282" rx="30" ry="14"/></g>
+    <g fill="#8e44ad"><circle cx="630" cy="284" r="16"/><circle cx="660" cy="284" r="16"/><circle cx="695" cy="284" r="16"/></g>
+  </g>
+  <g>
+    <circle cx="395" cy="285" r="24" fill="#e2b08a"/><path d="M372 280a24 24 0 0 1 46 0z" fill="#3b2314"/>
+    <path d="M360 440v-90a35 40 0 0 1 70 0v90z" fill="#16a085"/>
+    <path d="M432 370h22l6 46h-34z" fill="#d7b98e"/><path d="M435 370c0-14 16-14 16 0" fill="none" stroke="#6b4423" stroke-width="3"/>
+  </g>
+  <g>
+    <circle cx="210" cy="310" r="22" fill="#8d5a3b"/><path d="M188 306a22 22 0 0 1 44 0z" fill="#111"/>
+    <path d="M178 450v-80a32 36 0 0 1 64 0v80z" fill="#e67e22"/>
+  </g>
+</svg>

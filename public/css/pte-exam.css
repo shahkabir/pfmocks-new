@@ -1,0 +1,149 @@
+/* ==========================================================================
+   PTE Exam — shared styles
+   Organized by concern for maintainability; each block matches a
+   distinct piece of the exam UI (top bar, pre-screens, question widgets,
+   per-response-type widgets, timers, footer).
+   ========================================================================== */
+
+body { background:#f4f6f9; margin:0; }
+
+/* ── Top bar (section pill / elapsed timer / exit) ── */
+.pte-bar {
+    position: sticky; top: 0; z-index: 1020;
+    background:#0d6efd; color:#fff;
+    display:flex; align-items:center; padding:10px 18px;
+    box-shadow:0 2px 6px rgba(0,0,0,.1);
+    width:100%;
+}
+.pte-bar .left  { width:30%; }
+.pte-bar .mid   { width:40%; text-align:center; font-weight:700; font-size:1.1rem; letter-spacing:1px; font-variant-numeric:tabular-nums; }
+.pte-bar .right { width:30%; text-align:right; }
+
+.pte-section-pill { background:rgba(255,255,255,.18); padding:4px 10px; border-radius:14px; font-size:.78rem; letter-spacing:.4px; }
+
+/* ── Question / pre-screen card shell ── */
+.pte-question-card { border:1px solid #dee2e6; border-radius:10px; padding:24px; margin-top:18px; background:#fff; }
+.pte-question-meta { font-size:.82rem; color:#6c757d; }
+.pte-stimulus-img  { max-width:100%; max-height:320px; border:1px solid #e9ecef; border-radius:6px; }
+
+/* ── Save-status pill ── */
+.pte-save-pill { font-size:.72rem; padding:.18rem .5rem; border-radius:10px; }
+.pte-save-pill.saving { background:#fff3cd; color:#856404; }
+.pte-save-pill.saved  { background:#d1e7dd; color:#0a3622; }
+.pte-save-pill.error  { background:#f8d7da; color:#842029; }
+
+/* ── response_type: single_choice / multi_choice — whole row is clickable ── */
+.pte-option-list { display:flex; flex-direction:column; gap:8px; }
+.pte-option-row {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:10px 14px; border:1px solid #dee2e6; border-radius:8px;
+    cursor:pointer; user-select:none; background:#fff;
+    transition:background .15s, border-color .15s;
+    margin:0; /* reset default <label> margin */
+}
+.pte-option-row:hover { background:#f1f6ff; border-color:#a8caff; }
+.pte-option-row.is-selected { background:#e7f1ff; border-color:#0d6efd; }
+.pte-option-input {
+    margin-top:3px; flex:0 0 auto; cursor:pointer;
+    width:1.1em; height:1.1em;
+}
+.pte-option-text { flex:1 1 auto; line-height:1.4; }
+
+/* ── Stimulus audio: modern minimal player (play + progress + volume) ── */
+.pte-audio-player {
+    display:flex; align-items:center; gap:16px;
+    padding:14px 18px; border:1px solid #dee2e6; border-radius:12px;
+    background:#f8f9fb; max-width:520px;
+}
+.pte-audio-play {
+    width:52px; height:52px; border-radius:50%; flex:0 0 auto;
+    border:none; background:#0d6efd; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem; cursor:pointer;
+    transition:background .15s, transform .1s;
+}
+.pte-audio-play:hover  { background:#0a58ca; }
+.pte-audio-play:active { transform:scale(.95); }
+.pte-audio-play[disabled] { opacity:.6; cursor:not-allowed; }
+/* Pulses when autoplay was blocked by the browser and needs a manual click */
+.pte-audio-play.pte-audio-pulse { animation:pteAudioPulse 1.1s ease-in-out infinite; }
+@keyframes pteAudioPulse {
+    0%,100% { box-shadow:0 0 0 0 rgba(13,110,253,.5); }
+    50%     { box-shadow:0 0 0 10px rgba(13,110,253,0); }
+}
+
+/* Played-time / total-time readout — visual only, not seekable, so students
+   can't scrub ahead of what they've actually heard. */
+.pte-audio-progress-wrap { flex:1 1 auto; min-width:0; }
+.pte-audio-progress-track {
+    width:100%; height:6px; border-radius:3px; background:#e1e6ee;
+    overflow:hidden; margin-bottom:5px;
+}
+.pte-audio-progress-fill {
+    height:100%; width:0%; background:#0d6efd; border-radius:3px;
+    transition:width .2s linear;
+}
+.pte-audio-time { font-size:.75rem; color:#6c757d; font-variant-numeric:tabular-nums; }
+
+.pte-audio-volume { display:flex; align-items:center; gap:8px; color:#6c757d; flex:0 0 auto; width:110px; }
+.pte-audio-volume input[type=range] { flex:1 1 auto; accent-color:#0d6efd; }
+
+/* ── response_type: reorder ── */
+.pte-reorder-item { cursor:grab; }
+.pte-reorder-item.dragging { opacity:.5; }
+
+/* ── response_type: highlight_words (marked word = yellow) ── */
+.pte-hi-word {
+    padding:2px 5px; cursor:pointer; border-radius:3px; user-select:none;
+    border:1px solid transparent;
+}
+.pte-hi-word:hover  { background:#f1f3f5; }
+.pte-hi-word.marked {
+    background:#ffeb3b;         /* vivid yellow */
+    border-color:#f9a825;
+    font-weight:600;
+}
+
+/* ── response_type: audio_record ── */
+.pte-rec-btn { min-width:140px; }
+
+/* ── Circled play button (recorded answers + intro playback) ── */
+.pte-play-btn {
+    width:56px; height:56px; border-radius:50%;
+    border:2px solid #0d6efd; background:#fff; color:#0d6efd;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:1.5rem; cursor:pointer; flex:0 0 auto;
+    transition:background .2s, color .2s, transform .1s;
+}
+.pte-play-btn:hover   { transform:scale(1.06); }
+.pte-play-btn.playing { background:#0d6efd; color:#fff; }
+
+/* ── Per-question rounded countdown (preparation → answer) ── */
+.pte-qtimer-wrap { display:flex; justify-content:center; margin-top:24px; }
+.pte-qtimer {
+    width:120px; height:120px; border-radius:50%;
+    border:6px solid #0d6efd; background:#fff;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    transition:border-color .3s;
+}
+.phase-prep   .pte-qtimer { border-color:#ffc107; }
+.phase-audio  .pte-qtimer { border-color:#0dcaf0; }
+.phase-answer .pte-qtimer { border-color:#dc3545; }
+.pte-qtimer-secs  { font-size:2rem; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
+.pte-qtimer-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color:#6c757d; }
+
+/* ── Full-screen pre-exam loader ── */
+#examLoader {
+    display:none; position:fixed; inset:0; z-index:2000;
+    background:rgba(244,246,249,.97);
+    flex-direction:column; align-items:center; justify-content:center; text-align:center;
+}
+
+/* ── Sticky footer (pre-screen nav + question nav) ── */
+.pte-footer {
+    position: sticky; bottom:0; z-index:1015;
+    background:#f8f9fa; border-top:1px solid #dee2e6;
+    padding:12px 18px; margin-top:20px;
+    display:flex; justify-content:space-between; align-items:center;
+}

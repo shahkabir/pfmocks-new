@@ -2,74 +2,7 @@
 
 @section('title', 'PTE Exam — ' . $module->name)
 
-<style>
-    body { background:#f4f6f9; margin:0; }
-</style>
-<style>
-    .pte-bar {
-        position: sticky; top: 0; z-index: 1020;
-        background:#0d6efd; color:#fff;
-        display:flex; align-items:center; padding:10px 18px;
-        box-shadow:0 2px 6px rgba(0,0,0,.1);
-        width:100%;
-    }
-    .pte-bar .left  { width:30%; }
-    .pte-bar .mid   { width:40%; text-align:center; font-weight:700; font-size:1.1rem; letter-spacing:1px; font-variant-numeric:tabular-nums; }
-    .pte-bar .right { width:30%; text-align:right; }
-
-    .pte-section-pill   { background:rgba(255,255,255,.18); padding:4px 10px; border-radius:14px; font-size:.78rem; letter-spacing:.4px; }
-    .pte-question-card  { border:1px solid #dee2e6; border-radius:10px; padding:24px; margin-top:18px; background:#fff; }
-    .pte-question-meta  { font-size:.82rem; color:#6c757d; }
-    .pte-stimulus-img   { max-width:100%; max-height:320px; border:1px solid #e9ecef; border-radius:6px; }
-    .pte-reorder-item   { cursor:grab; }
-    .pte-reorder-item.dragging { opacity:.5; }
-    .pte-hi-word        { padding:2px 4px; cursor:pointer; border-radius:3px; user-select:none; }
-    .pte-hi-word.marked { background:#ffe69c; }
-    .pte-save-pill      { font-size:.72rem; padding:.18rem .5rem; border-radius:10px; }
-    .pte-save-pill.saving { background:#fff3cd; color:#856404; }
-    .pte-save-pill.saved  { background:#d1e7dd; color:#0a3622; }
-    .pte-save-pill.error  { background:#f8d7da; color:#842029; }
-    .pte-rec-btn        { min-width:140px; }
-
-    /* ── Per-question rounded countdown ── */
-    .pte-qtimer-wrap { display:flex; justify-content:center; margin-top:24px; }
-    .pte-qtimer {
-        width:120px; height:120px; border-radius:50%;
-        border:6px solid #0d6efd; background:#fff;
-        display:flex; flex-direction:column; align-items:center; justify-content:center;
-        box-shadow:0 2px 10px rgba(0,0,0,.08);
-        transition:border-color .3s;
-    }
-    .phase-prep   .pte-qtimer { border-color:#ffc107; }
-    .phase-answer .pte-qtimer { border-color:#dc3545; }
-    .pte-qtimer-secs  { font-size:2rem; font-weight:700; line-height:1.1; font-variant-numeric:tabular-nums; }
-    .pte-qtimer-label { font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color:#6c757d; }
-
-    /* ── Circled play button for recorded audio ── */
-    .pte-play-btn {
-        width:56px; height:56px; border-radius:50%;
-        border:2px solid #0d6efd; background:#fff; color:#0d6efd;
-        display:inline-flex; align-items:center; justify-content:center;
-        font-size:1.5rem; cursor:pointer; flex:0 0 auto;
-        transition:background .2s, color .2s, transform .1s;
-    }
-    .pte-play-btn:hover  { transform:scale(1.06); }
-    .pte-play-btn.playing { background:#0d6efd; color:#fff; }
-
-    /* ── Full-screen pre-exam loader ── */
-    #examLoader {
-        display:none; position:fixed; inset:0; z-index:2000;
-        background:rgba(244,246,249,.97);
-        flex-direction:column; align-items:center; justify-content:center; text-align:center;
-    }
-
-    .pte-footer {
-        position: sticky; bottom:0; z-index:1015;
-        background:#f8f9fa; border-top:1px solid #dee2e6;
-        padding:12px 18px; margin-top:20px;
-        display:flex; justify-content:space-between; align-items:center;
-    }
-</style>
+<link rel="stylesheet" href="{{ asset('css/pte-exam.css') }}">
 
 {{-- ── Top bar with section / timer / exit ──────────────────────────── --}}
 <div class="pte-bar">
@@ -289,6 +222,7 @@
                  data-q-index="{{ $globalIndex }}"
                  data-mapping-id="{{ $mwq->id }}"
                  data-resp="{{ $resp }}"
+                 data-stim="{{ $stim }}"
                  data-prep="{{ $effPrep }}"
                  data-anst="{{ $effAns }}"
                  data-section-name="{{ $section?->name }}"
@@ -313,8 +247,22 @@
                     </div>
                 @endif
                 @if($q?->audio_url && in_array($stim, ['audio','audio_image']))
-                    <div class="mb-3">
-                        <audio controls src="{{ asset(ltrim($q->audio_url, '/')) }}" style="width:100%;"></audio>
+                    <div class="pte-audio-player mb-3" data-role="stimulus-audio-wrap">
+                        <audio data-role="stimulus-audio" src="{{ asset(ltrim($q->audio_url, '/')) }}" preload="metadata"></audio>
+                        <button type="button" class="pte-audio-play" data-role="stimulus-audio-play" aria-label="Play audio">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        <div class="pte-audio-progress-wrap">
+                            <div class="pte-audio-progress-track">
+                                <div class="pte-audio-progress-fill" data-role="stimulus-audio-progress"></div>
+                            </div>
+                            <div class="pte-audio-time" data-role="stimulus-audio-time">0:00 / 0:00</div>
+                        </div>
+                        <div class="pte-audio-volume">
+                            <i class="bi bi-volume-up-fill"></i>
+                            <input type="range" min="0" max="1" step="0.05" value="1"
+                                   data-role="stimulus-audio-volume" aria-label="Volume">
+                        </div>
                     </div>
                 @endif
 
@@ -360,29 +308,35 @@
 
                     @case('single_choice')
                         @php $picked = $saved?->selected_option_ids[0] ?? null; @endphp
-                        @foreach($opts as $opt)
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio"
-                                       name="opt-{{ $mwq->id }}"
-                                       data-role="single-opt"
-                                       value="{{ $opt->id }}"
-                                       {{ (int)$picked === (int)$opt->id ? 'checked' : '' }}>
-                                <label class="form-check-label">{{ $opt->option_text }}</label>
-                            </div>
-                        @endforeach
+                        <div class="pte-option-list" data-role="single-opt-list">
+                            @foreach($opts as $opt)
+                                @php $isChecked = (int)$picked === (int)$opt->id; @endphp
+                                <label class="pte-option-row {{ $isChecked ? 'is-selected' : '' }}">
+                                    <input class="pte-option-input" type="radio"
+                                           name="opt-{{ $mwq->id }}"
+                                           data-role="single-opt"
+                                           value="{{ $opt->id }}"
+                                           {{ $isChecked ? 'checked' : '' }}>
+                                    <span class="pte-option-text">{{ $opt->option_text }}</span>
+                                </label>
+                            @endforeach
+                        </div>
                         @break
 
                     @case('multi_choice')
                         @php $picks = $saved?->selected_option_ids ?? []; @endphp
-                        @foreach($opts as $opt)
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox"
-                                       data-role="multi-opt"
-                                       value="{{ $opt->id }}"
-                                       {{ in_array((int)$opt->id, array_map('intval',$picks), true) ? 'checked' : '' }}>
-                                <label class="form-check-label">{{ $opt->option_text }}</label>
-                            </div>
-                        @endforeach
+                        <div class="pte-option-list" data-role="multi-opt-list">
+                            @foreach($opts as $opt)
+                                @php $isChecked = in_array((int)$opt->id, array_map('intval',$picks), true); @endphp
+                                <label class="pte-option-row {{ $isChecked ? 'is-selected' : '' }}">
+                                    <input class="pte-option-input" type="checkbox"
+                                           data-role="multi-opt"
+                                           value="{{ $opt->id }}"
+                                           {{ $isChecked ? 'checked' : '' }}>
+                                    <span class="pte-option-text">{{ $opt->option_text }}</span>
+                                </label>
+                            @endforeach
+                        </div>
                         @break
 
                     @case('select_option')
@@ -471,7 +425,7 @@
     </div>
 
     {{-- ── Footer navigation ───────────────────────────────────────────── --}}
-    <div class="pte-footer" id="examFooter" style="display:none;"
+    <div class="pte-footer" id="examFooter" style="display:none;">
         <button id="prevBtn" type="button" class="btn btn-outline-secondary" disabled>
             <i class="bi bi-arrow-left me-1"></i>Previous
         </button>
@@ -497,450 +451,13 @@
 </div>
 
 <script>
-(function () {
-    const saveUrl   = '{{ route("pte.exam.answer", $attempt->id) }}';
-    const csrf      = '{{ csrf_token() }}';
-    const startedAt = new Date('{{ $attempt->started_at?->toIso8601String() }}'.replace(/Z$/,'Z')).getTime();
-
-    // ─── Top-bar timer (elapsed) ───────────────────────────────────────
-    const $timer = $('#timer');
-    function tickTimer() {
-        const sec = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
-        const h = String(Math.floor(sec / 3600)).padStart(2, '0');
-        const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
-        const s = String(sec % 60).padStart(2, '0');
-        $timer.text(`${h}:${m}:${s}`);
-    }
-    setInterval(tickTimer, 1000); tickTimer();
-
-    // ─── Save helper ───────────────────────────────────────────────────
-    function setStatus($card, state, text) {
-        $card.find('[data-role=status]').removeClass('saving saved error').addClass(state).text(text);
-    }
-    function postAnswer($card, payload, fileBlob) {
-        setStatus($card, 'saving', 'saving…');
-        const fd = new FormData();
-        fd.append('_token', csrf);
-        fd.append('pte_module_wise_question_id', $card.data('mappingId'));
-        Object.entries(payload).forEach(([k, v]) => {
-            if (Array.isArray(v)) v.forEach(x => fd.append(`${k}[]`, x));
-            else if (v !== null && v !== undefined) fd.append(k, v);
-        });
-        if (fileBlob) fd.append('audio_blob', fileBlob, 'recording.webm');
-        return fetch(saveUrl, { method: 'POST', body: fd, credentials: 'same-origin' })
-            .then(r => r.json())
-            .then(j => { setStatus($card, j.ok ? 'saved' : 'error', j.ok ? 'saved' : 'error'); return j; })
-            .catch(() => setStatus($card, 'error', 'error'));
-    }
-
-    // ─── Per-card response widgets (scoped to real questions only —
-    //     pre-screens reuse .pte-question-card for styling) ────────────
-    $('#qContainer .pte-question-card').each(function () {
-        const $c   = $(this);
-        const resp = $c.data('resp');
-
-        if (resp === 'text_write' || (resp === 'fill_blank' && $c.find('[data-role=blank]').length === 0)) {
-            const $ta = $c.find('[data-role=text-input]');
-            const $wc = $c.find('[data-role=word-count]');
-            const recount = () => $wc.text(($ta.val().trim().match(/\S+/g) || []).length);
-            $ta.on('input', recount).on('blur', () => postAnswer($c, { response_text: $ta.val() }));
-            recount();
-        }
-        if (resp === 'single_choice') {
-            $c.on('change', '[data-role=single-opt]', function () {
-                postAnswer($c, { selected_option_ids: [parseInt(this.value, 10)] });
-            });
-        }
-        if (resp === 'select_option') {
-            $c.on('change', '[data-role=select-opt]', function () {
-                postAnswer($c, { selected_option_ids: this.value ? [parseInt(this.value, 10)] : [] });
-            });
-        }
-        if (resp === 'multi_choice') {
-            $c.on('change', '[data-role=multi-opt]', function () {
-                const ids = $c.find('[data-role=multi-opt]:checked').map((_, el) => parseInt(el.value, 10)).get();
-                postAnswer($c, { selected_option_ids: ids });
-            });
-        }
-        if (resp === 'fill_blank' && $c.find('[data-role=blank]').length) {
-            const collect = () => {
-                const out = {};
-                $c.find('[data-role=blank]').each(function () { out[$(this).data('order')] = $(this).val(); });
-                return out;
-            };
-            $c.on('change blur', '[data-role=blank]', () => postAnswer($c, { response_blanks: collect() }));
-        }
-        if (resp === 'highlight_words') {
-            $c.on('click', '[data-role=word-bag] .pte-hi-word', function () {
-                $(this).toggleClass('marked');
-                const ids = $c.find('[data-role=word-bag] .pte-hi-word.marked')
-                              .map((_, el) => parseInt($(el).data('word-id'), 10)).get();
-                postAnswer($c, { response_highlight_word_ids: ids });
-            });
-        }
-        if (resp === 'reorder') {
-            const $list = $c.find('[data-role=reorder-list]');
-            let dragEl = null;
-            $list.on('dragstart', '.pte-reorder-item', function () { dragEl = this; $(this).addClass('dragging'); });
-            $list.on('dragend',   '.pte-reorder-item', function () { $(this).removeClass('dragging'); dragEl = null; });
-            $list.on('dragover',  '.pte-reorder-item', function (e) {
-                e.preventDefault();
-                if (!dragEl || dragEl === this) return;
-                const rect = this.getBoundingClientRect();
-                const after = e.originalEvent.clientY > rect.top + rect.height / 2;
-                this.parentNode.insertBefore(dragEl, after ? this.nextSibling : this);
-            });
-            $list.on('drop', () => {
-                const order = $list.find('.pte-reorder-item').map((_, el) => parseInt($(el).data('segmentId'), 10)).get();
-                postAnswer($c, { response_segments_order: order });
-            });
-        }
-        if (resp === 'audio_record') {
-            const $btn   = $c.find('[data-role=rec-toggle]');
-            const $label = $c.find('[data-role=rec-label]');
-            const $rtime = $c.find('[data-role=rec-timer]');
-            const $play  = $c.find('[data-role=rec-playback]');
-            let recorder = null, chunks = [], tick = null, seconds = 0;
-
-            async function startRec() {
-                if (recorder) return;
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-                    chunks = []; seconds = 0; $rtime.text('00:00');
-                    recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-                    recorder.onstop = () => {
-                        const blob = new Blob(chunks, { type: 'audio/webm' });
-                        $play.attr('src', URL.createObjectURL(blob));
-                        $c.find('[data-role=rec-play],[data-role=rec-play-hint]').show();
-                        postAnswer($c, {}, blob);
-                        stream.getTracks().forEach(t => t.stop());
-                        recorder = null;
-                        clearInterval(tick);
-                        $label.text('Re-record');
-                        $btn.removeClass('btn-danger').addClass('btn-outline-danger');
-                    };
-                    recorder.start();
-                    $label.text('Stop');
-                    $btn.removeClass('btn-outline-danger').addClass('btn-danger');
-                    tick = setInterval(() => {
-                        seconds++;
-                        $rtime.text(String(Math.floor(seconds / 60)).padStart(2,'0') + ':' + String(seconds % 60).padStart(2,'0'));
-                    }, 1000);
-                } catch (err) {
-                    alert('Microphone access denied or unavailable.');
-                }
-            }
-            function stopRec() { if (recorder) recorder.stop(); }
-
-            $btn.on('click', () => { recorder ? stopRec() : startRec(); });
-
-            // Timed questions run the mic automatically — hide the manual button
-            const timed = (parseInt($c.data('anst'), 10) || 0) > 0;
-            if (timed) $btn.closest('.mb-2').hide();
-
-            $c.data('recApi', { start: startRec, stop: stopRec, active: () => !!recorder });
-        }
-    });
-
-    // ─── One-at-a-time navigation ──────────────────────────────────────
-    const $cards    = $('#qContainer .pte-question-card');
-    const total     = $cards.length;
-    $('#qTotal').text(total);
-
-    const $prev   = $('#prevBtn');
-    const $next   = $('#nextBtn');
-    const $submit = $('#submitForm');
-    const $pos    = $('#qPos');
-    const $secPill= $('#sectionPill');
-    const $secLbl = $('#sectionLabel');
-
-    let current = 0; // 0-based
-
-    // ─── Per-question prep/answer countdown engine ─────────────────────
-    let qTick = null;
-    let $activeCard = null;
-
-    function clearQuestionTimer() {
-        if (qTick) { clearInterval(qTick); qTick = null; }
-    }
-
-    function stopActiveRecording($card) {
-        const api = $card && $card.data('recApi');
-        if (api && api.active()) api.stop(); // onstop uploads the answer
-    }
-
-    function runQuestionTimers($card) {
-        clearQuestionTimer();
-        const prep    = parseInt($card.data('prep'), 10) || 0;
-        const ans     = parseInt($card.data('anst'), 10) || 0;
-        const isAudio = $card.data('resp') === 'audio_record';
-        const $wrap   = $card.find('[data-role=qtimer]');
-        const $lbl    = $card.find('[data-role=qtimer-label]');
-        const $secs   = $card.find('[data-role=qtimer-secs]');
-
-        $card.removeClass('phase-prep phase-answer');
-        if (!prep && !ans) { $wrap.hide(); return; }
-        $wrap.show();
-
-        function phaseAnswer() {
-            if (!ans) { $wrap.hide(); return; }
-            $card.removeClass('phase-prep').addClass('phase-answer');
-            if (isAudio) {
-                const api = $card.data('recApi');
-                if (api) api.start();
-                $lbl.text('Recording');
-            } else {
-                $lbl.text('Time Left');
-            }
-            let left = ans;
-            $secs.text(left);
-            qTick = setInterval(() => {
-                left--;
-                $secs.text(Math.max(0, left));
-                if (left <= 0) {
-                    clearQuestionTimer();
-                    if (isAudio) stopActiveRecording($card);
-                    // Time up → advance automatically (recording upload happens onstop)
-                    setTimeout(() => {
-                        if (current < total - 1) { current++; showCurrent(); }
-                    }, isAudio ? 800 : 300);
-                }
-            }, 1000);
-        }
-
-        if (prep > 0) {
-            $card.addClass('phase-prep');
-            $lbl.text('Preparation');
-            let left = prep;
-            $secs.text(left);
-            qTick = setInterval(() => {
-                left--;
-                $secs.text(Math.max(0, left));
-                if (left <= 0) { clearQuestionTimer(); phaseAnswer(); }
-            }, 1000);
-        } else {
-            phaseAnswer();
-        }
-    }
-
-    function showCurrent() {
-        // Tear down the outgoing question first (stops mic + timers)
-        clearQuestionTimer();
-        stopActiveRecording($activeCard);
-
-        $cards.hide();
-        if (total === 0) { $next.hide(); return; }
-        const $c = $cards.eq(current).show();
-        $activeCard = $c;
-        $pos.text(current + 1);
-
-        const secName = $c.data('sectionName') || '';
-        const secTag  = $c.data('sectionTag')  || '';
-        $secPill.text(secTag ? `${secTag} · ${secName}` : secName || '—');
-        $secLbl.text(secName || '—');
-
-        $prev.prop('disabled', current === 0);
-        if (current === total - 1) { $next.hide(); $submit.show(); }
-        else                        { $next.show(); $submit.hide(); }
-
-        runQuestionTimers($c);
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    $prev.on('click', () => { if (current > 0)         { current--; showCurrent(); } });
-    $next.on('click', () => { if (current < total - 1) { current++; showCurrent(); } });
-
-    // ─── Pre-exam screens (overview → headset/mic check → introduction) ──
-    const preSteps   = $('.pte-pre-screen');
-    const preLabels  = ['Test Overview', 'Headset & Microphone Check', 'Introduction to Yourself'];
-    const $preFooter = $('#preFooter');
-    const $preBack   = $('#preBackBtn');
-    const $preNext   = $('#preNextBtn');
-    const introSaved = @json((bool) $attempt->intro_audio_url);
-    let preStep = 0;
-
-    function showPreScreen(n) {
-        preStep = n;
-        preSteps.hide();
-        preSteps.filter(`[data-pre-step=${n}]`).show();
-        $('#preStepLabel').text(`Step ${n + 1} of ${preSteps.length} · ${preLabels[n]}`);
-        $secPill.text(preLabels[n]);
-        $preBack.prop('disabled', n === 0);
-        // On the intro screen, Next becomes "Start Exam" and needs a saved recording
-        if (n === preSteps.length - 1) {
-            $preNext.html('Start Exam <i class="bi bi-play-fill ms-1"></i>')
-                    .prop('disabled', !introSaved && !window.pteIntroUploaded);
-        } else {
-            $preNext.html('Next <i class="bi bi-arrow-right ms-1"></i>').prop('disabled', false);
-        }
-        $preFooter.show();
-        $('#examFooter, #qHeaderRow').hide();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function startExam() {
-        preSteps.hide();
-        $preFooter.hide();
-        // Breathing-room loader before the first question appears
-        $('#examLoader').css('display', 'flex');
-        setTimeout(() => {
-            $('#examLoader').hide();
-            $('#qHeaderRow').show();
-            $('#examFooter').css('display', 'flex');
-            showCurrent();
-        }, 2200);
-    }
-
-    // ── Circled play/pause for recorded audio (answers + intro) ──────────
-    $(document).on('click', '.pte-play-btn', function () {
-        const $btn  = $(this);
-        const audio = $btn.closest('div').find('audio')[0];
-        if (!audio || !audio.src) return;
-
-        const setPlaying = on => {
-            $btn.toggleClass('playing', on)
-                .find('i').attr('class', on ? 'bi bi-stop-fill' : 'bi bi-play-fill');
-        };
-        audio.onplay  = () => setPlaying(true);
-        audio.onpause = audio.onended = () => setPlaying(false);
-
-        if (audio.paused) audio.play();
-        else { audio.pause(); audio.currentTime = 0; }
-    });
-
-    $preBack.on('click', () => { if (preStep > 0) showPreScreen(preStep - 1); });
-    $preNext.on('click', () => {
-        if (preStep < preSteps.length - 1) showPreScreen(preStep + 1);
-        else startExam();
-    });
-
-    // ── Headset check: play/stop a short recording (oscillator fallback) ──
-    (function () {
-        const $play = $('#hsPlayBtn'), $stop = $('#hsStopBtn'), $st = $('#hsStatus');
-        const testAudio = new Audio('{{ asset("data/audio/pte/sound-check.mp3") }}');
-        let osc = null, ctx = null;
-
-        function setStatus(txt, cls) { $st.text(txt).removeClass('bg-secondary bg-success bg-primary').addClass(cls); }
-        function stopAll() {
-            testAudio.pause(); testAudio.currentTime = 0;
-            if (osc) { try { osc.stop(); } catch (e) {} osc = null; }
-            if (ctx) { ctx.close().catch(() => {}); ctx = null; }
-            setStatus('Stopped', 'bg-secondary');
-            $play.prop('disabled', false); $stop.prop('disabled', true);
-        }
-        function playBeep() {
-            // Fallback tone sequence when the sound-check file is missing
-            ctx = new (window.AudioContext || window.webkitAudioContext)();
-            osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            gain.gain.value = 0.25;
-            osc.frequency.value = 440;
-            osc.connect(gain).connect(ctx.destination);
-            osc.start();
-            setTimeout(stopAll, 3000);
-        }
-        $play.on('click', () => {
-            setStatus('Playing', 'bg-success');
-            $play.prop('disabled', true); $stop.prop('disabled', false);
-            testAudio.play().catch(playBeep);
-        });
-        testAudio.addEventListener('ended', stopAll);
-        $stop.on('click', stopAll);
-    })();
-
-    // ── Microphone check: record / stop / playback (local only) ──────────
-    (function () {
-        const $rec = $('#mcRecBtn'), $stop = $('#mcStopBtn'), $play = $('#mcPlayBtn');
-        const $st = $('#mcStatus'), $tm = $('#mcTimer'), player = document.getElementById('mcPlayback');
-        let recorder = null, chunks = [], tick = null, sec = 0;
-
-        function setStatus(txt, cls) { $st.text(txt).removeClass('bg-secondary bg-danger bg-success').addClass(cls); }
-
-        $rec.on('click', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-                chunks = []; sec = 0; $tm.text('00:00');
-                recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-                recorder.onstop = () => {
-                    player.src = URL.createObjectURL(new Blob(chunks, { type: 'audio/webm' }));
-                    stream.getTracks().forEach(t => t.stop());
-                    clearInterval(tick);
-                    setStatus('Recorded', 'bg-success');
-                    $rec.prop('disabled', false); $stop.prop('disabled', true); $play.prop('disabled', false);
-                    recorder = null;
-                };
-                recorder.start();
-                setStatus('Recording', 'bg-danger');
-                $rec.prop('disabled', true); $stop.prop('disabled', false); $play.prop('disabled', true);
-                tick = setInterval(() => {
-                    sec++;
-                    $tm.text(String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0'));
-                }, 1000);
-            } catch (e) { alert('Microphone access denied or unavailable.'); }
-        });
-        $stop.on('click', () => { if (recorder) recorder.stop(); });
-        $play.on('click', () => { player.play(); });
-    })();
-
-    // ── Introduction: 25s auto-stop recording, uploaded to the attempt ───
-    (function () {
-        const INTRO_SECONDS = 25;
-        const $rec = $('#inRecBtn'), $st = $('#inStatus'), $cd = $('#inCountdown');
-        const player = document.getElementById('inPlayback');
-        let recorder = null, chunks = [], tick = null, left = INTRO_SECONDS;
-
-        function setStatus(txt, cls) { $st.text(txt).removeClass('bg-secondary bg-danger bg-warning bg-success text-dark').addClass(cls); }
-
-        function uploadIntro(blob) {
-            setStatus('Uploading…', 'bg-warning text-dark');
-            const fd = new FormData();
-            fd.append('_token', csrf);
-            fd.append('audio_blob', blob, 'intro.webm');
-            fetch('{{ route("pte.exam.intro", $attempt->id) }}', { method: 'POST', body: fd, credentials: 'same-origin' })
-                .then(r => r.json())
-                .then(j => {
-                    if (j.ok) {
-                        setStatus('Saved', 'bg-success');
-                        window.pteIntroUploaded = true;
-                        if (preStep === preSteps.length - 1) $preNext.prop('disabled', false);
-                    } else setStatus('Upload failed', 'bg-danger');
-                })
-                .catch(() => setStatus('Upload failed', 'bg-danger'));
-        }
-
-        $rec.on('click', async () => {
-            if (recorder) { recorder.stop(); return; }
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-                chunks = []; left = INTRO_SECONDS; $cd.text(left + 's');
-                recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-                recorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: 'audio/webm' });
-                    player.src = URL.createObjectURL(blob);
-                    $('#inPlayBtn, #inPlayHint').show();
-                    stream.getTracks().forEach(t => t.stop());
-                    clearInterval(tick);
-                    $rec.html('<i class="bi bi-arrow-repeat me-1"></i>Re-record').removeClass('btn-danger').addClass('btn-outline-danger');
-                    recorder = null;
-                    uploadIntro(blob);
-                };
-                recorder.start();
-                setStatus('Recording', 'bg-danger');
-                $rec.html('<i class="bi bi-stop-fill me-1"></i>Stop');
-                tick = setInterval(() => {
-                    left--;
-                    $cd.text(Math.max(0, left) + 's');
-                    if (left <= 0 && recorder) recorder.stop();
-                }, 1000);
-            } catch (e) { alert('Microphone access denied or unavailable.'); }
-        });
-    })();
-
-    // Entry point: resume attempts (intro already saved) skip straight to questions
-    if (introSaved) startExam();
-    else            showPreScreen(0);
-})();
+    window.PteExamConfig = {
+        saveUrl:       @json(route('pte.exam.answer', $attempt->id)),
+        introUrl:      @json(route('pte.exam.intro', $attempt->id)),
+        csrf:          @json(csrf_token()),
+        startedAtIso:  @json(optional($attempt->started_at)->toIso8601String()),
+        introSaved:    @json((bool) $attempt->intro_audio_url),
+        soundCheckUrl: @json(asset('data/audio/pte/sound-check.mp3')),
+    };
 </script>
+<script src="{{ asset('js/pte-exam.js') }}"></script>

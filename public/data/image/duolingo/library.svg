@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Students studying in a library">
+  <rect width="800" height="500" fill="#efe6d5"/>
+  <g>
+    <rect x="30" y="40" width="740" height="190" fill="#7a5230"/>
+    <rect x="30" y="130" width="740" height="10" fill="#5c3c20"/>
+    <g id="books">
+      <rect x="50" y="62" width="22" height="68" fill="#c0392b"/><rect x="75" y="72" width="18" height="58" fill="#2980b9"/><rect x="96" y="58" width="26" height="72" fill="#27ae60"/><rect x="125" y="70" width="20" height="60" fill="#f1c40f"/><rect x="148" y="60" width="24" height="70" fill="#8e44ad"/><rect x="176" y="68" width="18" height="62" fill="#e67e22"/><rect x="198" y="62" width="24" height="68" fill="#16a085"/>
+    </g>
+    <use href="#books" x="240"/><use href="#books" x="480"/>
+    <use href="#books" y="88"/><use href="#books" x="240" y="88"/><use href="#books" x="480" y="88"/>
+  </g>
+  <rect y="400" width="800" height="100" fill="#b08d57"/>
+  <rect x="90" y="340" width="620" height="22" fill="#6b4423"/>
+  <rect x="120" y="362" width="18" height="110" fill="#6b4423"/><rect x="662" y="362" width="18" height="110" fill="#6b4423"/>
+  <g>
+    <circle cx="220" cy="240" r="30" fill="#8d5a3b"/><path d="M190 232a30 30 0 0 1 60 0z" fill="#2c1b10"/>
+    <path d="M175 340v-40a45 40 0 0 1 90 0v40z" fill="#2980b9"/>
+    <rect x="170" y="322" width="100" height="18" fill="#fff"/><rect x="218" y="322" width="4" height="18" fill="#999"/>
+  </g>
+  <g>
+    <circle cx="400" cy="240" r="30" fill="#e2b08a"/><path d="M368 245a32 34 0 1 1 64 0v30h-14v-35a18 18 0 0 0-36 0v35h-14z" fill="#4a2c17"/>
+    <path d="M355 340v-40a45 40 0 0 1 90 0v40z" fill="#c0392b"/>
+    <path d="M355 340l15-40h60l15 40z" fill="#34495e"/><rect x="376" y="306" width="48" height="28" fill="#85c1e9"/>
+  </g>
+  <g>
+    <circle cx="580" cy="240" r="30" fill="#6e4a33"/><path d="M550 234a30 30 0 0 1 60 0z" fill="#111"/>
+    <path d="M535 340v-40a45 40 0 0 1 90 0v40z" fill="#27ae60"/>
+    <rect x="530" y="322" width="100" height="18" fill="#fff"/><rect x="578" y="322" width="4" height="18" fill="#999"/>
+  </g>
+</svg>

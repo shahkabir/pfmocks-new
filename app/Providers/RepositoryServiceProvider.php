@@ -39,6 +39,10 @@ use App\Repositories\Pte\PteQuestionGranularRepository;
 use App\Repositories\Pte\PteModuleWiseQuestionRepository;
 use App\Repositories\Pte\PteAttemptRepository;
 use App\Repositories\Pte\PteAnswerRepository;
+use App\Repositories\Interfaces\Duolingo\DuolingoAttemptRepositoryInterface;
+use App\Repositories\Interfaces\Duolingo\DuolingoAnswerRepositoryInterface;
+use App\Repositories\Duolingo\DuolingoAttemptRepository;
+use App\Repositories\Duolingo\DuolingoAnswerRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -62,5 +66,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(PteModuleWiseQuestionRepositoryInterface::class,   PteModuleWiseQuestionRepository::class);
         $this->app->bind(PteAttemptRepositoryInterface::class,              PteAttemptRepository::class);
         $this->app->bind(PteAnswerRepositoryInterface::class,               PteAnswerRepository::class);
+
+        // Duolingo
+        $this->app->bind(DuolingoAttemptRepositoryInterface::class,         DuolingoAttemptRepository::class);
+        $this->app->bind(DuolingoAnswerRepositoryInterface::class,          DuolingoAnswerRepository::class);
     }
 }

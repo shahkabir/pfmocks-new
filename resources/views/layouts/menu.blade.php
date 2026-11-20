@@ -378,7 +378,9 @@
               <li class="nav-item">
                 <a href="{{ route('exams.show', ['examName' => 'duolingo']) }}" class="nav-link">
                   <i class="nav-icon bi bi-grip-horizontal"></i>
-                  <p>Duolingo <sup class="text-warning text-xs"><b>TBA</b></sup></p>
+                  <p>Duolingo
+                    <sup class="badge rounded-pill text-bg-success pulse-chip ms-1" style="font-size: 0.7rem;">Ready</sup>
+                  </p>
                 </a>
               </li>
               <li class="nav-item">

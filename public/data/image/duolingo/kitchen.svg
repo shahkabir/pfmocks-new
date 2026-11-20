@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Two people cooking together in a kitchen">
+  <rect width="800" height="500" fill="#fdf2dc"/>
+  <rect y="400" width="800" height="100" fill="#c9a77c"/>
+  <g fill="#7fb3a7"><rect x="30" y="40" width="160" height="110" rx="6"/><rect x="200" y="40" width="160" height="110" rx="6"/><rect x="620" y="40" width="150" height="110" rx="6"/></g>
+  <rect x="400" y="50" width="180" height="120" fill="#bfe3f5" stroke="#fff" stroke-width="10"/>
+  <path d="M490 50v120M400 110h180" stroke="#fff" stroke-width="6"/>
+  <rect x="20" y="320" width="760" height="24" fill="#6b4423"/><rect x="20" y="344" width="760" height="120" fill="#a9743d"/>
+  <g fill="#6b4423"><rect x="70" y="362" width="150" height="86" rx="4"/><rect x="250" y="362" width="150" height="86" rx="4"/><rect x="580" y="362" width="150" height="86" rx="4"/></g>
+  <rect x="430" y="300" width="130" height="20" fill="#333"/>
+  <path d="M450 300v-34h90v34z" fill="#c0392b"/><path d="M540 280h40" stroke="#333" stroke-width="8"/>
+  <path d="M470 250c-8-14 8-18 0-32M515 250c-8-14 8-18 0-32" fill="none" stroke="#bbb" stroke-width="5"/>
+  <rect x="120" y="304" width="130" height="16" rx="3" fill="#d4a55a"/>
+  <g fill="#e74c3c"><circle cx="150" cy="298" r="10"/><circle cx="175" cy="298" r="10"/></g>
+  <g fill="#27ae60"><rect x="195" y="292" width="40" height="10" rx="4"/></g>
+  <g>
+    <circle cx="200" cy="165" r="30" fill="#e2b08a"/><path d="M170 160a30 30 0 0 1 60 0z" fill="#4a2c17"/>
+    <path d="M155 320v-80a45 45 0 0 1 90 0v80z" fill="#fff"/><path d="M175 320v-70h50v70z" fill="#2980b9"/>
+    <path d="M155 250l-20 55M245 250l-30 55" stroke="#e2b08a" stroke-width="16" stroke-linecap="round"/>
+  </g>
+  <g>
+    <circle cx="470" cy="150" r="30" fill="#8d5a3b"/><path d="M440 145a30 30 0 0 1 60 0z" fill="#111"/>
+    <path d="M430 138h80l-8-34h-64z" fill="#fff"/>
+    <path d="M425 300v-70a45 45 0 0 1 90 0v70z" fill="#fff"/><path d="M445 300v-60h50v60z" fill="#c0392b"/>
+    <path d="M515 240l40 40" stroke="#8d5a3b" stroke-width="16" stroke-linecap="round"/>
+  </g>
+</svg>

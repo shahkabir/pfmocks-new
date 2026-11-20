@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="People relaxing and playing on a sunny beach">
+  <rect width="800" height="230" fill="#9fdcf7"/>
+  <circle cx="660" cy="70" r="46" fill="#fbdc4e"/>
+  <rect y="200" width="800" height="90" fill="#2e9fd6"/>
+  <path d="M0 240q40-14 80 0t80 0 80 0 80 0 80 0 80 0 80 0 80 0 80 0 80 0" fill="none" stroke="#fff" stroke-width="4"/>
+  <path d="M0 290q200-40 400-10t400-10v230H0z" fill="#f3d9a1"/>
+  <path d="M170 205l50-46 8 46z" fill="#fff"/><rect x="150" y="205" width="90" height="12" rx="5" fill="#c0392b"/>
+  <path d="M205 430l40-200" stroke="#6b4423" stroke-width="8"/>
+  <path d="M130 240a120 90 0 0 1 225 40z" fill="#e74c3c"/><path d="M200 225l45 40 40-30z" fill="#fff"/>
+  <rect x="120" y="420" width="180" height="44" rx="6" fill="#2980b9"/><path d="M120 436h180M120 450h180" stroke="#fff" stroke-width="5"/>
+  <g>
+    <circle cx="150" cy="400" r="22" fill="#c68b5e"/><path d="M128 396a22 22 0 0 1 44 0z" fill="#3b2314"/>
+    <path d="M170 415h95q20 0 20 18h-115z" fill="#f39c12"/>
+  </g>
+  <g>
+    <circle cx="500" cy="300" r="24" fill="#e2b08a"/><path d="M476 296a24 24 0 0 1 48 0z" fill="#b7791f"/>
+    <path d="M470 400v-55a30 34 0 0 1 60 0v55z" fill="#16a085"/>
+    <path d="M478 400l-14 58M522 400l14 58" stroke="#e2b08a" stroke-width="15" stroke-linecap="round"/>
+    <path d="M530 340l38-45" stroke="#e2b08a" stroke-width="13" stroke-linecap="round"/>
+  </g>
+  <g>
+    <circle cx="690" cy="315" r="24" fill="#8d5a3b"/><path d="M666 311a24 24 0 0 1 48 0z" fill="#111"/>
+    <path d="M660 410v-52a30 34 0 0 1 60 0v52z" fill="#8e44ad"/>
+    <path d="M668 410l-10 56M712 410l10 56" stroke="#8d5a3b" stroke-width="15" stroke-linecap="round"/>
+    <path d="M660 355l-40-50" stroke="#8d5a3b" stroke-width="13" stroke-linecap="round"/>
+  </g>
+  <circle cx="595" cy="255" r="20" fill="#fff"/><path d="M576 250a20 20 0 0 1 38 0M595 235v40" fill="none" stroke="#e74c3c" stroke-width="4"/>
+  <path d="M340 480v-34h60v34z" fill="#e67e22"/><path d="M340 446l30-16 30 16z" fill="#d35400"/>
+</svg>

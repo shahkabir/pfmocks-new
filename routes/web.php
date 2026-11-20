@@ -62,6 +62,18 @@ Route::middleware('auth')->group(function(){
     Route::post('/pte/exam/attempt/{attempt}/submit',
         [\App\Http\Controllers\PteExamController::class, 'submit'])->name('pte.exam.submit');
 
+    // ── Duolingo English Test (student-facing) ───────────────────────────
+    Route::get ('/duolingo/exam/{module}/start',
+        [\App\Http\Controllers\Duolingo\DuolingoExamController::class, 'start'])->name('duolingo.exam.start');
+    Route::get ('/duolingo/exam/attempt/{attempt}',
+        [\App\Http\Controllers\Duolingo\DuolingoExamController::class, 'play'])->name('duolingo.exam.play');
+    Route::post('/duolingo/exam/attempt/{attempt}/answer',
+        [\App\Http\Controllers\Duolingo\DuolingoExamController::class, 'saveAnswer'])->name('duolingo.exam.answer');
+    Route::post('/duolingo/exam/attempt/{attempt}/submit',
+        [\App\Http\Controllers\Duolingo\DuolingoExamController::class, 'submit'])->name('duolingo.exam.submit');
+    Route::get ('/duolingo/exam/attempt/{attempt}/result',
+        [\App\Http\Controllers\Duolingo\DuolingoExamController::class, 'result'])->name('duolingo.exam.result');
+
     Route::post('/logout',[AuthController::class,'logout'])->name('logout');
 
     Route::get('/profile', function () {

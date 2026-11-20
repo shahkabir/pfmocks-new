@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="A family having a picnic in a park">
+  <rect width="800" height="500" fill="#bfe8ff"/>
+  <circle cx="110" cy="80" r="44" fill="#fbdc4e"/>
+  <g fill="#fff"><ellipse cx="400" cy="80" rx="60" ry="22"/><ellipse cx="450" cy="66" rx="42" ry="20"/><ellipse cx="620" cy="110" rx="50" ry="18"/></g>
+  <rect y="280" width="800" height="220" fill="#6fbf58"/>
+  <rect x="610" y="170" width="36" height="170" fill="#6b4423"/>
+  <g fill="#2f8f3e"><circle cx="628" cy="130" r="80"/><circle cx="565" cy="175" r="52"/><circle cx="695" cy="175" r="52"/></g>
+  <path d="M130 410l50-70h300l60 70z" fill="#e74c3c"/>
+  <path d="M190 340l-12 70M270 340l-6 70M350 340v70M430 340l14 70" stroke="#fff" stroke-width="8"/>
+  <rect x="280" y="340" width="74" height="34" rx="4" fill="#a9743d"/><path d="M290 340c0-26 54-26 54 0" fill="none" stroke="#6b4423" stroke-width="5"/>
+  <g>
+    <circle cx="180" cy="270" r="26" fill="#e2b08a"/><path d="M154 266a26 26 0 0 1 52 0z" fill="#3b2314"/>
+    <path d="M145 370v-50a35 35 0 0 1 70 0v50z" fill="#2980b9"/>
+  </g>
+  <g>
+    <circle cx="470" cy="270" r="26" fill="#8d5a3b"/><path d="M442 275a28 30 0 1 1 56 0v22h-12v-26a16 16 0 0 0-32 0v26h-12z" fill="#2c1b10"/>
+    <path d="M435 370v-50a35 35 0 0 1 70 0v50z" fill="#8e44ad"/>
+  </g>
+  <g>
+    <circle cx="325" cy="430" r="18" fill="#c68b5e"/><path d="M307 426a18 18 0 0 1 36 0z" fill="#111"/>
+    <path d="M300 495v-34a25 25 0 0 1 50 0v34z" fill="#f1c40f"/>
+  </g>
+  <circle cx="560" cy="440" r="26" fill="#fff"/><path d="M536 440a24 24 0 0 0 48 0" fill="none" stroke="#e74c3c" stroke-width="5"/>
+</svg>

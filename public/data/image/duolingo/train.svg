@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Passengers waiting on a platform as a train arrives">
+  <rect width="800" height="500" fill="#d9e4ec"/>
+  <path d="M0 0h800v60L400 100 0 60z" fill="#5d6d7e"/>
+  <rect x="100" y="60" width="14" height="300" fill="#7f8c8d"/><rect x="680" y="60" width="14" height="300" fill="#7f8c8d"/>
+  <rect x="300" y="72" width="200" height="40" rx="4" fill="#1c2833"/><rect x="316" y="86" width="168" height="10" fill="#f1c40f"/>
+  <g>
+    <rect x="150" y="150" width="650" height="170" rx="20" fill="#c0392b"/>
+    <rect x="150" y="270" width="650" height="22" fill="#fff"/>
+    <g fill="#aed6f1"><rect x="180" y="178" width="100" height="70" rx="6"/><rect x="430" y="178" width="100" height="70" rx="6"/><rect x="560" y="178" width="100" height="70" rx="6"/><rect x="690" y="178" width="100" height="70" rx="6"/></g>
+    <rect x="310" y="170" width="90" height="150" fill="#922b21"/><path d="M355 170v150" stroke="#fff" stroke-width="3"/>
+  </g>
+  <rect y="320" width="800" height="26" fill="#f4d03f"/>
+  <rect y="346" width="800" height="154" fill="#aab7b8"/>
+  <g>
+    <circle cx="240" cy="300" r="26" fill="#e2b08a"/><path d="M214 296a26 26 0 0 1 52 0z" fill="#3b2314"/>
+    <path d="M205 470v-110a35 40 0 0 1 70 0v110z" fill="#34495e"/>
+    <rect x="282" y="400" width="44" height="66" rx="5" fill="#16a085"/><path d="M296 400v-14h16v14" fill="none" stroke="#111" stroke-width="4"/>
+  </g>
+  <g>
+    <circle cx="470" cy="310" r="24" fill="#8d5a3b"/><path d="M444 314a26 28 0 1 1 52 0v22h-10v-24a16 16 0 0 0-32 0v24h-10z" fill="#111"/>
+    <path d="M438 475v-100a32 38 0 0 1 64 0v100z" fill="#e67e22"/>
+    <rect x="505" y="372" width="18" height="30" rx="3" fill="#2c3e50"/>
+  </g>
+  <g>
+    <circle cx="620" cy="306" r="25" fill="#c68b5e"/><path d="M595 302a25 25 0 0 1 50 0z" fill="#555"/>
+    <path d="M586 475v-105a34 38 0 0 1 68 0v105z" fill="#2980b9"/>
+  </g>
+</svg>

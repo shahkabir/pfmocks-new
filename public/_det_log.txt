@@ -1,0 +1,5 @@
+plain lty1.wav: pending in 4002ms ready=1
+plain lsl1.wav: pending in 4008ms ready=1
+plain isp1_t1.wav: pending in 4000ms ready=1
+plain lsl2.wav: pending in 4015ms ready=1
+DONE

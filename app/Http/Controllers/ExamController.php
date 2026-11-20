@@ -68,8 +68,13 @@ class ExamController extends Controller
         $module = Module::findOrFail($moduleId);
                   // ->get();
                  //->toArray();
-         
+
         //dd($module);
+
+        // Duolingo modules have their own player.
+        if ($module->module_type === \App\Models\Duolingo\DuolingoModule::MODULE_TYPE) {
+            return redirect()->route('duolingo.exam.start', $module->id);
+        }
 
         $duration = $module->duration_minutes;
         $moduleType = $module->module_type;

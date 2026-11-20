@@ -34,7 +34,13 @@ class PteExamController extends Controller
         return view('exams.pte.start', compact('attempt', 'module', 'structure', 'answers'));
     }
 
-    /** POST /pte/exam/attempt/{attempt}/answer — AJAX upsert one answer. */
+    /**
+     * POST /pte/exam/attempt/{attempt}/answer — AJAX upsert one answer.
+     *
+     * The request is routed to a dedicated per-response_type handler so each
+     * question shape (fill_blank, multi_choice, …) owns its own validation
+     * and payload-shaping logic — see the "Per response_type handlers" block below.
+     */
     public function saveAnswer(Request $request, PteAttempt $attempt): JsonResponse
     {
         abort_unless($attempt->user_id === auth()->id(), 403);
@@ -42,8 +48,126 @@ class PteExamController extends Controller
             return response()->json(['ok' => false, 'message' => 'Attempt already submitted.'], 422);
         }
 
+        $request->validate(['pte_module_wise_question_id' => 'required|exists:pte_module_wise_question,id']);
+
+        $mapping = PteModuleWiseQuestion::with('question.subType')
+            ->findOrFail($request->input('pte_module_wise_question_id'));
+
+        $responseType = $mapping->question?->subType?->response_type;
+
+        $payload = match ($responseType) {
+            'fill_blank'      => $this->handleFillBlankAnswer($request),
+            'multi_choice'    => $this->handleMultiChoiceAnswer($request),
+            'single_choice'   => $this->handleSingleChoiceAnswer($request),
+            'select_option'   => $this->handleSelectOptionAnswer($request),
+            'reorder'         => $this->handleReorderAnswer($request),
+            'highlight_words' => $this->handleHighlightWordsAnswer($request),
+            'audio_record'    => $this->handleAudioRecordAnswer($request, $attempt),
+            'text_write'      => $this->handleTextWriteAnswer($request),
+            default           => $this->handleGenericAnswer($request),
+        };
+
+        $answer = $this->exam->saveAnswer(
+            attemptId:  $attempt->id,
+            mappingId:  $mapping->id,
+            questionId: (int) $mapping->pte_question_granular_id,
+            payload:    $payload,
+        );
+
+        return response()->json(['ok' => true, 'answer_id' => $answer->id, 'audio_url' => $answer->response_audio_url]);
+    }
+
+    /* ========================================================================
+     | Per response_type handlers — each validates its own payload shape and
+     | returns only the columns relevant to that question type.
+     |========================================================================*/
+
+    /** response_type: fill_blank — { "1": "answer", "2": "answer" } keyed by blank_order */
+    private function handleFillBlankAnswer(Request $request): array
+    {
+        $data = $request->validate(['response_blanks' => 'nullable|array']);
+        return ['response_blanks' => $data['response_blanks'] ?? []];
+    }
+
+    /** response_type: multi_choice — zero or more selected option ids */
+    private function handleMultiChoiceAnswer(Request $request): array
+    {
         $data = $request->validate([
-            'pte_module_wise_question_id'   => 'required|exists:pte_module_wise_question,id',
+            'selected_option_ids'   => 'nullable|array',
+            'selected_option_ids.*' => 'integer',
+        ]);
+        return ['selected_option_ids' => $data['selected_option_ids'] ?? []];
+    }
+
+    /** response_type: single_choice — at most one selected option id */
+    private function handleSingleChoiceAnswer(Request $request): array
+    {
+        $data = $request->validate([
+            'selected_option_ids'   => 'nullable|array|max:1',
+            'selected_option_ids.*' => 'integer',
+        ]);
+        return ['selected_option_ids' => $data['selected_option_ids'] ?? []];
+    }
+
+    /** response_type: select_option (e.g. Select Missing Word) — at most one selected option id */
+    private function handleSelectOptionAnswer(Request $request): array
+    {
+        $data = $request->validate([
+            'selected_option_ids'   => 'nullable|array|max:1',
+            'selected_option_ids.*' => 'integer',
+        ]);
+        return ['selected_option_ids' => $data['selected_option_ids'] ?? []];
+    }
+
+    /** response_type: reorder — ordered list of segment ids */
+    private function handleReorderAnswer(Request $request): array
+    {
+        $data = $request->validate([
+            'response_segments_order'   => 'nullable|array',
+            'response_segments_order.*' => 'integer',
+        ]);
+        return ['response_segments_order' => $data['response_segments_order'] ?? []];
+    }
+
+    /** response_type: highlight_words — ids of the words the student flagged */
+    private function handleHighlightWordsAnswer(Request $request): array
+    {
+        $data = $request->validate([
+            'response_highlight_word_ids'   => 'nullable|array',
+            'response_highlight_word_ids.*' => 'integer',
+        ]);
+        return ['response_highlight_word_ids' => $data['response_highlight_word_ids'] ?? []];
+    }
+
+    /** response_type: text_write — free-form typed response */
+    private function handleTextWriteAnswer(Request $request): array
+    {
+        $data = $request->validate(['response_text' => 'nullable|string']);
+        return ['response_text' => $data['response_text'] ?? null];
+    }
+
+    /** response_type: audio_record — stores the uploaded recording, if any */
+    private function handleAudioRecordAnswer(Request $request, PteAttempt $attempt): array
+    {
+        if (!$request->hasFile('audio_blob')) {
+            return [];
+        }
+
+        // Loose validation: MediaRecorder blobs often sniff as octet-stream and fail mimes:
+        $request->validate(['audio_blob' => 'file|max:51200']);
+
+        $file = $request->file('audio_blob');
+        $dir  = "data/audio/pte/{$attempt->id}";
+        $name = uniqid('pte_ans_') . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path($dir), $name);
+
+        return ['response_audio_url' => "{$dir}/{$name}"];
+    }
+
+    /** Fallback for any question whose sub-type isn't mapped above (defensive). */
+    private function handleGenericAnswer(Request $request): array
+    {
+        return $request->validate([
             'response_text'                 => 'nullable|string',
             'selected_option_ids'           => 'nullable|array',
             'selected_option_ids.*'         => 'integer',
@@ -53,28 +177,6 @@ class PteExamController extends Controller
             'response_highlight_word_ids'   => 'nullable|array',
             'response_highlight_word_ids.*' => 'integer',
         ]);
-
-        $mapping = PteModuleWiseQuestion::findOrFail($data['pte_module_wise_question_id']);
-
-        // Optional audio upload (for audio_record sub-types)
-        if ($request->hasFile('audio_blob')) {
-            // Loose validation: MediaRecorder blobs often sniff as octet-stream and fail mimes:
-            $request->validate(['audio_blob' => 'file|max:51200']);
-            $file = $request->file('audio_blob');
-            $dir  = "data/audio/pte/{$attempt->id}";
-            $name = uniqid('pte_ans_') . '_' . Str::random(6) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path($dir), $name);
-            $data['response_audio_url'] = "{$dir}/{$name}";
-        }
-
-        $answer = $this->exam->saveAnswer(
-            attemptId:  $attempt->id,
-            mappingId:  $mapping->id,
-            questionId: (int) $mapping->pte_question_granular_id,
-            payload:    $data,
-        );
-
-        return response()->json(['ok' => true, 'answer_id' => $answer->id, 'audio_url' => $answer->response_audio_url]);
     }
 
     /** POST /pte/exam/attempt/{attempt}/intro — save the 25s self-introduction recording. */

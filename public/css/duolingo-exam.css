@@ -1,0 +1,101 @@
+/* Duolingo English Test — basic exam UI */
+
+.det-bar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .6rem 1rem;
+    background: #58cc02;
+    color: #fff;
+}
+.det-bar .mid { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.det-section-pill {
+    display: inline-block;
+    padding: .2rem .75rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .2);
+    font-weight: 600;
+}
+
+/*
+ * The shared header declares "color-scheme: light dark", so on a device in dark mode
+ * the browser draws form fields with light text. The exam always uses light
+ * backgrounds, so it is pinned to the light scheme with dark text.
+ */
+.det-container {
+    color-scheme: light;
+    color: #212529;
+}
+.det-container input,
+.det-container textarea,
+.det-container select {
+    color: #000;
+    caret-color: #000;
+}
+.det-container input::placeholder,
+.det-container textarea::placeholder { color: #6c757d; }
+
+.det-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: .75rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.det-instructions { color: #4b4b4b; font-weight: 500; }
+
+.det-passage {
+    padding: 1rem;
+    background: #f7f7f7;
+    border-radius: .5rem;
+    line-height: 1.7;
+}
+
+.det-group { border-left: 4px solid #58cc02; padding-left: .75rem; }
+
+.det-image { max-height: 360px; }
+
+.det-word {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+}
+
+.det-recorder { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.det-playback { flex-basis: 100%; height: 40px; }
+
+.det-container { max-width: 900px; }
+
+.det-timer-low { color: #fff; background: #c0392b; border-radius: .25rem; padding: 0 .35rem; }
+
+.det-audio { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; }
+
+/* Line breaks in passages come from the text itself, so offsets match what is displayed. */
+.det-passage { white-space: pre-line; }
+.det-selectable { cursor: text; }
+.det-selectable mark { background: #ffe066; padding: 0; }
+
+.det-cloze { line-height: 2.4; font-size: 1.05rem; }
+.det-blank { white-space: nowrap; }
+.det-blank-input {
+    display: inline-block;
+    min-width: 3ch;
+    padding: 0 .15rem;
+    border: 0;
+    border-bottom: 2px solid #58cc02;
+    background: #f3fbe9;
+    font: inherit;
+    color: #000;
+    outline: none;
+}
+.det-blank-input:focus { background: #e2f6cb; }
+
+.det-stage + .det-stage { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e5e5e5; }
+.det-stage textarea[readonly] { background: #f7f7f7; }
+
+.det-overall { font-size: 4rem; font-weight: 800; color: #58cc02; line-height: 1; }

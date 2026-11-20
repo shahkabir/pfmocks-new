@@ -1,0 +1,17 @@
+<!doctype html><body><script>
+const send = (s) => fetch('/_det_log.php', {method:'POST', body:s});
+async function trial(name, file, prep) {
+  const a = new Audio(); a.preload = 'none'; a.src = '/data/audio/duolingo/' + file; document.body.appendChild(a);
+  await prep(a);
+  const t0 = performance.now();
+  const r = await Promise.race([a.play().then(() => 'resolved'), new Promise(r => setTimeout(() => r('pending'), 4000))]).catch(e => 'rejected ' + e.name);
+  send(name + ' ' + file + ': ' + r + ' in ' + Math.round(performance.now() - t0) + 'ms ready=' + a.readyState);
+  a.pause();
+}
+(async () => {
+  for (const f of ['lty1.wav', 'lsl1.wav', 'isp1_t1.wav', 'lsl2.wav']) {
+    await trial('plain', f, async () => {});
+  }
+  send('DONE');
+})();
+</script></body>
