@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\File;
 /**
  * Creates the free Duolingo mock exam with 3 sample questions per question type.
  *
+ *   php artisan migrate --path=database/migrations/duolingo
  *   php artisan db:seed --class="Database\Seeders\Duolingo\DuolingoSampleSeeder"
  *
  * Idempotent: rows are matched on natural keys and updated in place. Missing
