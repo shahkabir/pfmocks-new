@@ -163,7 +163,9 @@
                                     </div>
 
                                     <div>
-                                        @if($status === 'completed')
+                                        @if(($module->module_type ?? null) === \App\Models\Duolingo\DuolingoModule::MODULE_TYPE && Auth::user()->role !== 'evaluator')
+                                            @include('exams.duolingo.partials._listing_action', ['module' => $module])
+                                        @elseif($status === 'completed')
                                             <span class="chip chip-completed"><i class="bi bi-check-circle-fill"></i>Completed</span>
                                         @elseif($status === 'purchased' || $status === 'free')
                                             <span class="chip chip-purchased"><i class="bi bi-bag-check-fill"></i>Unlocked</span>

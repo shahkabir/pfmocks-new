@@ -568,6 +568,14 @@
                   </a>
                 </li>
 
+                <li class="nav-item">
+                  <a href="{{ route('evaluator.duolingo.index') }}"
+                     class="nav-link {{ request()->routeIs('evaluator.duolingo.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-translate"></i>
+                    <p>Duolingo Evaluations</p>
+                  </a>
+                </li>
+
               @endif
 
               {{-- {{ dd(Auth::user()) }} --}}
@@ -575,9 +583,16 @@
                 <li class="nav-header">Evaluator</li>
                 <li class="nav-item">
                   <a href="{{ route('evaluator.evaluations.index') }}"
-                     class="nav-link {{ request()->routeIs('evaluator.*') ? 'active' : '' }}">
+                     class="nav-link {{ request()->routeIs('evaluator.evaluations.*') ? 'active' : '' }}">
                     <i class="nav-icon bi bi-clipboard-check"></i>
                     <p>My Evaluations</p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{{ route('evaluator.duolingo.index') }}"
+                     class="nav-link {{ request()->routeIs('evaluator.duolingo.*') ? 'active' : '' }}">
+                    <i class="nav-icon bi bi-translate"></i>
+                    <p>Duolingo Evaluations</p>
                   </a>
                 </li>
               @endif

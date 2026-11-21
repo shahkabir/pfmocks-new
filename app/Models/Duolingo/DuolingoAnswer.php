@@ -2,6 +2,7 @@
 
 namespace App\Models\Duolingo;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -20,8 +21,11 @@ class DuolingoAnswer extends Model
         'response_highlight',
         'raw_score',
         'max_score',
+        'is_correct',
+        'score_detail',
         'rubric_scores',
         'feedback',
+        'evaluated_by',
         'evaluated_at',
     ];
 
@@ -32,8 +36,10 @@ class DuolingoAnswer extends Model
         'response_blanks'     => 'array',
         'response_highlight'  => 'array',
         'rubric_scores'       => 'array',
+        'score_detail'        => 'array',
         'raw_score'           => 'float',
         'max_score'           => 'float',
+        'is_correct'          => 'boolean',
         'evaluated_at'        => 'datetime',
     ];
 
@@ -50,5 +56,15 @@ class DuolingoAnswer extends Model
     public function question(): BelongsTo
     {
         return $this->belongsTo(DuolingoQuestion::class, 'duolingo_question_id');
+    }
+
+    public function evaluator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'evaluated_by');
+    }
+
+    public function isEvaluated(): bool
+    {
+        return $this->evaluated_at !== null;
     }
 }

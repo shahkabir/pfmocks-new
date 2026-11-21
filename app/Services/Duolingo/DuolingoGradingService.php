@@ -4,7 +4,6 @@ namespace App\Services\Duolingo;
 
 use App\Models\Duolingo\DuolingoAnswer;
 use App\Models\Duolingo\DuolingoQuestionType;
-use Illuminate\Support\Collection;
 
 /**
  * Duolingo mock grading model (duolingo.md §5–§6).
@@ -104,24 +103,33 @@ class DuolingoGradingService
     /* ── Raw performance per skill ──────────────────────────────────── */
 
     /**
-     * Raw earned / max per individual skill.
-     * Answers must have question.type.section loaded.
+     * Raw earned / max per individual skill, over every question in the test.
+     * Unanswered questions count as 0 out of their marks.
      *
-     * @param  Collection<int, DuolingoAnswer> $answers
+     * @param  iterable<array{skill: string, earned: float, max: float}> $rows
      * @return array<string, array{earned: float, max: float, percent: float|null}>
      */
-    public function rawBySkill(Collection $answers): array
+    public function rawBySkill(iterable $rows): array
     {
-        $skills = config('duolingo.grading.skills');
-
-        $grouped = $answers->groupBy(fn (DuolingoAnswer $a) =>
-            $skills[$a->question?->type?->section?->tag] ?? 'unknown'
-        );
-
         $out = [];
-        foreach (array_values($skills) as $skill) {
-            $out[$skill] = $this->aggregate($grouped->get($skill, collect()));
+        foreach (array_values(config('duolingo.grading.skills')) as $skill) {
+            $out[$skill] = ['earned' => 0.0, 'max' => 0.0];
         }
+
+        foreach ($rows as $row) {
+            if (!isset($out[$row['skill']])) continue;
+            $out[$row['skill']]['earned'] += (float) $row['earned'];
+            $out[$row['skill']]['max']    += (float) $row['max'];
+        }
+
+        foreach ($out as $skill => $r) {
+            $out[$skill] = [
+                'earned'  => round($r['earned'], 2),
+                'max'     => round($r['max'], 2),
+                'percent' => $r['max'] > 0 ? round($r['earned'] / $r['max'] * 100, 2) : null,
+            ];
+        }
+
         return $out;
     }
 
@@ -187,13 +195,14 @@ class DuolingoGradingService
     }
 
     /**
-     * Full report for a set of answers (with question.type.section loaded).
+     * Full report: raw performance kept separate from the estimated scores.
      *
+     * @param  iterable<array{skill: string, earned: float, max: float}> $rows one row per question
      * @return array{raw: array, individual: array, integrated: array, overall: int|null}
      */
-    public function report(Collection $answers): array
+    public function report(iterable $rows): array
     {
-        $raw = $this->rawBySkill($answers);
+        $raw = $this->rawBySkill($rows);
 
         $individual = [];
         foreach ($raw as $skill => $r) {

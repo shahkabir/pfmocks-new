@@ -15,7 +15,7 @@
     </div>
     <div class="right">
         <a href="{{ route('dashboard.student') }}" class="btn btn-light btn-sm"
-           onclick="return confirm('Exit the exam? Answers are not saved yet, so this attempt will restart from the beginning.');">
+           onclick="return confirm('Exit the test? Your answers are saved, and you can resume from this question later.');">
             <i class="bi bi-box-arrow-right me-1"></i>Exit
         </a>
     </div>
@@ -56,9 +56,16 @@
         </table>
         <p class="small text-muted">
             <i class="bi bi-mic me-1"></i>The speaking section needs your microphone, and listening tasks need audio.
+            <br><i class="bi bi-cloud-check me-1"></i>Each answer is saved automatically as soon as you give it.
         </p>
+        @if(!empty($attempt->state['mapping_id']))
+            <div class="alert alert-info small">
+                <i class="bi bi-arrow-repeat me-1"></i>
+                Welcome back. Your answers are saved, and the test will continue from the question you were on, with the time you had left.
+            </div>
+        @endif
         <button type="button" class="btn btn-success" data-det-action="begin" @disabled($structure->isEmpty())>
-            Begin <i class="bi bi-arrow-right ms-1"></i>
+            {{ !empty($attempt->state['mapping_id']) ? 'Resume test' : 'Begin' }} <i class="bi bi-arrow-right ms-1"></i>
         </button>
     </div>
 
@@ -108,19 +115,32 @@
     <div class="det-card text-center" id="detFinish" style="display:none;">
         <h4 class="mb-2"><i class="bi bi-flag me-2 text-success"></i>You have reached the end of the test</h4>
         <p class="text-muted mb-1">You responded to <strong id="detAnsweredCount">0</strong> of <span id="detAnsweredTotal">0</span> questions.</p>
-        <p class="small text-muted">Answer saving is not available yet, so this attempt will not be scored.</p>
-        <form method="POST" action="{{ route('duolingo.exam.submit', $attempt->id) }}"
-              onsubmit="return confirm('Submit the test?');">
+        <p class="small text-muted">
+            Reading and listening are marked automatically. Writing and speaking are reviewed by an evaluator,
+            and your final score is published after that review.
+        </p>
+        <p class="small text-warning" id="detPendingSaves" style="display:none;">
+            <span class="spinner-border spinner-border-sm me-1"></span>Saving your last answers…
+        </p>
+        <form method="POST" action="{{ route('duolingo.exam.submit', $attempt->id) }}" id="detSubmitForm"
+              onsubmit="return confirm('Submit the test? You cannot change your answers afterwards.');">
             @csrf
-            <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle me-1"></i>Submit test</button>
+            <button type="submit" class="btn btn-primary" id="detSubmitButton"><i class="bi bi-check2-circle me-1"></i>Submit test</button>
         </form>
     </div>
 </div>
 
+{{-- Save notifications --}}
+<div class="det-toasts" id="detToasts" aria-live="polite"></div>
+
 <script>
     window.DET_CONFIG = {
-        answerUrl: @json(route('duolingo.exam.answer', $attempt->id)),
-        csrf:      @json(csrf_token()),
+        attemptId:  @json($attempt->id),
+        answerUrl:  @json(route('duolingo.exam.answer', $attempt->id)),
+        stateUrl:   @json(route('duolingo.exam.state', $attempt->id)),
+        csrf:       @json(csrf_token()),
+        state:      @json($attempt->state),
+        answeredIds: @json(array_map('strval', array_keys($answers))),
     };
 </script>
 <script src="{{ asset('js/duolingo-exam.js') }}"></script>

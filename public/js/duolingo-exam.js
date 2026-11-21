@@ -5,14 +5,22 @@
  * and shared group timers, limited-replay audio, inline blanks, highlight capture,
  * multi-stage writing, multi-turn speaking and microphone recording.
  *
- * Responses are collected in the browser only. persistAnswer() is the single place
- * to add the POST to DET_CONFIG.answerUrl when answer saving is implemented.
+ * Every response is saved to the server as soon as it is given, with a short
+ * notification. The current position, timers and audio plays are saved too, so a
+ * refresh or a later visit resumes in the same place.
  */
 (function () {
     'use strict';
 
+    const CFG = window.DET_CONFIG;
+
     const AUTO_ADVANCE_DELAY_MS = 300;
-    const LOW_TIME_SEC = 10;
+    const LOW_TIME_SEC          = 10;
+    const TEXT_SAVE_DELAY_MS    = 1500;
+    const BLANK_SAVE_DELAY_MS   = 1000;
+    const STATE_SAVE_EVERY_MS   = 10000;
+    const SAVE_RETRIES          = 3;
+    const TOAST_MS              = 1800;
 
     const overview  = document.getElementById('detOverview');
     const questions = Array.from(document.querySelectorAll('.det-question'));
@@ -23,11 +31,264 @@
     const timerEl   = document.getElementById('detTimer');
     const progress  = document.getElementById('detProgress');
     const posEl     = document.getElementById('detPos');
+    const toasts    = document.getElementById('detToasts');
+    const submitBtn = document.getElementById('detSubmitButton');
+    const pendingEl = document.getElementById('detPendingSaves');
 
     document.getElementById('detTotal').textContent = questions.length;
     document.getElementById('detAnsweredTotal').textContent = questions.length;
 
-    let current = -1;
+    let current  = -1;
+    let finished = false;
+
+    /* ── Notifications ─────────────────────────────────────────────── */
+
+    let toastEl = null;
+    let toastTimer = null;
+
+    /** One notification at a time: a new message replaces the previous one. */
+    function notify(message, kind) {
+        if (!toastEl) {
+            toastEl = document.createElement('div');
+            toastEl.setAttribute('role', 'status');
+            toasts.appendChild(toastEl);
+        }
+        toastEl.className = 'det-toast det-toast-' + (kind || 'success');
+        toastEl.innerHTML = '';
+        const icon = document.createElement('i');
+        icon.className = 'bi me-2 ' + (kind === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-cloud-check-fill');
+        toastEl.append(icon, message);
+        toastEl.classList.add('show');
+
+        clearTimeout(toastTimer);
+        if (kind !== 'error') {
+            toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, TOAST_MS);
+        }
+    }
+
+    /* ── Server requests ───────────────────────────────────────────── */
+
+    let pendingSaves = 0;
+
+    function updatePending(delta) {
+        pendingSaves += delta;
+        if (submitBtn) submitBtn.disabled = pendingSaves > 0;
+        if (pendingEl) pendingEl.style.display = pendingSaves > 0 ? '' : 'none';
+    }
+
+    const wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+
+    /** POST with retries for network and server errors. Resolves with the JSON reply. */
+    async function post(url, body) {
+        let lastError = null;
+        for (let attempt = 0; attempt < SAVE_RETRIES; attempt++) {
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': CFG.csrf, 'Accept': 'application/json' },
+                    body: body,
+                    credentials: 'same-origin',
+                });
+                if (res.ok) return res.json();
+
+                const data = await res.json().catch(function () { return {}; });
+                if (res.status === 419 || res.status === 401) {
+                    throw Object.assign(new Error('Your session has expired. Reload the page to continue; your saved answers are kept.'), { final: true });
+                }
+                if (res.status < 500) {
+                    throw Object.assign(new Error(data.message || 'This answer could not be saved.'), { final: true });
+                }
+                lastError = new Error('The server could not save your answer.');
+            } catch (err) {
+                if (err.final) throw err;
+                lastError = err;
+            }
+            await wait(1500 * (attempt + 1));
+        }
+        throw lastError || new Error('Could not save your answer.');
+    }
+
+    /* ── Answer saving ─────────────────────────────────────────────── */
+
+    const answered   = new Set(CFG.answeredIds || []);
+    const lastSent   = new Map();     // card => JSON of the last saved payload
+    const queues     = new Map();     // card => promise chain, so saves for one question stay in order
+    const debounces  = new Map();     // card => timeout id
+
+    function refreshAnsweredCount() {
+        document.getElementById('detAnsweredCount').textContent = answered.size;
+    }
+
+    /** Runs saves for one question one after another. */
+    function enqueue(card, task) {
+        updatePending(1);
+        const run = (queues.get(card) || Promise.resolve())
+            .then(task)
+            .then(function () {
+                answered.add(card.dataset.mappingId);
+                refreshAnsweredCount();
+                notify('Answer saved');
+            })
+            .catch(function (err) { notify(err.message || 'Could not save your answer.', 'error'); })
+            .finally(function () { updatePending(-1); });
+        queues.set(card, run);
+        return run;
+    }
+
+    /** The response of a typed or selected question, including empty values. */
+    function payloadOf(card) {
+        const value = function (selector) {
+            const el = card.querySelector(selector);
+            return el ? el.value : null;
+        };
+
+        switch (card.dataset.responseType) {
+            case 'fill_in_blanks': {
+                const blanks = {};
+                card.querySelectorAll('[data-role="blank"]').forEach(function (input) {
+                    blanks[input.dataset.order] = input.value.trim();
+                });
+                return { response_blanks: blanks };
+            }
+            case 'word_classification':
+                return { response_text: value('[data-role="word-choice"]:checked') };
+            case 'mcq_single': {
+                const option = value('[data-role="option"]:checked');
+                return { selected_option_ids: option ? [parseInt(option, 10)] : [] };
+            }
+            case 'highlighting':
+                return { response_highlight: card.highlight || null };
+            case 'dictation':
+            case 'writing':
+            case 'essay':
+                return { response_text: value('[data-role="text-input"]') || '' };
+            case 'interactive_writing':
+                return {
+                    response_texts: Array.from(card.querySelectorAll('[data-role="stage-text"]'))
+                        .map(function (t) { return t.value; }),
+                };
+            default:
+                return null; // Recordings are saved separately when they stop.
+        }
+    }
+
+    /** Saves the question's response now, if it changed since the last save. */
+    function saveNow(card) {
+        clearTimeout(debounces.get(card));
+        debounces.delete(card);
+
+        const payload = payloadOf(card);
+        if (!payload) return Promise.resolve();
+
+        const json = JSON.stringify(payload);
+        if (lastSent.get(card) === json) return Promise.resolve();
+        lastSent.set(card, json);
+
+        return enqueue(card, function () {
+            const body = new FormData();
+            body.append('mapping_id', card.dataset.mappingId);
+            body.append('payload', json);
+            return post(CFG.answerUrl, body);
+        });
+    }
+
+    function saveSoon(card, delay) {
+        clearTimeout(debounces.get(card));
+        debounces.set(card, setTimeout(function () { saveNow(card); }, delay));
+    }
+
+    function saveRecording(card, blob, turn) {
+        const ext = (blob.type.match(/audio\/(webm|ogg|mp4|wav)/) || [null, 'webm'])[1];
+        return enqueue(card, function () {
+            const body = new FormData();
+            body.append('mapping_id', card.dataset.mappingId);
+            body.append('audio_blob', blob, 'recording.' + ext);
+            if (turn) body.append('turn', turn);
+            return post(CFG.answerUrl, body);
+        });
+    }
+
+    /* ── Exam state (position, timers, plays) ──────────────────────── */
+
+    let currentDeadline = null; // ms timestamp of the running question or step timer
+    let stateTimer = null;
+
+    function remainingSec(deadline) {
+        return Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    }
+
+    function stateSnapshot() {
+        const card = finished ? questions[questions.length - 1] : questions[current];
+        if (!card) return null;
+
+        const groups = {};
+        Object.keys(groupDeadlines).forEach(function (id) { groups[id] = remainingSec(groupDeadlines[id]); });
+
+        const plays = Array.from(card.querySelectorAll('[data-role="audio"]')).map(function (w) { return w.getPlays(); });
+
+        return {
+            mapping_id: parseInt(card.dataset.mappingId, 10),
+            step: card.stepIndex || 0,
+            remaining: currentDeadline ? remainingSec(currentDeadline) : null,
+            groups: groups,
+            plays: plays,
+            finished: finished,
+            saved_at: Date.now(),
+        };
+    }
+
+    /*
+     * The state is also kept in the browser. A request sent while the page unloads can
+     * reach the server after the reloaded page has already been served, so on resume
+     * the newer of the two copies wins.
+     */
+    const LOCAL_KEY = 'det_state_' + CFG.attemptId;
+
+    function storeLocally(state) {
+        try { localStorage.setItem(LOCAL_KEY, JSON.stringify(state)); } catch (e) { /* Storage may be disabled. */ }
+    }
+
+    function newestState() {
+        let local = null;
+        try { local = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null'); } catch (e) { local = null; }
+        const server = CFG.state;
+        if (!local) return server;
+        if (!server) return local;
+        return (local.saved_at || 0) > (server.saved_at || 0) ? local : server;
+    }
+
+    function saveState() {
+        const state = stateSnapshot();
+        if (!state) return;
+        storeLocally(state);
+        fetch(CFG.stateUrl, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': CFG.csrf, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+            body: JSON.stringify({ state: state }),
+            credentials: 'same-origin',
+            keepalive: true,
+        }).catch(function () { /* The next checkpoint will retry. */ });
+    }
+
+    /** Leaving the page: flush typed answers and the position with requests that outlive the page. */
+    function saveOnExit() {
+        if (current < 0) return;
+        questions.forEach(function (card) { if (debounces.has(card)) saveNow(card); });
+
+        const state = stateSnapshot();
+        if (state) storeLocally(state);
+        if (state && navigator.sendBeacon) {
+            const body = new FormData();
+            body.append('_token', CFG.csrf);
+            body.append('state', JSON.stringify(state));
+            navigator.sendBeacon(CFG.stateUrl, body);
+        }
+    }
+
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') saveOnExit();
+    });
+    window.addEventListener('pagehide', saveOnExit);
 
     /* ── Timer ─────────────────────────────────────────────────────── */
 
@@ -44,15 +305,17 @@
     function clearTimer() {
         clearInterval(timerHandle);
         timerHandle = null;
+        currentDeadline = null;
         timerEl.textContent = '--:--';
         timerEl.classList.remove('det-timer-low');
     }
 
     function runUntil(deadline, onExpire) {
         clearInterval(timerHandle);
+        currentDeadline = deadline;
 
         const tick = function () {
-            const left = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+            const left = remainingSec(deadline);
             renderTime(left);
             if (left === 0) {
                 clearInterval(timerHandle);
@@ -99,9 +362,12 @@
             button.disabled = !audio.paused || left <= 0;
             label.textContent = audio.paused ? (plays ? 'Play again' : 'Play audio') : 'Playing…';
             if (maxPlays !== Infinity) {
-                remaining.textContent = 'Plays left: ' + left;
+                remaining.textContent = 'Plays left: ' + Math.max(0, left);
             }
         }
+
+        wrap.getPlays = function () { return plays; };
+        wrap.setPlays = function (n) { plays = Math.max(0, parseInt(n, 10) || 0); refresh(); };
 
         wrap.playClip = function () {
             if (plays >= maxPlays || !audio.paused) return;
@@ -124,9 +390,10 @@
         refresh();
     }
 
+    /** Autoplay only clips that have not been played yet, so a resumed question does not use up a play. */
     function startAutoplay(root) {
         root.querySelectorAll('[data-role="audio"][data-autoplay]').forEach(function (wrap) {
-            if (wrap.offsetParent !== null) wrap.playClip();
+            if (wrap.offsetParent !== null && wrap.getPlays() === 0) wrap.playClip();
         });
     }
 
@@ -165,6 +432,8 @@
     }
 
     function setupRecorder(wrap) {
+        const card     = wrap.closest('.det-question');
+        const turnEl   = wrap.closest('[data-role="turn"]');
         const startBtn = wrap.querySelector('[data-role="record-start"]');
         const stopBtn  = wrap.querySelector('[data-role="record-stop"]');
         const status   = wrap.querySelector('[data-role="record-status"]');
@@ -206,8 +475,13 @@
                 playback.style.display = '';
                 startBtn.disabled = false;
                 stopBtn.disabled = true;
-                status.textContent = 'Recording captured. Record again to replace it.';
+                status.textContent = 'Saving your recording…';
                 activeRecorder = null;
+
+                const turn = turnEl ? stepsOf(card).indexOf(turnEl) + 1 : null;
+                saveRecording(card, blob, turn).then(function () {
+                    status.textContent = 'Recording saved. Record again to replace it.';
+                });
             });
 
             recorder.start();
@@ -236,7 +510,23 @@
         const passage = card.querySelector('[data-role="passage"]');
         const preview = card.querySelector('[data-role="highlight-preview"]');
         const clear   = card.querySelector('[data-role="highlight-clear"]');
-        const empty   = preview.textContent;
+        const empty   = preview.dataset.empty;
+
+        // Restore a saved highlight, re-finding the text if the offsets no longer match.
+        if (preview.dataset.saved) {
+            try {
+                const saved = JSON.parse(preview.dataset.saved);
+                const text  = passage.textContent;
+                if (text.slice(saved.start, saved.end) !== saved.text) {
+                    saved.start = text.indexOf(saved.text);
+                    saved.end   = saved.start + saved.text.length;
+                }
+                if (saved.start >= 0) {
+                    card.highlight = saved;
+                    renderHighlight(passage, saved);
+                }
+            } catch (e) { /* Ignore an unreadable saved value. */ }
+        }
 
         function capture() {
             const sel = window.getSelection();
@@ -258,6 +548,7 @@
             preview.textContent = value;
             sel.removeAllRanges();
             renderHighlight(passage, card.highlight);
+            saveNow(card);
         }
 
         passage.addEventListener('mouseup', capture);
@@ -266,6 +557,7 @@
             card.highlight = null;
             preview.textContent = empty;
             renderHighlight(passage, null);
+            saveNow(card);
         });
     }
 
@@ -285,8 +577,10 @@
         return selector ? Array.from(card.querySelectorAll(selector)) : [];
     }
 
-    function enterStep(card, index) {
+    /** @param {?number} remaining seconds left when resuming, otherwise the step's full time */
+    function enterStep(card, index, remaining) {
         const steps = stepsOf(card);
+        index = Math.min(index, steps.length - 1);
         card.stepIndex = index;
 
         steps.forEach(function (step, i) {
@@ -296,6 +590,7 @@
 
         // A finished writing stage stays visible for reference but cannot be edited.
         if (card.dataset.responseType === 'interactive_writing' && index > 0) {
+            saveNow(card);
             for (let i = 0; i < index; i++) {
                 steps[i].style.display = '';
                 steps[i].querySelector('textarea').readOnly = true;
@@ -304,103 +599,50 @@
 
         const step = steps[index];
         nextLabel.textContent = index < steps.length - 1 ? 'Continue' : 'Next';
-        runFor(parseInt(step.dataset.time, 10) || 0, advance);
-        startAutoplay(step);
-    }
 
-    /* ── Response collection ───────────────────────────────────────── */
-
-    function collect(card) {
-        const value = function (selector) {
-            const el = card.querySelector(selector);
-            return el ? el.value : null;
-        };
-
-        switch (card.dataset.responseType) {
-            case 'fill_in_blanks': {
-                const blanks = {};
-                card.querySelectorAll('[data-role="blank"]').forEach(function (input) {
-                    if (input.value.trim()) blanks[input.dataset.order] = input.value.trim();
-                });
-                return Object.keys(blanks).length ? { response_blanks: blanks } : null;
-            }
-            case 'word_classification': {
-                const choice = value('[data-role="word-choice"]:checked');
-                return choice ? { response_text: choice } : null;
-            }
-            case 'mcq_single': {
-                const option = value('[data-role="option"]:checked');
-                return option ? { selected_option_ids: [parseInt(option, 10)] } : null;
-            }
-            case 'highlighting':
-                return card.highlight ? { response_highlight: card.highlight } : null;
-            case 'dictation':
-            case 'writing':
-            case 'essay': {
-                const text = (value('[data-role="text-input"]') || '').trim();
-                return text ? { response_text: text } : null;
-            }
-            case 'interactive_writing': {
-                const texts = Array.from(card.querySelectorAll('[data-role="stage-text"]')).map(function (t) { return t.value.trim(); });
-                return texts.some(Boolean) ? { response_texts: texts } : null;
-            }
-            case 'speaking': {
-                const wrap = card.querySelector('[data-role="recorder"]');
-                return wrap.recording ? { audio_blob: wrap.recording } : null;
-            }
-            case 'interactive_speaking': {
-                const recordings = {};
-                stepsOf(card).forEach(function (turn, i) {
-                    const wrap = turn.querySelector('[data-role="recorder"]');
-                    if (wrap.recording) recordings[i + 1] = wrap.recording;
-                });
-                return Object.keys(recordings).length ? { audio_blobs: recordings } : null;
-            }
-            default:
-                return null;
+        const seconds = remaining !== undefined && remaining !== null ? remaining : (parseInt(step.dataset.time, 10) || 0);
+        if (remaining === 0) {
+            setTimeout(advance, 0);
+            return;
         }
-    }
-
-    const responses = {}; // mapping id => collected response
-
-    /** Answer saving is not implemented yet. Responses stay in memory for this page view. */
-    function persistAnswer(mappingId, response) {
-        responses[mappingId] = response;
-        document.getElementById('detAnsweredCount').textContent = Object.keys(responses).length;
+        runFor(seconds, advance);
+        startAutoplay(step);
+        saveState();
     }
 
     /* ── Navigation ────────────────────────────────────────────────── */
 
     function leave(card) {
-        const store = function () {
-            const response = collect(card);
-            if (response) persistAnswer(card.dataset.mappingId, response);
-        };
-
         stopAudio(card);
-
-        // A recording only becomes available after the recorder's asynchronous stop event.
-        if (activeRecorder && activeRecorder.state === 'recording') {
-            activeRecorder.addEventListener('stop', function () { setTimeout(store, 0); });
-            stopRecording();
-        } else {
-            store();
-        }
+        // A recording in progress is saved by the recorder's stop handler.
+        stopRecording();
+        saveNow(card);
     }
 
     function showFinish() {
         current = questions.length;
+        finished = true;
         clearTimer();
         releaseMicrophone();
+        clearInterval(stateTimer);
+        questions.forEach(function (q) { q.style.display = 'none'; });
+        overview.style.display = 'none';
         nav.style.display = 'none';
         progress.style.display = 'none';
         pill.textContent = 'Finished';
+        refreshAnsweredCount();
         finish.style.display = '';
+        saveState();
     }
 
-    function show(index) {
+    /**
+     * @param {number} index
+     * @param {{step?: number, remaining?: ?number, plays?: number[]}} [resume]
+     */
+    function show(index, resume) {
         const card = questions[index];
         current = index;
+        resume = resume || {};
 
         questions.forEach(function (q, i) { q.style.display = i === index ? '' : 'none'; });
         pill.textContent = card.dataset.section || '';
@@ -409,9 +651,14 @@
         window.scrollTo(0, 0);
         preloadAudio(questions[index + 1]);
 
+        (resume.plays || []).forEach(function (n, i) {
+            const wrap = card.querySelectorAll('[data-role="audio"]')[i];
+            if (wrap) wrap.setPlays(n);
+        });
+
         const steps = stepsOf(card);
         if (steps.length) {
-            enterStep(card, 0);
+            enterStep(card, resume.step || 0, resume.remaining);
             return;
         }
 
@@ -421,11 +668,16 @@
                 groupDeadlines[id] = Date.now() + parseInt(card.dataset.groupLimit, 10) * 1000;
             }
             runUntil(groupDeadlines[id], advance);
+        } else if (resume.remaining === 0 && parseInt(card.dataset.answerTime, 10) > 0) {
+            setTimeout(advance, 0); // Its time ran out before the student left.
+            return;
         } else {
-            runFor(parseInt(card.dataset.answerTime, 10) || 0, advance);
+            const own = parseInt(card.dataset.answerTime, 10) || 0;
+            runFor(resume.remaining !== undefined && resume.remaining !== null ? resume.remaining : own, advance);
         }
 
         startAutoplay(card);
+        saveState();
     }
 
     /** Move on one step: the next stage or turn if there is one, otherwise the next question. */
@@ -450,9 +702,34 @@
         if (next < questions.length) {
             show(next);
         } else {
-            questions.forEach(function (q) { q.style.display = 'none'; });
             showFinish();
         }
+    }
+
+    function begin() {
+        overview.style.display = 'none';
+        nav.style.display = '';
+        progress.style.display = '';
+        stateTimer = setInterval(saveState, STATE_SAVE_EVERY_MS);
+
+        const state = newestState();
+        const index = state ? questions.findIndex(function (q) { return q.dataset.mappingId === String(state.mapping_id); }) : -1;
+
+        if (index < 0) {
+            show(0);
+            return;
+        }
+
+        Object.keys(state.groups || {}).forEach(function (id) {
+            groupDeadlines[id] = Date.now() + state.groups[id] * 1000;
+        });
+
+        if (state.finished) {
+            showFinish();
+            return;
+        }
+
+        show(index, { step: state.step, remaining: state.remaining, plays: state.plays });
     }
 
     document.addEventListener('click', function (e) {
@@ -460,10 +737,7 @@
         if (!btn) return;
 
         if (btn.dataset.detAction === 'begin') {
-            overview.style.display = 'none';
-            nav.style.display = '';
-            progress.style.display = '';
-            show(0);
+            begin();
         } else if (btn.dataset.detAction === 'next') {
             advance();
         }
@@ -477,13 +751,32 @@
         setupHighlight(preview.closest('.det-question'));
     });
 
-    // Yes/No word tasks move on as soon as the student chooses.
-    document.querySelectorAll('[data-role="word-choice"]').forEach(function (radio) {
-        radio.addEventListener('change', function () {
-            const card = radio.closest('.det-question');
-            setTimeout(function () {
-                if (questions[current] === card) advance();
-            }, AUTO_ADVANCE_DELAY_MS);
+    // What is already on the page counts as saved, so untouched questions send nothing.
+    questions.forEach(function (card) {
+        const payload = payloadOf(card);
+        if (payload) lastSent.set(card, JSON.stringify(payload));
+    });
+
+    // Choices save at once; Yes/No word tasks then move on by themselves.
+    questions.forEach(function (card) {
+        card.querySelectorAll('[data-role="option"]').forEach(function (radio) {
+            radio.addEventListener('change', function () { saveNow(card); });
+        });
+        card.querySelectorAll('[data-role="word-choice"]').forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                saveNow(card);
+                setTimeout(function () {
+                    if (questions[current] === card) advance();
+                }, AUTO_ADVANCE_DELAY_MS);
+            });
+        });
+        card.querySelectorAll('[data-role="blank"]').forEach(function (input) {
+            input.addEventListener('input', function () { saveSoon(card, BLANK_SAVE_DELAY_MS); });
+            input.addEventListener('blur', function () { saveNow(card); });
+        });
+        card.querySelectorAll('[data-role="text-input"], [data-role="stage-text"]').forEach(function (textarea) {
+            textarea.addEventListener('input', function () { saveSoon(card, TEXT_SAVE_DELAY_MS); });
+            textarea.addEventListener('blur', function () { saveNow(card); });
         });
     });
 
@@ -499,4 +792,21 @@
         textarea.addEventListener('input', update);
         update();
     });
+
+    // A position saved only in this browser still means the student is resuming.
+    const resumeState = newestState();
+    const beginBtn    = document.querySelector('[data-det-action="begin"]');
+    if (resumeState && resumeState.mapping_id && beginBtn && !CFG.state) {
+        beginBtn.firstChild.textContent = 'Resume test ';
+    }
+
+    // The local copy is no longer needed once the test is submitted.
+    const submitForm = document.getElementById('detSubmitForm');
+    if (submitForm) {
+        submitForm.addEventListener('submit', function () {
+            try { localStorage.removeItem(LOCAL_KEY); } catch (e) { /* ignore */ }
+        });
+    }
+
+    refreshAnsweredCount();
 })();

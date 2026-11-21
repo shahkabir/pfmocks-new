@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Duolingo student recordings
+/public/data/audio/duolingo/answers/

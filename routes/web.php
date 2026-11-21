@@ -69,6 +69,8 @@ Route::middleware('auth')->group(function(){
         [\App\Http\Controllers\Duolingo\DuolingoExamController::class, 'play'])->name('duolingo.exam.play');
     Route::post('/duolingo/exam/attempt/{attempt}/answer',
         [\App\Http\Controllers\Duolingo\DuolingoExamController::class, 'saveAnswer'])->name('duolingo.exam.answer');
+    Route::post('/duolingo/exam/attempt/{attempt}/state',
+        [\App\Http\Controllers\Duolingo\DuolingoExamController::class, 'saveState'])->name('duolingo.exam.state');
     Route::post('/duolingo/exam/attempt/{attempt}/submit',
         [\App\Http\Controllers\Duolingo\DuolingoExamController::class, 'submit'])->name('duolingo.exam.submit');
     Route::get ('/duolingo/exam/attempt/{attempt}/result',
@@ -137,6 +139,17 @@ Route::middleware(['auth', 'evaluator'])
         Route::post('/evaluations/{id}',
             [\App\Http\Controllers\Evaluator\EvaluationController::class, 'update'])
             ->name('evaluations.update');
+
+        // Duolingo writing & speaking review
+        Route::get ('/duolingo',
+            [\App\Http\Controllers\Duolingo\DuolingoEvaluationController::class, 'index'])
+            ->name('duolingo.index');
+        Route::get ('/duolingo/{evaluation}',
+            [\App\Http\Controllers\Duolingo\DuolingoEvaluationController::class, 'show'])
+            ->name('duolingo.show');
+        Route::post('/duolingo/{evaluation}',
+            [\App\Http\Controllers\Duolingo\DuolingoEvaluationController::class, 'update'])
+            ->name('duolingo.update');
     });
 
 Route::get('/ielts-writing',function(){

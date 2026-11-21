@@ -5,17 +5,20 @@ namespace App\Services\Duolingo;
 use App\Models\Duolingo\DuolingoAnswer;
 use App\Models\Duolingo\DuolingoAttempt;
 use App\Models\Duolingo\DuolingoModule;
+use App\Models\Duolingo\DuolingoModuleWiseQuestion;
 use App\Models\Module\Module;
 use App\Repositories\Interfaces\Duolingo\DuolingoAnswerRepositoryInterface;
 use App\Repositories\Interfaces\Duolingo\DuolingoAttemptRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class DuolingoExamService
 {
     public function __construct(
         private readonly DuolingoAttemptRepositoryInterface $attempts,
         private readonly DuolingoAnswerRepositoryInterface  $answers,
-        private readonly DuolingoGradingService             $grading,
+        private readonly DuolingoAnswerScorer               $scorer,
+        private readonly DuolingoEvaluationService          $evaluations,
     ) {}
 
     /** Return (or create) the in-progress attempt for the given user + module. */
@@ -25,10 +28,11 @@ class DuolingoExamService
         if ($existing) return $existing;
 
         return $this->attempts->create([
-            'user_id'    => $userId,
-            'module_id'  => $moduleId,
-            'status'     => DuolingoAttempt::STATUS_IN_PROGRESS,
-            'started_at' => now(),
+            'user_id'          => $userId,
+            'module_id'        => $moduleId,
+            'status'           => DuolingoAttempt::STATUS_IN_PROGRESS,
+            'started_at'       => now(),
+            'last_activity_at' => now(),
         ]);
     }
 
@@ -62,30 +66,54 @@ class DuolingoExamService
             ->all();
     }
 
-    /** Close the attempt and store the grading report (raw + estimated). */
-    public function submit(int $attemptId): DuolingoAttempt
+    /** An active question of the attempt's own module, or null. */
+    public function findMapping(DuolingoAttempt $attempt, int $mappingId): ?DuolingoModuleWiseQuestion
     {
-        /** @var DuolingoAttempt $attempt */
-        $attempt = $this->attempts->find($attemptId);
+        return DuolingoModuleWiseQuestion::where('id', $mappingId)
+            ->where('is_active', true)
+            ->whereHas('duolingoModule', fn ($q) => $q->where('module_id', $attempt->module_id))
+            ->with(['question.type', 'question.options', 'question.blanks', 'question.highlights', 'question.group'])
+            ->first();
+    }
 
-        $answers = $attempt->answers()->with('question.type.section')->get();
-        $report  = $this->grading->report($answers);
+    /**
+     * Stores a response and marks it straight away when it is objective.
+     * $payload holds only the columns for this question's response type.
+     */
+    public function saveAnswer(DuolingoAttempt $attempt, DuolingoModuleWiseQuestion $mapping, array $payload): DuolingoAnswer
+    {
+        return DB::transaction(function () use ($attempt, $mapping, $payload) {
+            $answer = $this->answers->upsertForMapping(
+                $attempt->id,
+                $mapping->id,
+                (int) $mapping->duolingo_question_id,
+                $payload,
+            );
 
-        $attempt->update([
-            'status'              => DuolingoAttempt::STATUS_COMPLETED,
-            'ended_at'            => now(),
-            'raw_scores'          => $report['raw'],
-            'reading_score'       => $report['individual']['reading']   ?? null,
-            'writing_score'       => $report['individual']['writing']   ?? null,
-            'listening_score'     => $report['individual']['listening'] ?? null,
-            'speaking_score'      => $report['individual']['speaking']  ?? null,
-            'literacy_score'      => $report['integrated']['literacy']      ?? null,
-            'comprehension_score' => $report['integrated']['comprehension'] ?? null,
-            'conversation_score'  => $report['integrated']['conversation']  ?? null,
-            'production_score'    => $report['integrated']['production']    ?? null,
-            'overall_score'       => $report['overall'],
-        ]);
+            $answer->update($this->scorer->score($mapping->question, $answer));
+            $attempt->update(['last_activity_at' => now()]);
 
-        return $attempt->fresh();
+            return $answer->fresh();
+        });
+    }
+
+    /** Remembers where the student is, so a refresh or a later visit resumes there. */
+    public function saveState(DuolingoAttempt $attempt, array $state): void
+    {
+        $attempt->update(['state' => $state, 'last_activity_at' => now()]);
+    }
+
+    /** Closes the attempt and sends writing and speaking to an evaluator. */
+    public function submit(DuolingoAttempt $attempt): DuolingoAttempt
+    {
+        return DB::transaction(function () use ($attempt) {
+            $attempt->update([
+                'status'           => DuolingoAttempt::STATUS_COMPLETED,
+                'ended_at'         => now(),
+                'last_activity_at' => now(),
+            ]);
+
+            return $this->evaluations->open($attempt->fresh());
+        });
     }
 }

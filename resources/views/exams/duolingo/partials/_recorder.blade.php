@@ -7,7 +7,7 @@
     <button type="button" class="btn btn-outline-secondary" data-role="record-stop" disabled>
         <i class="bi bi-stop-fill me-1"></i>Stop
     </button>
-    <span class="small text-muted" data-role="record-status">Click Record when you are ready.</span>
+    <span class="small text-muted" data-role="record-status">{{ ($savedUrl ?? null) ? 'Your recording is saved. Record again to replace it.' : 'Click Record when you are ready.' }}</span>
     <audio controls class="det-playback" data-role="playback"
            @if($savedUrl ?? null) src="{{ asset(ltrim($savedUrl, '/')) }}" @else style="display:none;" @endif></audio>
 </div>
