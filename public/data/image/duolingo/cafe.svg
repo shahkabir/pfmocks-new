@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="People in a busy café while a barista makes coffee">
+  <rect width="800" height="500" fill="#f6ead8"/>
+  <rect y="410" width="800" height="90" fill="#a9743d"/>
+  <rect x="40" y="40" width="300" height="150" fill="#bfe3f5" stroke="#6b4423" stroke-width="10"/>
+  <path d="M190 40v150M40 115h300" stroke="#6b4423" stroke-width="6"/>
+  <rect x="420" y="50" width="340" height="90" rx="6" fill="#2c3e50"/>
+  <g fill="#fff" font-family="Arial, sans-serif" font-size="18"><text x="440" y="82">COFFEE</text><text x="440" y="112">TEA</text><text x="600" y="82">CAKE</text><text x="600" y="112">JUICE</text></g>
+  <rect x="440" y="250" width="320" height="30" fill="#6b4423"/><rect x="440" y="280" width="320" height="130" fill="#8a5a2b"/>
+  <rect x="660" y="190" width="70" height="60" rx="6" fill="#7f8c8d"/><rect x="676" y="235" width="22" height="15" fill="#333"/>
+  <g>
+    <circle cx="590" cy="190" r="26" fill="#e2b08a"/><path d="M564 186a26 26 0 0 1 52 0z" fill="#4a2c17"/>
+    <path d="M555 250v-20a35 30 0 0 1 70 0v20z" fill="#16a085"/>
+    <path d="M565 230h50v20h-50z" fill="#ecf0f1"/>
+  </g>
+  <g>
+    <rect x="90" y="330" width="160" height="16" rx="4" fill="#6b4423"/><rect x="164" y="346" width="12" height="64" fill="#6b4423"/>
+    <rect x="128" y="312" width="22" height="18" rx="3" fill="#fff"/><rect x="190" y="312" width="22" height="18" rx="3" fill="#fff"/>
+    <circle cx="70" cy="270" r="24" fill="#8d5a3b"/><path d="M46 266a24 24 0 0 1 48 0z" fill="#111"/>
+    <path d="M40 410v-90a30 36 0 0 1 60 0v90z" fill="#c0392b"/>
+    <circle cx="275" cy="270" r="24" fill="#f0c9a0"/><path d="M251 275a26 28 0 1 1 48 0v20h-10v-24a14 14 0 0 0-28 0v24h-10z" fill="#b7791f"/>
+    <path d="M245 410v-90a30 36 0 0 1 60 0v90z" fill="#8e44ad"/>
+  </g>
+  <g>
+    <circle cx="370" cy="300" r="22" fill="#c68b5e"/><path d="M348 296a22 22 0 0 1 44 0z" fill="#333"/>
+    <path d="M342 410v-70a28 32 0 0 1 56 0v70z" fill="#2980b9"/>
+    <rect x="396" y="350" width="34" height="24" rx="3" fill="#34495e"/>
+  </g>
+</svg>

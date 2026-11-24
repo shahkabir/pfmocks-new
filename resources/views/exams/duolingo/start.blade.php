@@ -49,7 +49,8 @@
                     <tr>
                         <td>{{ $dm->section?->name }}</td>
                         <td class="text-center">{{ $dm->moduleQuestions->count() }}</td>
-                        <td class="text-center">{{ $dm->section?->time_allowed_minutes ? $dm->section->time_allowed_minutes . ' min' : '—' }}</td>
+                        @php $minutes = $dm->time_allowed_minutes ?? $dm->section?->time_allowed_minutes; @endphp
+                        <td class="text-center">{{ $minutes ? $minutes . ' min' : '—' }}</td>
                     </tr>
                 @endforeach
             </tbody>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Travellers with suitcases in an airport hall, with a plane outside">
+  <rect width="800" height="500" fill="#e8edf1"/>
+  <rect x="0" y="40" width="800" height="230" fill="#a9d6f5"/>
+  <g stroke="#7f8c8d" stroke-width="10"><path d="M0 40h800M0 270h800M200 40v230M400 40v230M600 40v230"/></g>
+  <g fill="#fff">
+    <path d="M420 150h230l40 -20h20l-20 40h-270a20 20 0 0 1 0-20z"/>
+    <path d="M520 160l-50 60h30l70-60zM530 150l-30-40h25l50 40z"/>
+  </g>
+  <rect x="40" y="70" width="140" height="70" rx="5" fill="#1c2833"/>
+  <g fill="#f1c40f" font-family="Arial, sans-serif" font-size="16"><text x="52" y="98">DEPARTURES</text><text x="52" y="124">GATE 12</text></g>
+  <rect y="270" width="800" height="230" fill="#d5dbdb"/>
+  <g>
+    <circle cx="160" cy="300" r="26" fill="#e2b08a"/><path d="M134 296a26 26 0 0 1 52 0z" fill="#4a2c17"/>
+    <path d="M125 460v-110a35 40 0 0 1 70 0v110z" fill="#2980b9"/>
+    <rect x="205" y="380" width="56" height="76" rx="8" fill="#c0392b"/><path d="M222 380v-26h22v26" fill="none" stroke="#333" stroke-width="5"/>
+    <circle cx="214" cy="462" r="6" fill="#333"/><circle cx="252" cy="462" r="6" fill="#333"/>
+  </g>
+  <g>
+    <circle cx="420" cy="310" r="24" fill="#8d5a3b"/><path d="M394 314a26 28 0 1 1 52 0v22h-10v-24a16 16 0 0 0-32 0v24h-10z" fill="#111"/>
+    <path d="M388 470v-100a32 38 0 0 1 64 0v100z" fill="#16a085"/>
+    <rect x="345" y="400" width="36" height="56" rx="6" fill="#8e44ad"/>
+  </g>
+  <g>
+    <circle cx="640" cy="305" r="25" fill="#c68b5e"/><path d="M615 301a25 25 0 0 1 50 0z" fill="#555"/>
+    <path d="M606 470v-105a34 38 0 0 1 68 0v105z" fill="#e67e22"/>
+    <rect x="690" y="410" width="60" height="50" rx="6" fill="#34495e"/>
+  </g>
+</svg>

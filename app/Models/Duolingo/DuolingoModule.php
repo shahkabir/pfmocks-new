@@ -17,6 +17,7 @@ class DuolingoModule extends Model
     protected $fillable = [
         'module_id',
         'duolingo_section_id',
+        'time_allowed_minutes',
     ];
 
     public function module(): BelongsTo

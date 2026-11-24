@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="A teacher at a whiteboard while students listen at their desks">
+  <rect width="800" height="500" fill="#eef3e2"/>
+  <rect y="420" width="800" height="80" fill="#c9a77c"/>
+  <rect x="200" y="40" width="420" height="200" rx="6" fill="#fff" stroke="#7f8c8d" stroke-width="10"/>
+  <g stroke="#2980b9" stroke-width="5" fill="none"><path d="M240 90h150"/><path d="M240 130h220"/><path d="M240 170h120"/></g>
+  <circle cx="520" cy="140" r="40" fill="none" stroke="#c0392b" stroke-width="5"/>
+  <rect x="40" y="60" width="110" height="140" fill="#bfe3f5" stroke="#fff" stroke-width="8"/>
+  <g>
+    <circle cx="680" cy="200" r="30" fill="#8d5a3b"/><path d="M650 195a30 30 0 0 1 60 0z" fill="#2c1b10"/>
+    <path d="M640 420v-150a40 45 0 0 1 80 0v150z" fill="#34495e"/>
+    <path d="M645 270l-40-80" stroke="#8d5a3b" stroke-width="15" stroke-linecap="round"/>
+  </g>
+  <g id="desk">
+    <rect x="60" y="360" width="150" height="16" fill="#6b4423"/><rect x="70" y="376" width="12" height="44" fill="#6b4423"/><rect x="188" y="376" width="12" height="44" fill="#6b4423"/>
+    <rect x="110" y="346" width="40" height="14" fill="#fff"/>
+  </g>
+  <use href="#desk" x="200"/><use href="#desk" x="400"/>
+  <g>
+    <circle cx="135" cy="290" r="22" fill="#e2b08a"/><path d="M113 286a22 22 0 0 1 44 0z" fill="#4a2c17"/>
+    <path d="M105 360v-36a30 30 0 0 1 60 0v36z" fill="#e67e22"/>
+  </g>
+  <g>
+    <circle cx="335" cy="290" r="22" fill="#6e4a33"/><path d="M311 294a24 26 0 1 1 48 0v18h-10v-22a14 14 0 0 0-28 0v22h-10z" fill="#111"/>
+    <path d="M305 360v-36a30 30 0 0 1 60 0v36z" fill="#27ae60"/>
+  </g>
+  <g>
+    <circle cx="535" cy="290" r="22" fill="#f0c9a0"/><path d="M513 286a22 22 0 0 1 44 0z" fill="#b7791f"/>
+    <path d="M505 360v-36a30 30 0 0 1 60 0v36z" fill="#2980b9"/>
+    <path d="M555 330l20-60" stroke="#f0c9a0" stroke-width="12" stroke-linecap="round"/>
+  </g>
+</svg>
